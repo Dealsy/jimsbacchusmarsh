@@ -104,7 +104,11 @@ export function OfferStackSection({ page }: OfferStackSectionProps) {
         ) : null}
 
         <div className="text-center">
-          <LinkButton href="#quote-form" size="lg">
+          <LinkButton
+            href="#quote-form"
+            size="lg"
+            className="h-auto px-8 py-3.5 text-lg font-semibold md:text-xl"
+          >
             {page.ctaLabel}
           </LinkButton>
         </div>

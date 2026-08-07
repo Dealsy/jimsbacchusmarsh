@@ -3,7 +3,8 @@
 import { Resend } from "resend";
 
 import {
-  createLeadFormSchema,
+  extractLeadFormValues,
+  validateLeadForm,
   type LeadFormFieldErrors,
   type LeadFormValues,
 } from "@/lib/validations/lead-form";
@@ -41,8 +42,14 @@ async function submitToLeadOs(
   const firstName = nameParts[0] ?? values.name;
   const lastName = nameParts.slice(1).join(" ") || undefined;
 
+  const locationLabel = values.suburb?.trim() || values.address;
+
   const estimatedScope = [
+    `Address: ${values.address}`,
     `Surfaces: ${values.surfaces.join(", ")}`,
+    values.otherDescription
+      ? `Other details: ${values.otherDescription}`
+      : undefined,
     `Page: ${values.pageSlug}`,
     photoBase64 ? "Customer attached a photo with the form." : undefined,
   ]
@@ -59,7 +66,7 @@ async function submitToLeadOs(
       firstName,
       lastName,
       phone: values.phone,
-      suburb: values.suburb,
+      suburb: locationLabel,
       serviceType: values.leadServiceType,
       propertyType: "residential",
       estimatedScope,
@@ -89,13 +96,19 @@ async function submitToResend(
 
   const resend = new Resend(resendApiKey);
 
+  const locationLabel = values.suburb?.trim() || values.address;
+
   const plainText = [
     "New softwash quote request",
     "",
     `Name: ${values.name}`,
     `Phone: ${values.phone}`,
-    `Suburb: ${values.suburb}`,
+    `Address: ${values.address}`,
+    values.suburb ? `Suburb: ${values.suburb}` : "",
     `Surfaces: ${values.surfaces.join(", ")}`,
+    values.otherDescription
+      ? `Other details: ${values.otherDescription}`
+      : "",
     `Service: ${values.leadServiceType}`,
     `Page: ${values.pageSlug}`,
     photoBase64 ? "Photo attached." : "",
@@ -116,14 +129,24 @@ async function submitToResend(
   const { error } = await resend.emails.send({
     from: fromEmail,
     to: toEmail,
-    subject: `Softwash quote — ${values.name} — ${values.suburb}`,
+    subject: `Softwash quote — ${values.name} — ${locationLabel}`,
     text: plainText,
     html: `
       <h2>New softwash quote request</h2>
       <p><strong>Name:</strong> ${escapeHtml(values.name)}</p>
       <p><strong>Phone:</strong> ${escapeHtml(values.phone)}</p>
-      <p><strong>Suburb:</strong> ${escapeHtml(values.suburb)}</p>
+      <p><strong>Address:</strong> ${escapeHtml(values.address)}</p>
+      ${
+        values.suburb
+          ? `<p><strong>Suburb:</strong> ${escapeHtml(values.suburb)}</p>`
+          : ""
+      }
       <p><strong>Surfaces:</strong> ${escapeHtml(values.surfaces.join(", "))}</p>
+      ${
+        values.otherDescription
+          ? `<p><strong>Other details:</strong> ${escapeHtml(values.otherDescription)}</p>`
+          : ""
+      }
       <p><strong>Service:</strong> ${escapeHtml(values.leadServiceType)}</p>
       <p><strong>Page:</strong> ${escapeHtml(values.pageSlug)}</p>
     `,
@@ -143,35 +166,20 @@ export async function submitLead(
   surfaceOptions: readonly string[],
 ): Promise<SubmitLeadResult> {
   const surfacesRaw = formData.getAll("surfaces").map(String);
-  const rawValues = {
-    name: String(formData.get("name") ?? ""),
-    phone: String(formData.get("phone") ?? ""),
-    suburb: String(formData.get("suburb") ?? ""),
-    surfaces: surfacesRaw,
-    website: String(formData.get("website") ?? ""),
-    pageSlug: String(formData.get("pageSlug") ?? ""),
-    leadServiceType: String(formData.get("leadServiceType") ?? ""),
-  };
+  const rawValues = extractLeadFormValues(formData, surfacesRaw);
+  const validation = validateLeadForm(rawValues, surfaceOptions);
 
-  const schema = createLeadFormSchema(surfaceOptions);
-  const parsed = schema.safeParse(rawValues);
-
-  if (!parsed.success) {
-    const fieldErrors: LeadFormFieldErrors = {};
-    for (const issue of parsed.error.issues) {
-      const field = issue.path[0];
-      if (typeof field === "string" && !(field in fieldErrors)) {
-        fieldErrors[field as keyof LeadFormValues] = issue.message;
-      }
-    }
+  if (!validation.success) {
     return {
       success: false,
-      error: "Please fix the errors in the form.",
-      fieldErrors,
+      error: "Please fix the errors below.",
+      fieldErrors: validation.fieldErrors,
     };
   }
 
-  if (parsed.data.website) {
+  const values = validation.data;
+
+  if (values.website) {
     return { success: true };
   }
 
@@ -204,9 +212,9 @@ export async function submitLead(
   }
 
   const [leadOsOk, resendOk] = await Promise.all([
-    submitToLeadOs(parsed.data, photoBase64, photoMimeType),
+    submitToLeadOs(values, photoBase64, photoMimeType),
     submitToResend(
-      parsed.data,
+      values,
       photoBase64,
       photoMimeType,
       photoFileName,

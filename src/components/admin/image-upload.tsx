@@ -14,6 +14,7 @@ type ImageUploadProps = {
   readonly currentUrl?: string | null;
   readonly storageId?: Id<"_storage">;
   readonly onUploaded: (storageId: Id<"_storage">) => void;
+  readonly onUploadingChange?: (uploading: boolean) => void;
 };
 
 export async function uploadToConvex(
@@ -39,6 +40,7 @@ export function ImageUpload({
   currentUrl,
   storageId,
   onUploaded,
+  onUploadingChange,
 }: ImageUploadProps) {
   const inputRef = useRef<HTMLInputElement>(null);
   const generateUploadUrl = useMutation(api.landingPages.generateUploadUrl);
@@ -50,8 +52,14 @@ export function ImageUpload({
   const [error, setError] = useState<string | null>(null);
   const [dragOver, setDragOver] = useState(false);
   const [localPreviewUrl, setLocalPreviewUrl] = useState<string | null>(null);
+  const [awaitingStorageId, setAwaitingStorageId] =
+    useState<Id<"_storage"> | null>(null);
 
   const displayUrl = localPreviewUrl ?? storageUrl ?? currentUrl ?? null;
+
+  useEffect(() => {
+    onUploadingChange?.(uploading);
+  }, [onUploadingChange, uploading]);
 
   useEffect(() => {
     return () => {
@@ -62,11 +70,19 @@ export function ImageUpload({
   }, [localPreviewUrl]);
 
   useEffect(() => {
-    if (localPreviewUrl && storageUrl) {
-      URL.revokeObjectURL(localPreviewUrl);
-      setLocalPreviewUrl(null);
+    if (
+      !localPreviewUrl ||
+      !storageUrl ||
+      !storageId ||
+      awaitingStorageId !== storageId
+    ) {
+      return;
     }
-  }, [localPreviewUrl, storageUrl]);
+
+    URL.revokeObjectURL(localPreviewUrl);
+    setLocalPreviewUrl(null);
+    setAwaitingStorageId(null);
+  }, [awaitingStorageId, localPreviewUrl, storageId, storageUrl]);
 
   function setInstantPreview(file: File) {
     const blobUrl = URL.createObjectURL(file);
@@ -87,13 +103,22 @@ export function ImageUpload({
       const result = await generateUploadUrl({});
       if (!result.success) {
         setError(result.error ?? "Could not upload");
+        setAwaitingStorageId(null);
         return;
       }
 
       const uploadedStorageId = await uploadToConvex(file, result.uploadUrl);
+      setAwaitingStorageId(uploadedStorageId);
       onUploaded(uploadedStorageId);
     } catch {
       setError("Upload failed. Try again.");
+      setAwaitingStorageId(null);
+      setLocalPreviewUrl((previous) => {
+        if (previous) {
+          URL.revokeObjectURL(previous);
+        }
+        return null;
+      });
     } finally {
       setUploading(false);
       if (inputRef.current) {
@@ -126,6 +151,7 @@ export function ImageUpload({
       {displayUrl ? (
         // eslint-disable-next-line @next/next/no-img-element
         <img
+          key={displayUrl}
           src={displayUrl}
           alt=""
           className="aspect-video w-full max-w-md rounded-xl border object-cover"

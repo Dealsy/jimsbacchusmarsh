@@ -2,6 +2,7 @@
 
 import { useRef, useState, useTransition } from "react";
 
+import { AddressAutocompleteField } from "@/components/landing/address-autocomplete-field";
 import { trackGoogleConversion } from "@/components/analytics/google-ads";
 import { trackMetaLead } from "@/components/analytics/meta-pixel";
 import { Button } from "@/components/ui/button";
@@ -11,12 +12,20 @@ import {
   FieldError,
   FieldGroup,
   FieldLabel,
+  FieldLegend,
+  FieldSet,
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { submitLead } from "@/lib/actions/submit-lead";
 import { formatPhoneHref, isPlaceholderPhone } from "@/lib/phone";
 import type { PublishedLandingPage } from "@/lib/types/landing-page";
-import type { LeadFormFieldErrors } from "@/lib/validations/lead-form";
+import {
+  extractLeadFormValues,
+  OTHER_SURFACE_OPTION,
+  validateLeadForm,
+  type LeadFormFieldErrors,
+} from "@/lib/validations/lead-form";
 
 type LeadFormProps = {
   readonly page: PublishedLandingPage;
@@ -28,13 +37,41 @@ export function LeadForm({ page }: LeadFormProps) {
   const [formError, setFormError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
   const [selectedSurfaces, setSelectedSurfaces] = useState<string[]>([]);
+  const [address, setAddress] = useState("");
+  const [suburb, setSuburb] = useState("");
   const [isPending, startTransition] = useTransition();
 
+  const showOtherDescription = selectedSurfaces.includes(OTHER_SURFACE_OPTION);
+
+  function clearFieldError(field: keyof LeadFormFieldErrors) {
+    setFieldErrors((current) => {
+      if (!(field in current)) {
+        return current;
+      }
+      const next = { ...current };
+      delete next[field];
+      return next;
+    });
+  }
+
   function toggleSurface(surface: string, checked: boolean) {
+    clearFieldError("surfaces");
+    clearFieldError("otherDescription");
+
     setSelectedSurfaces((current) => {
       if (checked) {
         return [...current, surface];
       }
+
+      if (surface === OTHER_SURFACE_OPTION) {
+        const otherDescription = formRef.current?.elements.namedItem(
+          "otherDescription",
+        );
+        if (otherDescription instanceof HTMLTextAreaElement) {
+          otherDescription.value = "";
+        }
+      }
+
       return current.filter((item) => item !== surface);
     });
   }
@@ -49,6 +86,14 @@ export function LeadForm({ page }: LeadFormProps) {
       formData.append("surfaces", surface);
     }
 
+    const rawValues = extractLeadFormValues(formData, selectedSurfaces);
+    const validation = validateLeadForm(rawValues, page.surfaceOptions);
+
+    if (!validation.success) {
+      setFieldErrors(validation.fieldErrors);
+      return;
+    }
+
     startTransition(async () => {
       const result = await submitLead(formData, page.surfaceOptions);
 
@@ -56,6 +101,8 @@ export function LeadForm({ page }: LeadFormProps) {
         setSuccess(true);
         formRef.current?.reset();
         setSelectedSurfaces([]);
+        setAddress("");
+        setSuburb("");
         trackMetaLead();
         trackGoogleConversion(
           page.googleAdsId ?? process.env.NEXT_PUBLIC_GOOGLE_ADS_ID,
@@ -90,7 +137,12 @@ export function LeadForm({ page }: LeadFormProps) {
   }
 
   return (
-    <form ref={formRef} onSubmit={handleSubmit} className="space-y-6">
+    <form
+      ref={formRef}
+      onSubmit={handleSubmit}
+      noValidate
+      className="space-y-6"
+    >
       <input type="hidden" name="pageSlug" value={page.slug} />
       <input
         type="hidden"
@@ -109,7 +161,13 @@ export function LeadForm({ page }: LeadFormProps) {
       <FieldGroup>
         <Field data-invalid={Boolean(fieldErrors.name)}>
           <FieldLabel htmlFor="name">Name</FieldLabel>
-          <Input id="name" name="name" required autoComplete="name" />
+          <Input
+            id="name"
+            name="name"
+            autoComplete="name"
+            aria-invalid={Boolean(fieldErrors.name)}
+            onChange={() => clearFieldError("name")}
+          />
           {fieldErrors.name ? (
             <FieldError>{fieldErrors.name}</FieldError>
           ) : null}
@@ -121,44 +179,79 @@ export function LeadForm({ page }: LeadFormProps) {
             id="phone"
             name="phone"
             type="tel"
-            required
             autoComplete="tel"
+            aria-invalid={Boolean(fieldErrors.phone)}
+            onChange={() => clearFieldError("phone")}
           />
           {fieldErrors.phone ? (
             <FieldError>{fieldErrors.phone}</FieldError>
           ) : null}
         </Field>
 
-        <Field data-invalid={Boolean(fieldErrors.suburb)}>
-          <FieldLabel htmlFor="suburb">Suburb</FieldLabel>
-          <Input id="suburb" name="suburb" required autoComplete="address-level2" />
-          {fieldErrors.suburb ? (
-            <FieldError>{fieldErrors.suburb}</FieldError>
-          ) : null}
+        <Field data-invalid={Boolean(fieldErrors.address)}>
+          <FieldLabel htmlFor="address">Property address</FieldLabel>
+          <AddressAutocompleteField
+            id="address"
+            value={address}
+            suburb={suburb}
+            error={fieldErrors.address}
+            onChange={({ address: nextAddress, suburb: nextSuburb }) => {
+              setAddress(nextAddress);
+              setSuburb(nextSuburb);
+              clearFieldError("address");
+            }}
+          />
         </Field>
 
-        <Field data-invalid={Boolean(fieldErrors.surfaces)}>
-          <FieldLabel>Affected surface</FieldLabel>
+        <FieldSet
+          data-invalid={Boolean(fieldErrors.surfaces)}
+          className="gap-3 border-0 p-0"
+        >
+          <FieldLegend className="mb-0 px-0">Affected surface</FieldLegend>
           <div className="grid gap-3 sm:grid-cols-2">
-            {page.surfaceOptions.map((surface) => (
-              <label
-                key={surface}
-                className="flex cursor-pointer items-center gap-2 rounded-lg border p-3 has-checked:border-primary has-checked:bg-primary/5"
-              >
-                <Checkbox
-                  checked={selectedSurfaces.includes(surface)}
-                  onCheckedChange={(checked) =>
-                    toggleSurface(surface, checked === true)
-                  }
-                />
-                <span className="text-sm">{surface}</span>
-              </label>
-            ))}
+            {page.surfaceOptions.map((surface) => {
+              const surfaceId = `surface-${surface.replace(/\s+/g, "-").toLowerCase()}`;
+              return (
+                <label
+                  key={surface}
+                  htmlFor={surfaceId}
+                  className="flex cursor-pointer items-center gap-2 rounded-lg border p-3 has-checked:border-primary has-checked:bg-primary/5"
+                >
+                  <Checkbox
+                    id={surfaceId}
+                    checked={selectedSurfaces.includes(surface)}
+                    onCheckedChange={(checked) =>
+                      toggleSurface(surface, checked === true)
+                    }
+                  />
+                  <span className="text-sm">{surface}</span>
+                </label>
+              );
+            })}
           </div>
           {fieldErrors.surfaces ? (
             <FieldError>{fieldErrors.surfaces}</FieldError>
           ) : null}
-        </Field>
+        </FieldSet>
+
+        {showOtherDescription ? (
+          <Field data-invalid={Boolean(fieldErrors.otherDescription)}>
+            <FieldLabel htmlFor="otherDescription">
+              Describe the issue
+            </FieldLabel>
+            <Textarea
+              id="otherDescription"
+              name="otherDescription"
+              rows={4}
+              placeholder="Tell us what's affected and what you're seeing…"
+              aria-invalid={Boolean(fieldErrors.otherDescription)}
+              onChange={() => clearFieldError("otherDescription")}
+            />
+            {fieldErrors.otherDescription ? (
+              <FieldError>{fieldErrors.otherDescription}</FieldError>
+            ) : null}
+          </Field>
+        ) : null}
 
         <Field data-invalid={Boolean(fieldErrors.photo)}>
           <FieldLabel htmlFor="photo">
@@ -171,6 +264,8 @@ export function LeadForm({ page }: LeadFormProps) {
             type="file"
             accept="image/*"
             className="cursor-pointer file:cursor-pointer"
+            aria-invalid={Boolean(fieldErrors.photo)}
+            onChange={() => clearFieldError("photo")}
           />
           {fieldErrors.photo ? (
             <FieldError>{fieldErrors.photo}</FieldError>

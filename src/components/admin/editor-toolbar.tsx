@@ -11,6 +11,7 @@ type EditorToolbarProps = {
   readonly slug: string;
   readonly status: "draft" | "published";
   readonly saving: boolean;
+  readonly uploading?: boolean;
   readonly message: string | null;
   readonly onSave: () => void;
   readonly onPublish: () => void;
@@ -22,6 +23,7 @@ export function EditorToolbar({
   slug,
   status,
   saving,
+  uploading = false,
   message,
   onSave,
   onPublish,
@@ -72,9 +74,14 @@ export function EditorToolbar({
               Publish
             </Button>
           )}
-          <Button type="button" size="sm" onClick={onSave} disabled={saving}>
+          <Button
+            type="button"
+            size="sm"
+            onClick={onSave}
+            disabled={saving || uploading}
+          >
             <SaveIcon className="size-4" />
-            {saving ? "Saving…" : "Save"}
+            {saving ? "Saving…" : uploading ? "Uploading…" : "Save"}
           </Button>
         </div>
       </div>

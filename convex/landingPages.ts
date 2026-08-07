@@ -3,7 +3,9 @@ import { v } from "convex/values";
 import type { Doc, Id } from "./_generated/dataModel";
 import { mutation, query } from "./_generated/server";
 import type { MutationCtx } from "./_generated/server";
+import { createPageFromTemplate } from "./lib/createPageFromTemplate";
 import { describeAdminAuthFailure, requireAdmin } from "./lib/adminAuth";
+import { describeSlugError } from "./lib/slug";
 import {
   createSoftwashingSeed,
   SOFTWASHING_SLUG,
@@ -300,6 +302,64 @@ export const debugAuth = query({
       adminError: describeAdminAuthFailure(identity),
       isAdmin: (await requireAdmin(ctx)) !== null,
     };
+  },
+});
+
+export const createPage = mutation({
+  args: {
+    name: v.string(),
+    slug: v.string(),
+  },
+  returns: v.union(
+    v.object({
+      success: v.literal(true),
+      slug: v.string(),
+      pageId: v.id("landingPages"),
+    }),
+    v.object({
+      success: v.literal(false),
+      error: v.string(),
+    }),
+  ),
+  handler: async (ctx, args) => {
+    const identity = await ctx.auth.getUserIdentity();
+    const admin = await requireAdmin(ctx);
+    if (!admin) {
+      return {
+        success: false as const,
+        error: describeAdminAuthFailure(identity),
+      };
+    }
+
+    const trimmedName = args.name.trim();
+    if (!trimmedName) {
+      return { success: false as const, error: "Page name is required." };
+    }
+
+    const slug = args.slug.trim().toLowerCase();
+    const slugError = describeSlugError(slug);
+    if (slugError) {
+      return { success: false as const, error: slugError };
+    }
+
+    const existing = await ctx.db
+      .query("landingPages")
+      .withIndex("by_slug", (q) => q.eq("slug", slug))
+      .unique();
+
+    if (existing) {
+      return {
+        success: false as const,
+        error: `A page with URL /${slug} already exists.`,
+      };
+    }
+
+    const pageId = await ctx.db.insert(
+      "landingPages",
+      createPageFromTemplate(slug, trimmedName, Date.now()),
+    );
+
+    return { success: true as const, slug, pageId };
   },
 });
 

@@ -3,7 +3,7 @@
 import { useMutation, useQuery } from "convex/react";
 import { ArrowLeftIcon } from "lucide-react";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 import {
   type CloseFields,
@@ -25,6 +25,7 @@ import { StringListEditor } from "@/components/admin/fields/string-list-editor";
 import { TestimonialsEditor } from "@/components/admin/fields/testimonials-editor";
 import { ThemeEditor } from "@/components/admin/fields/theme-editor";
 import { EditorToolbar } from "@/components/admin/editor-toolbar";
+import { AdminPageEditorSkeleton } from "@/components/admin/admin-skeletons";
 import { ImageUpload } from "@/components/admin/image-upload";
 import type { EditorState, LoadedPage } from "@/components/admin/page-editor-types";
 import {
@@ -248,9 +249,19 @@ export function PageEditor({ slug }: PageEditorProps) {
   const [state, setState] = useState<EditorState | null>(null);
   const [message, setMessage] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
+  const [activeUploads, setActiveUploads] = useState(0);
   const [newBeforeId, setNewBeforeId] = useState<Id<"_storage"> | undefined>();
   const [newAfterId, setNewAfterId] = useState<Id<"_storage"> | undefined>();
   const [newGalleryLabel, setNewGalleryLabel] = useState("");
+
+  const handleUploadingChange = useCallback((uploading: boolean) => {
+    setActiveUploads((count) => {
+      if (uploading) {
+        return count + 1;
+      }
+      return Math.max(0, count - 1);
+    });
+  }, []);
 
   useEffect(() => {
     if (!page || state) {
@@ -261,7 +272,7 @@ export function PageEditor({ slug }: PageEditorProps) {
   }, [page, state]);
 
   if (page === undefined || !state) {
-    return <p className="text-muted-foreground">Loading page…</p>;
+    return <AdminPageEditorSkeleton />;
   }
 
   if (page === null) {
@@ -395,6 +406,7 @@ export function PageEditor({ slug }: PageEditorProps) {
         slug={slug}
         status={page.status}
         saving={saving}
+        uploading={activeUploads > 0}
         message={message}
         onSave={handleSave}
         onPublish={handlePublish}
@@ -598,6 +610,7 @@ export function PageEditor({ slug }: PageEditorProps) {
               label="Upload logo"
               currentUrl={page.hero.logoUrl}
               storageId={state.heroLogoStorageId}
+              onUploadingChange={handleUploadingChange}
               onUploaded={(storageId) =>
                 updateField("heroLogoStorageId", storageId)
               }
@@ -609,6 +622,7 @@ export function PageEditor({ slug }: PageEditorProps) {
               label="Upload hero image"
               currentUrl={page.hero.imageUrl}
               storageId={state.heroImageStorageId}
+              onUploadingChange={handleUploadingChange}
               onUploaded={(storageId) =>
                 updateField("heroImageStorageId", storageId)
               }
@@ -1042,11 +1056,13 @@ export function PageEditor({ slug }: PageEditorProps) {
               <ImageUpload
                 label="Before"
                 storageId={newBeforeId}
+                onUploadingChange={handleUploadingChange}
                 onUploaded={setNewBeforeId}
               />
               <ImageUpload
                 label="After"
                 storageId={newAfterId}
+                onUploadingChange={handleUploadingChange}
                 onUploaded={setNewAfterId}
               />
             </div>

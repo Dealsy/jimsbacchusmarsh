@@ -1,10 +1,11 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+import { preloadQuery } from "convex/nextjs";
 
 import { LandingPageClient } from "@/components/landing/landing-page-client";
 import { fetchPublishedPage } from "@/lib/convex-server";
-
-const RESERVED_SLUGS = new Set(["admin", "sign-in", "sign-up", "api"]);
+import { RESERVED_SLUGS } from "@/lib/slug";
+import { api } from "convex/_generated/api";
 
 type LandingSlugPageProps = {
   readonly params: Promise<{ slug: string }>;
@@ -46,5 +47,15 @@ export default async function LandingSlugPage({ params }: LandingSlugPageProps) 
     notFound();
   }
 
-  return <LandingPageClient slug={slug} />;
+  const [preloadedPage, preloadedGallery] = await Promise.all([
+    preloadQuery(api.landingPages.getPublishedBySlug, { slug }),
+    preloadQuery(api.landingPageGallery.listByPageSlug, { slug }),
+  ]);
+
+  return (
+    <LandingPageClient
+      preloadedPage={preloadedPage}
+      preloadedGallery={preloadedGallery}
+    />
+  );
 }

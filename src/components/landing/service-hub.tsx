@@ -1,6 +1,6 @@
 "use client";
 
-import { useQuery } from "convex/react";
+import { usePreloadedQuery, type Preloaded } from "convex/react";
 import Link from "next/link";
 
 import {
@@ -12,18 +12,15 @@ import {
 } from "@/components/ui/card";
 import { api } from "convex/_generated/api";
 
-export function ServiceHub() {
-  const pages = useQuery(api.landingPages.listPublished);
+type ServiceHubProps = {
+  readonly preloadedPages: Preloaded<typeof api.landingPages.listPublished>;
+};
 
-  if (pages === undefined) {
-    return (
-      <main className="flex min-h-[50vh] items-center justify-center">
-        <p className="text-muted-foreground">Loading…</p>
-      </main>
-    );
-  }
+export function ServiceHub({ preloadedPages }: ServiceHubProps) {
+  const pages = usePreloadedQuery(preloadedPages);
 
-  const businessName = pages[0]?.businessName ?? "Jim's Window & Pressure Cleaning";
+  const businessName =
+    pages[0]?.businessName ?? "Jim's Window & Pressure Cleaning";
   const serviceAreas = pages[0]?.serviceAreas ?? [];
 
   return (

@@ -20,10 +20,10 @@ export function FaqSection({ page }: FaqSectionProps) {
         <Accordion className="w-full">
           {page.faq.map((item, index) => (
             <AccordionItem key={item.question} value={`faq-${index}`}>
-              <AccordionTrigger className="text-left">
+              <AccordionTrigger className="px-5 py-5 text-left text-base md:text-lg **:data-[slot=accordion-trigger-icon]:size-5">
                 {item.question}
               </AccordionTrigger>
-              <AccordionContent className="text-muted-foreground">
+              <AccordionContent className="px-5 pb-5 text-base leading-relaxed text-muted-foreground md:text-lg md:leading-relaxed">
                 {item.answer}
               </AccordionContent>
             </AccordionItem>
