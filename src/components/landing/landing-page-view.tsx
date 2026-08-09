@@ -11,6 +11,7 @@ import { GuaranteeSection } from "@/components/landing/guarantee-section";
 import { OfferStackSection } from "@/components/landing/offer-stack-section";
 import { ProblemSection } from "@/components/landing/problem-section";
 import { ServicesGrid } from "@/components/landing/services-grid";
+import { SiteFooter } from "@/components/landing/site-footer";
 import { StickyMobileBar } from "@/components/landing/sticky-mobile-bar";
 import { TestimonialsSection } from "@/components/landing/testimonials-section";
 import { WedgeSection } from "@/components/landing/wedge-section";
@@ -33,7 +34,7 @@ export function LandingPageView({ page, gallery }: LandingPageViewProps) {
       <MetaPixel pixelId={metaPixelId} />
       <GoogleAds adsId={googleAdsId} />
       <LandingPageTheme theme={page.theme}>
-        <main className="pb-20 md:pb-0">
+        <main className="pb-32 md:pb-14">
           <Hero page={page} />
           <TrustStrip page={page} />
           <ProblemSection page={page} />
@@ -47,12 +48,8 @@ export function LandingPageView({ page, gallery }: LandingPageViewProps) {
           <FaqSection page={page} />
           <FinalCta page={page} />
           <CloseSection page={page} />
-          <footer className="border-t py-8 text-center text-sm text-muted-foreground">
-            <p>
-              {page.businessName} · {page.phone}
-            </p>
-          </footer>
         </main>
+        <SiteFooter businessName={page.businessName} phone={page.phone} />
         <StickyMobileBar phone={page.phone} ctaLabel={page.ctaLabel} />
       </LandingPageTheme>
     </>

@@ -21,7 +21,7 @@ function SectionBlock({
 
 export function LandingPageSkeleton() {
   return (
-    <main className="pb-20 md:pb-0" aria-busy="true" aria-live="polite">
+    <main className="pb-32 md:pb-14" aria-busy="true" aria-live="polite">
       <span className="sr-only">Loading page</span>
 
       <section className="bg-muted/70">
@@ -102,7 +102,9 @@ export function LandingPageSkeleton() {
         </div>
       </SectionBlock>
 
-      <footer className="border-t py-8">
+      <div className="h-12" aria-hidden />
+
+      <footer className="fixed inset-x-0 bottom-0 z-40 border-t bg-background/95 py-3 backdrop-blur">
         <Skeleton className="mx-auto h-5 w-64" />
       </footer>
     </main>
