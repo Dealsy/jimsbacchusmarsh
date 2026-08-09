@@ -1,3 +1,6 @@
+import type { api } from "convex/_generated/api";
+import type { Id } from "convex/_generated/dataModel";
+import type { FunctionReturnType } from "convex/server";
 import type {
   CloseFields,
   FaqItem,
@@ -10,9 +13,6 @@ import type {
   UrgencyFields,
 } from "@/components/admin/fields/editor-types";
 import type { LandingTheme } from "@/lib/landing-theme";
-import type { api } from "convex/_generated/api";
-import type { Id } from "convex/_generated/dataModel";
-import type { FunctionReturnType } from "convex/server";
 
 export type EditorState = {
   name: string;

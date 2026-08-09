@@ -1,11 +1,6 @@
-import { HomeIcon, BuildingIcon, Fence, LayersIcon } from "lucide-react";
+import { BuildingIcon, Fence, HomeIcon, LayersIcon } from "lucide-react";
 
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { resolveServicesSection } from "@/lib/landing-page-content";
 import type { PublishedLandingPage } from "@/lib/types/landing-page";
 

@@ -1,8 +1,7 @@
+import { MapPinIcon, ShieldCheckIcon, SparklesIcon } from "lucide-react";
 import Image from "next/image";
-import { ShieldCheckIcon, SparklesIcon, MapPinIcon } from "lucide-react";
-
-import { LinkButton } from "@/components/ui/link-button";
 import { Badge } from "@/components/ui/badge";
+import { LinkButton } from "@/components/ui/link-button";
 import type { PublishedLandingPage } from "@/lib/types/landing-page";
 
 type HeroProps = {
@@ -36,9 +35,7 @@ export function Hero({ page }: HeroProps) {
           <h1 className="font-heading text-4xl font-bold leading-tight tracking-tight md:text-5xl">
             {hero.headline}
           </h1>
-          <p className="text-lg text-white/90 md:text-xl">
-            {hero.subheadline}
-          </p>
+          <p className="text-lg text-white/90 md:text-xl">{hero.subheadline}</p>
           {hero.intrigueBullets && hero.intrigueBullets.length > 0 ? (
             <ul className="space-y-2 text-left text-sm text-white/85 md:text-base">
               {hero.intrigueBullets.map((bullet) => (
@@ -70,7 +67,10 @@ export function Hero({ page }: HeroProps) {
         </div>
         <div
           className="relative aspect-[4/3] min-h-[280px] overflow-hidden rounded-2xl border border-white/10 shadow-2xl sm:min-h-[320px] md:aspect-auto md:h-full md:min-h-[400px] lg:col-span-7"
-          style={{ backgroundColor: "color-mix(in srgb, var(--landing-hero-from) 50%, transparent)" }}
+          style={{
+            backgroundColor:
+              "color-mix(in srgb, var(--landing-hero-from) 50%, transparent)",
+          }}
         >
           {hero.imageUrl ? (
             <Image

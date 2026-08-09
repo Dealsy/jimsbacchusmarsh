@@ -1,6 +1,5 @@
-import type { FunctionReturnType } from "convex/server";
-
 import type { api } from "convex/_generated/api";
+import type { FunctionReturnType } from "convex/server";
 
 type PublishedPage = NonNullable<
   FunctionReturnType<typeof api.landingPages.getPublishedBySlug>
@@ -20,8 +19,7 @@ export type ResolvedThankYou = {
 
 const DEFAULT_THANK_YOU = {
   headline: "Thanks — we'll call you back today",
-  body:
-    "Your request is in. We'll be in touch shortly to arrange your free assessment.",
+  body: "Your request is in. We'll be in touch shortly to arrange your free assessment.",
   phonePrompt: "Need to speak with someone now?",
   nextStepsTitle: "What happens next",
 } as const;
@@ -42,8 +40,7 @@ const DEFAULT_THANK_YOU_STEPS = [
   {
     step: 3,
     title: "Clear quote upfront",
-    description:
-      "You get scope and pricing confirmed before any work begins.",
+    description: "You get scope and pricing confirmed before any work begins.",
   },
 ] as const;
 
@@ -67,8 +64,7 @@ export function resolveThankYou(page: PublishedPage): ResolvedThankYou {
   return {
     headline: thankYou?.headline?.trim() || DEFAULT_THANK_YOU.headline,
     body: thankYou?.body?.trim() || DEFAULT_THANK_YOU.body,
-    phonePrompt:
-      thankYou?.phonePrompt?.trim() || DEFAULT_THANK_YOU.phonePrompt,
+    phonePrompt: thankYou?.phonePrompt?.trim() || DEFAULT_THANK_YOU.phonePrompt,
     nextStepsTitle:
       thankYou?.nextStepsTitle?.trim() || DEFAULT_THANK_YOU.nextStepsTitle,
     nextSteps,
@@ -78,7 +74,10 @@ export function resolveThankYou(page: PublishedPage): ResolvedThankYou {
 export type ResolvedOffer = {
   readonly headline: string;
   readonly reasonWhy: string | null;
-  readonly valueItems: readonly { readonly label: string; readonly value: string | null }[];
+  readonly valueItems: readonly {
+    readonly label: string;
+    readonly value: string | null;
+  }[];
   readonly bonuses: readonly string[];
 };
 

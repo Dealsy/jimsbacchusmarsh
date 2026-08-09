@@ -39,11 +39,7 @@ export function createLeadFormSchema(surfaceOptions: readonly string[]) {
         .min(1, "Please enter your phone number")
         .min(8, "Please enter a valid phone number")
         .max(20, "Phone number is too long"),
-      suburb: z
-        .string()
-        .trim()
-        .max(80, "Suburb is too long")
-        .optional(),
+      suburb: z.string().trim().max(80, "Suburb is too long").optional(),
       address: z
         .string()
         .trim()

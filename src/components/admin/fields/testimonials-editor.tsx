@@ -7,7 +7,7 @@ import { Field, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 
-import { type TestimonialItem } from "./editor-types";
+import type { TestimonialItem } from "./editor-types";
 import { ListSection } from "./list-section";
 import {
   reorderList,

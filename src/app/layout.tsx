@@ -1,6 +1,6 @@
 import { ClerkProvider } from "@clerk/nextjs";
 import type { Metadata } from "next";
-import { Roboto, Raleway } from "next/font/google";
+import { Raleway, Roboto } from "next/font/google";
 
 import { ConvexClientProvider } from "@/components/providers/convex-client-provider";
 import { Toaster } from "@/components/ui/toast";

@@ -1,10 +1,7 @@
 import type { Doc } from "../_generated/dataModel";
 import { createSoftwashingSeed } from "./seedSoftwashingData";
 
-type LandingPageInsert = Omit<
-  Doc<"landingPages">,
-  "_id" | "_creationTime"
->;
+type LandingPageInsert = Omit<Doc<"landingPages">, "_id" | "_creationTime">;
 
 export function createPageFromTemplate(
   slug: string,
@@ -35,8 +32,7 @@ export function createPageFromTemplate(
       ],
     },
     problem: {
-      body:
-        "Describe the problem your customers face here. Edit this section in admin to match your service.",
+      body: "Describe the problem your customers face here. Edit this section in admin to match your service.",
     },
     wedge: {
       headline: "Why choose us over the alternative",
@@ -77,10 +73,7 @@ export function createPageFromTemplate(
         ...item,
         label: "Edit value item in admin",
       })),
-      bonuses: [
-        "Edit bonus 1 in admin",
-        "Edit bonus 2 in admin",
-      ],
+      bonuses: ["Edit bonus 1 in admin", "Edit bonus 2 in admin"],
     },
     close: {
       warning: "Edit urgency warning in admin.",

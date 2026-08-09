@@ -1,8 +1,8 @@
 import { StarIcon } from "lucide-react";
 
 import { Card, CardContent } from "@/components/ui/card";
-import { cn } from "@/lib/utils";
 import type { PublishedLandingPage } from "@/lib/types/landing-page";
+import { cn } from "@/lib/utils";
 
 type TestimonialsSectionProps = {
   readonly page: PublishedLandingPage;
@@ -18,11 +18,7 @@ function FiveStarRating() {
       role="img"
     >
       {STAR_KEYS.map((key) => (
-        <StarIcon
-          key={key}
-          className="size-4 fill-current"
-          aria-hidden
-        />
+        <StarIcon key={key} className="size-4 fill-current" aria-hidden />
       ))}
     </div>
   );

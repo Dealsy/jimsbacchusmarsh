@@ -48,7 +48,9 @@ function formatSuburb(properties: PhotonProperties): string {
   );
 }
 
-export function mapPhotonFeature(feature: PhotonFeature): AddressSuggestion | null {
+export function mapPhotonFeature(
+  feature: PhotonFeature,
+): AddressSuggestion | null {
   const { properties } = feature;
   if (properties.countrycode && properties.countrycode !== "AU") {
     return null;

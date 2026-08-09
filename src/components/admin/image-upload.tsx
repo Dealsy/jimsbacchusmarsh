@@ -1,13 +1,12 @@
 "use client";
 
+import { api } from "convex/_generated/api";
+import type { Id } from "convex/_generated/dataModel";
 import { useMutation, useQuery } from "convex/react";
 import { ImageIcon, UploadIcon } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
-
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { api } from "convex/_generated/api";
-import type { Id } from "convex/_generated/dataModel";
 
 type ImageUploadProps = {
   readonly label: string;

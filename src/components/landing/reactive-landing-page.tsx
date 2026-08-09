@@ -1,16 +1,12 @@
 "use client";
 
+import { api } from "convex/_generated/api";
 import { useQuery } from "convex/react";
 import { useEffect } from "react";
-
 import { ComingSoon } from "@/components/landing/coming-soon";
 import { LandingPageSkeleton } from "@/components/landing/landing-page-skeleton";
 import { LandingPageView } from "@/components/landing/landing-page-view";
-import {
-  readLandingCache,
-  writeLandingCache,
-} from "@/lib/landing-query-cache";
-import { api } from "convex/_generated/api";
+import { readLandingCache, writeLandingCache } from "@/lib/landing-query-cache";
 
 type ReactiveLandingPageProps = {
   readonly slug: string;
@@ -74,11 +70,5 @@ export function ReactiveLandingPage({
     );
   }
 
-  return (
-    <LandingPageView
-      key={page.updatedAt}
-      page={page}
-      gallery={gallery}
-    />
-  );
+  return <LandingPageView key={page.updatedAt} page={page} gallery={gallery} />;
 }

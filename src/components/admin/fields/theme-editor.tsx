@@ -13,8 +13,8 @@ import { Input } from "@/components/ui/input";
 import {
   DEFAULT_LANDING_THEME,
   LANDING_THEME_PRESETS,
-  normalizeHexColor,
   type LandingTheme,
+  normalizeHexColor,
 } from "@/lib/landing-theme";
 
 type ThemeEditorProps = {

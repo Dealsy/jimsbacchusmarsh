@@ -1,6 +1,6 @@
 import type { Infer } from "convex/values";
 
-import {
+import type {
   closeValidator,
   faqItemValidator,
   guaranteeValidator,
@@ -59,8 +59,7 @@ export function createPressureWashingSeed(now: number) {
   };
 
   const problem: Problem = {
-    body:
-      "Oil stains on the driveway. Green slime on the path. A deck that's gone grey and slippery — and every time you look at it, you think \"I should get that done.\"\n\nYou know a clean exterior makes the whole property feel looked-after. The hard part is finding someone who shows up, does it properly, and doesn't leave streaks or damage behind.",
+    body: "Oil stains on the driveway. Green slime on the path. A deck that's gone grey and slippery — and every time you look at it, you think \"I should get that done.\"\n\nYou know a clean exterior makes the whole property feel looked-after. The hard part is finding someone who shows up, does it properly, and doesn't leave streaks or damage behind.",
   };
 
   const wedge: Wedge = {
@@ -192,8 +191,7 @@ export function createPressureWashingSeed(now: number) {
 
   const guarantee: Guarantee = {
     headline: "No-surprises guarantee",
-    body:
-      "Fully insured · Clear quote before any work starts · If you're not happy with our assessment, you owe nothing.",
+    body: "Fully insured · Clear quote before any work starts · If you're not happy with our assessment, you owe nothing.",
   };
 
   const urgency: Urgency = {
@@ -205,8 +203,7 @@ export function createPressureWashingSeed(now: number) {
   const close: Close = {
     warning:
       "Driveway grime and slippery decks only get worse with weather and traffic. The longer you leave it, the harder — and more expensive — the job becomes.",
-    ps:
-      "P.S. A clean driveway is the fastest kerb-appeal upgrade you can make. Book your free quote and we'll tell you exactly what's involved — no obligation.",
+    ps: "P.S. A clean driveway is the fastest kerb-appeal upgrade you can make. Book your free quote and we'll tell you exactly what's involved — no obligation.",
   };
 
   return {

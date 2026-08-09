@@ -1,5 +1,5 @@
-import type { MutationCtx, QueryCtx } from "../_generated/server";
 import type { UserIdentity } from "convex/server";
+import type { MutationCtx, QueryCtx } from "../_generated/server";
 
 type AuthCtx = QueryCtx | MutationCtx;
 
@@ -108,9 +108,7 @@ export function describeAdminAuthFailure(
   return "Authorized";
 }
 
-export async function requireAdmin(
-  ctx: AuthCtx,
-): Promise<UserIdentity | null> {
+export async function requireAdmin(ctx: AuthCtx): Promise<UserIdentity | null> {
   const identity = await ctx.auth.getUserIdentity();
   if (!identity || !isAdminIdentity(identity)) {
     return null;

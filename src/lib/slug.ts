@@ -1,9 +1,4 @@
-export const RESERVED_SLUGS = new Set([
-  "admin",
-  "sign-in",
-  "sign-up",
-  "api",
-]);
+export const RESERVED_SLUGS = new Set(["admin", "sign-in", "sign-up", "api"]);
 
 const SLUG_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 

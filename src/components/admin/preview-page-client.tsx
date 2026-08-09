@@ -1,9 +1,8 @@
 "use client";
 
-import { useQuery } from "convex/react";
-
-import { ReactiveLandingPage } from "@/components/landing/reactive-landing-page";
 import { api } from "convex/_generated/api";
+import { useQuery } from "convex/react";
+import { ReactiveLandingPage } from "@/components/landing/reactive-landing-page";
 
 type PreviewPageClientProps = {
   readonly slug: string;

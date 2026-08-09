@@ -15,7 +15,11 @@ export function StickyMobileBar({ phone, ctaLabel }: StickyMobileBarProps) {
     <div className="fixed inset-x-0 bottom-12 z-50 border-t bg-background/95 p-3 backdrop-blur md:hidden">
       <div className="mx-auto flex max-w-lg gap-2">
         {showPhone ? (
-          <LinkButton href={formatPhoneHref(phone)} variant="outline" className="flex-1">
+          <LinkButton
+            href={formatPhoneHref(phone)}
+            variant="outline"
+            className="flex-1"
+          >
             Call
           </LinkButton>
         ) : null}

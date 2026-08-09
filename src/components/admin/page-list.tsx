@@ -1,5 +1,6 @@
 "use client";
 
+import { api } from "convex/_generated/api";
 import { useMutation, useQuery } from "convex/react";
 import {
   ExternalLinkIcon,
@@ -10,7 +11,6 @@ import {
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-
 import { AdminPageListSkeleton } from "@/components/admin/admin-skeletons";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -33,7 +33,6 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { LinkButton } from "@/components/ui/link-button";
 import { describeSlugError, slugify } from "@/lib/slug";
-import { api } from "convex/_generated/api";
 
 const STARTER_PAGES = [
   {
@@ -161,9 +160,7 @@ export function PageList() {
               onClick={() => handleSeed(starter.mutation)}
             >
               <FilePlusIcon className="size-4" />
-              {seedingKey === starter.mutation
-                ? "Creating…"
-                : starter.label}
+              {seedingKey === starter.mutation ? "Creating…" : starter.label}
             </Button>
           ))}
         </div>
@@ -281,7 +278,10 @@ export function PageList() {
       ) : (
         <div className="grid gap-4 md:grid-cols-2">
           {pages.map((page) => (
-            <Card key={page._id} className="shadow-sm transition-shadow hover:shadow-md">
+            <Card
+              key={page._id}
+              className="shadow-sm transition-shadow hover:shadow-md"
+            >
               <CardHeader>
                 <div className="flex items-start justify-between gap-2">
                   <div>

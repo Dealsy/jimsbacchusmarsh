@@ -6,7 +6,9 @@ import { requireAdmin } from "./lib/adminAuth";
 async function resolveGalleryItem(
   ctx: {
     storage: {
-      getUrl: (id: import("./_generated/dataModel").Id<"_storage">) => Promise<string | null>;
+      getUrl: (
+        id: import("./_generated/dataModel").Id<"_storage">,
+      ) => Promise<string | null>;
     };
   },
   item: {
@@ -60,7 +62,9 @@ export const listByPageSlug = query({
       .collect();
 
     const sorted = items.sort((a, b) => a.sortOrder - b.sortOrder);
-    return await Promise.all(sorted.map((item) => resolveGalleryItem(ctx, item)));
+    return await Promise.all(
+      sorted.map((item) => resolveGalleryItem(ctx, item)),
+    );
   },
 });
 
@@ -78,7 +82,9 @@ export const listByPageId = query({
       .collect();
 
     const sorted = items.sort((a, b) => a.sortOrder - b.sortOrder);
-    return await Promise.all(sorted.map((item) => resolveGalleryItem(ctx, item)));
+    return await Promise.all(
+      sorted.map((item) => resolveGalleryItem(ctx, item)),
+    );
   },
 });
 

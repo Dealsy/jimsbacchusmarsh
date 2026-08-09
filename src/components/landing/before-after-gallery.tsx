@@ -1,7 +1,10 @@
 import Image from "next/image";
 
 import { resolveGallerySection } from "@/lib/landing-page-content";
-import type { GalleryItem, PublishedLandingPage } from "@/lib/types/landing-page";
+import type {
+  GalleryItem,
+  PublishedLandingPage,
+} from "@/lib/types/landing-page";
 
 type BeforeAfterGalleryProps = {
   readonly page: PublishedLandingPage;

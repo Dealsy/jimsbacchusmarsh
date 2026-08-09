@@ -1,8 +1,8 @@
 "use client";
 
-import { usePreloadedQuery, type Preloaded } from "convex/react";
+import type { api } from "convex/_generated/api";
+import { type Preloaded, usePreloadedQuery } from "convex/react";
 import Link from "next/link";
-
 import {
   Card,
   CardContent,
@@ -10,7 +10,6 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { api } from "convex/_generated/api";
 
 type ServiceHubProps = {
   readonly preloadedPages: Preloaded<typeof api.landingPages.listPublished>;

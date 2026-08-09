@@ -6,8 +6,22 @@ import { cn } from "@/lib/utils";
 type LinkButtonProps = {
   readonly href: string;
   readonly children: React.ReactNode;
-  readonly variant?: "default" | "outline" | "secondary" | "ghost" | "destructive" | "link";
-  readonly size?: "default" | "xs" | "sm" | "lg" | "icon" | "icon-xs" | "icon-sm" | "icon-lg";
+  readonly variant?:
+    | "default"
+    | "outline"
+    | "secondary"
+    | "ghost"
+    | "destructive"
+    | "link";
+  readonly size?:
+    | "default"
+    | "xs"
+    | "sm"
+    | "lg"
+    | "icon"
+    | "icon-xs"
+    | "icon-sm"
+    | "icon-lg";
   readonly className?: string;
   readonly target?: string;
 };

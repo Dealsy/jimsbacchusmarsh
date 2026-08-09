@@ -1,6 +1,6 @@
 import type { Infer } from "convex/values";
 
-import {
+import type {
   closeValidator,
   faqItemValidator,
   guaranteeValidator,
@@ -41,7 +41,8 @@ export const WINDOW_CLEANING_SLUG = "window-cleaning";
 
 export function createWindowCleaningSeed(now: number) {
   const hero: Hero = {
-    audienceCallout: "For Bacchus Marsh, Melton & Ballan homeowners & businesses",
+    audienceCallout:
+      "For Bacchus Marsh, Melton & Ballan homeowners & businesses",
     headline: "Streak-Free Windows — Without the Ladder or the Smears",
     subheadline:
       "Professional window cleaning for Bacchus Marsh, Melton & Ballan. Inside and out, single and double storey — crystal-clear glass that actually lasts.",
@@ -59,8 +60,7 @@ export function createWindowCleaningSeed(now: number) {
   };
 
   const problem: Problem = {
-    body:
-      "Fingerprints on the glass. Water marks catching the light. Upstairs windows you haven't touched in months — and every sunny afternoon, the smears are all you notice.\n\nClean windows change how a home feels inside and out. The problem isn't wanting them done — it's finding someone reliable who does a proper job without streaks, missed panes, or ladder marks on the sills.",
+    body: "Fingerprints on the glass. Water marks catching the light. Upstairs windows you haven't touched in months — and every sunny afternoon, the smears are all you notice.\n\nClean windows change how a home feels inside and out. The problem isn't wanting them done — it's finding someone reliable who does a proper job without streaks, missed panes, or ladder marks on the sills.",
   };
 
   const wedge: Wedge = {
@@ -192,8 +192,7 @@ export function createWindowCleaningSeed(now: number) {
 
   const guarantee: Guarantee = {
     headline: "Streak-free guarantee",
-    body:
-      "Fully insured · Clear quote before we start · Not happy with the finish? Tell us on the day and we'll make it right.",
+    body: "Fully insured · Clear quote before we start · Not happy with the finish? Tell us on the day and we'll make it right.",
   };
 
   const urgency: Urgency = {
@@ -205,8 +204,7 @@ export function createWindowCleaningSeed(now: number) {
   const close: Close = {
     warning:
       "Dust, pollen, and weather marks build up faster than you think. The longer you wait, the harder the first clean — and the worse it looks every sunny afternoon until then.",
-    ps:
-      "P.S. Clean windows are the cheapest way to make your whole home feel brighter. Get your free quote — no obligation, no streaks.",
+    ps: "P.S. Clean windows are the cheapest way to make your whole home feel brighter. Get your free quote — no obligation, no streaks.",
   };
 
   return {

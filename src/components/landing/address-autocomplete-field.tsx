@@ -4,8 +4,8 @@ import { useEffect, useId, useRef, useState } from "react";
 
 import { FieldError } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
-import { cn } from "@/lib/utils";
 import type { AddressSuggestion } from "@/lib/address-search/photon";
+import { cn } from "@/lib/utils";
 
 type AddressAutocompleteFieldProps = {
   readonly id: string;

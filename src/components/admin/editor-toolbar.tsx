@@ -50,7 +50,12 @@ export function EditorToolbar({
               {message}
             </span>
           ) : null}
-          <LinkButton href={`/${slug}`} size="sm" variant="outline" target="_blank">
+          <LinkButton
+            href={`/${slug}`}
+            size="sm"
+            variant="outline"
+            target="_blank"
+          >
             <ExternalLinkIcon className="size-4" />
             Live page
           </LinkButton>
@@ -66,11 +71,21 @@ export function EditorToolbar({
             Draft preview
           </LinkButton>
           {status === "published" ? (
-            <Button type="button" variant="outline" size="sm" onClick={onUnpublish}>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={onUnpublish}
+            >
               Unpublish
             </Button>
           ) : (
-            <Button type="button" variant="outline" size="sm" onClick={onPublish}>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={onPublish}
+            >
               Publish
             </Button>
           )}

@@ -38,7 +38,10 @@ function getPageLabel(values: LeadFormValues): string {
   return values.pageSlug.replace(/-/g, " ");
 }
 
-function buildDetailRows(values: LeadFormValues, hasPhoto: boolean): Array<{
+function buildDetailRows(
+  values: LeadFormValues,
+  hasPhoto: boolean,
+): Array<{
   label: string;
   value: string;
   htmlValue?: string;

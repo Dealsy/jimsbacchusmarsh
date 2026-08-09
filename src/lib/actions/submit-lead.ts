@@ -5,9 +5,9 @@ import { Resend } from "resend";
 import { buildLeadNotificationEmail } from "@/lib/emails/lead-notification-email";
 import {
   extractLeadFormValues,
-  validateLeadForm,
   type LeadFormFieldErrors,
   type LeadFormValues,
+  validateLeadForm,
 } from "@/lib/validations/lead-form";
 
 export type SubmitLeadResult =
@@ -79,8 +79,7 @@ async function submitToResend(
   const resendApiKey = process.env.RESEND_API_KEY;
   const toEmail = process.env.CONTACT_TO_EMAIL;
   const fromEmail =
-    process.env.RESEND_FROM_EMAIL ??
-    "Landing Pages <onboarding@resend.dev>";
+    process.env.RESEND_FROM_EMAIL ?? "Landing Pages <onboarding@resend.dev>";
 
   if (!resendApiKey || !toEmail) {
     return false;
@@ -171,12 +170,7 @@ export async function submitLead(
 
   const [leadOsOk, resendOk] = await Promise.all([
     submitToLeadOs(values, photoBase64, photoMimeType),
-    submitToResend(
-      values,
-      photoBase64,
-      photoMimeType,
-      photoFileName,
-    ),
+    submitToResend(values, photoBase64, photoMimeType, photoFileName),
   ]);
 
   if (!leadOsOk && !resendOk) {

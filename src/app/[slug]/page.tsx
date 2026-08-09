@@ -1,11 +1,10 @@
+import { api } from "convex/_generated/api";
+import { preloadQuery } from "convex/nextjs";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { preloadQuery } from "convex/nextjs";
-
 import { LandingPageClient } from "@/components/landing/landing-page-client";
 import { fetchPublishedPage } from "@/lib/convex-server";
 import { RESERVED_SLUGS } from "@/lib/slug";
-import { api } from "convex/_generated/api";
 
 type LandingSlugPageProps = {
   readonly params: Promise<{ slug: string }>;
@@ -40,7 +39,9 @@ export async function generateMetadata({
   };
 }
 
-export default async function LandingSlugPage({ params }: LandingSlugPageProps) {
+export default async function LandingSlugPage({
+  params,
+}: LandingSlugPageProps) {
   const { slug } = await params;
 
   if (RESERVED_SLUGS.has(slug)) {

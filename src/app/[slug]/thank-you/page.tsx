@@ -1,11 +1,10 @@
+import { api } from "convex/_generated/api";
+import { preloadQuery } from "convex/nextjs";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { preloadQuery } from "convex/nextjs";
-
 import { ThankYouPageClient } from "@/components/landing/thank-you-page-client";
 import { fetchPublishedPage } from "@/lib/convex-server";
 import { RESERVED_SLUGS } from "@/lib/slug";
-import { api } from "convex/_generated/api";
 
 type ThankYouPageProps = {
   readonly params: Promise<{ slug: string }>;

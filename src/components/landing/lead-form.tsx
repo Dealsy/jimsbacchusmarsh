@@ -1,11 +1,10 @@
 "use client";
 
-import { useRef, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
-
-import { AddressAutocompleteField } from "@/components/landing/address-autocomplete-field";
+import { useRef, useState, useTransition } from "react";
 import { trackGoogleConversion } from "@/components/analytics/google-ads";
 import { trackMetaLead } from "@/components/analytics/meta-pixel";
+import { AddressAutocompleteField } from "@/components/landing/address-autocomplete-field";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
@@ -23,9 +22,9 @@ import { formatPhoneHref, isPlaceholderPhone } from "@/lib/phone";
 import type { PublishedLandingPage } from "@/lib/types/landing-page";
 import {
   extractLeadFormValues,
+  type LeadFormFieldErrors,
   OTHER_SURFACE_OPTION,
   validateLeadForm,
-  type LeadFormFieldErrors,
 } from "@/lib/validations/lead-form";
 
 type LeadFormProps = {
@@ -239,7 +238,9 @@ export function LeadForm({ page }: LeadFormProps) {
         <Field data-invalid={Boolean(fieldErrors.photo)}>
           <FieldLabel htmlFor="photo">
             Photo of affected area{" "}
-            <span className="font-normal text-muted-foreground">(optional)</span>
+            <span className="font-normal text-muted-foreground">
+              (optional)
+            </span>
           </FieldLabel>
           <Input
             id="photo"

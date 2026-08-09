@@ -1,13 +1,15 @@
 "use client";
 
-import { LandingPageTheme } from "@/components/landing/landing-page-theme";
+import { GoogleAds } from "@/components/analytics/google-ads";
+import { MetaPixel } from "@/components/analytics/meta-pixel";
 import { BeforeAfterGallery } from "@/components/landing/before-after-gallery";
+import { CloseSection } from "@/components/landing/close-section";
 import { FaqSection } from "@/components/landing/faq-section";
 import { FinalCta } from "@/components/landing/final-cta";
+import { GuaranteeSection } from "@/components/landing/guarantee-section";
 import { Hero, TrustStrip } from "@/components/landing/hero";
 import { HowItWorks } from "@/components/landing/how-it-works";
-import { CloseSection } from "@/components/landing/close-section";
-import { GuaranteeSection } from "@/components/landing/guarantee-section";
+import { LandingPageTheme } from "@/components/landing/landing-page-theme";
 import { OfferStackSection } from "@/components/landing/offer-stack-section";
 import { ProblemSection } from "@/components/landing/problem-section";
 import { ServicesGrid } from "@/components/landing/services-grid";
@@ -15,9 +17,10 @@ import { SiteFooter } from "@/components/landing/site-footer";
 import { StickyMobileBar } from "@/components/landing/sticky-mobile-bar";
 import { TestimonialsSection } from "@/components/landing/testimonials-section";
 import { WedgeSection } from "@/components/landing/wedge-section";
-import { GoogleAds } from "@/components/analytics/google-ads";
-import { MetaPixel } from "@/components/analytics/meta-pixel";
-import type { GalleryItem, PublishedLandingPage } from "@/lib/types/landing-page";
+import type {
+  GalleryItem,
+  PublishedLandingPage,
+} from "@/lib/types/landing-page";
 
 type LandingPageViewProps = {
   readonly page: PublishedLandingPage;
@@ -25,8 +28,7 @@ type LandingPageViewProps = {
 };
 
 export function LandingPageView({ page, gallery }: LandingPageViewProps) {
-  const metaPixelId =
-    page.metaPixelId ?? process.env.NEXT_PUBLIC_META_PIXEL_ID;
+  const metaPixelId = page.metaPixelId ?? process.env.NEXT_PUBLIC_META_PIXEL_ID;
   const googleAdsId = page.googleAdsId ?? process.env.NEXT_PUBLIC_GOOGLE_ADS_ID;
 
   return (

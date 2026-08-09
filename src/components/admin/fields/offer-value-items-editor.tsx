@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Field, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 
-import { type OfferValueItem } from "./editor-types";
+import type { OfferValueItem } from "./editor-types";
 import { ListSection } from "./list-section";
 import {
   reorderList,

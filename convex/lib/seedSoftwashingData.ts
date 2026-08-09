@@ -1,6 +1,6 @@
 import type { Infer } from "convex/values";
-
-import {
+import { createDefaultThankYou } from "./defaultThankYou";
+import type {
   closeValidator,
   faqItemValidator,
   guaranteeValidator,
@@ -14,7 +14,6 @@ import {
   urgencyValidator,
   wedgeValidator,
 } from "./validators";
-import { createDefaultThankYou } from "./defaultThankYou";
 
 type Hero = Infer<typeof heroValidator>;
 type Problem = Infer<typeof problemValidator>;
@@ -58,8 +57,7 @@ export function createSoftwashingSeed(now: number) {
   };
 
   const problem: Problem = {
-    body:
-      "Black streaks creeping across your roof. Green algae climbing the fence. That grubby, ageing look spreading over walls you know should look better.\n\nIf you're noticing it every time you pull into the driveway — you're not alone, and it doesn't have to stay that way.",
+    body: "Black streaks creeping across your roof. Green algae climbing the fence. That grubby, ageing look spreading over walls you know should look better.\n\nIf you're noticing it every time you pull into the driveway — you're not alone, and it doesn't have to stay that way.",
   };
 
   const wedge: Wedge = {
@@ -175,8 +173,7 @@ export function createSoftwashingSeed(now: number) {
   ];
 
   const offer: Offer = {
-    headline:
-      "Free On-Site Softwash Assessment & Quote",
+    headline: "Free On-Site Softwash Assessment & Quote",
     reasonWhy:
       "We're building our local portfolio in Bacchus Marsh, Melton & Ballan — so we're offering free on-site assessments to homeowners who want an honest answer on whether softwashing is right for their property.",
     valueItems: [
@@ -192,8 +189,7 @@ export function createSoftwashingSeed(now: number) {
 
   const guarantee: Guarantee = {
     headline: "No-pressure guarantee",
-    body:
-      "Fully insured · Clear quote before any work starts · If you're not happy with our assessment, you owe nothing.",
+    body: "Fully insured · Clear quote before any work starts · If you're not happy with our assessment, you owe nothing.",
   };
 
   const urgency: Urgency = {
@@ -205,8 +201,7 @@ export function createSoftwashingSeed(now: number) {
   const close: Close = {
     warning:
       "Mould and algae spread quickly in shaded, damp areas. The longer roots stay alive, the worse it gets — and pressure washing alone won't fix it.",
-    ps:
-      "P.S. Mould comes back fast if roots aren't killed. Book your free assessment and we'll tell you honestly whether softwashing is right for your roof or walls.",
+    ps: "P.S. Mould comes back fast if roots aren't killed. Book your free assessment and we'll tell you honestly whether softwashing is right for your roof or walls.",
   };
 
   return {
@@ -240,13 +235,7 @@ export function createSoftwashingSeed(now: number) {
     googleAdsId: undefined,
     googleConversionLabel: undefined,
     leadServiceType: "softwashing",
-    surfaceOptions: [
-      "Roof",
-      "Walls",
-      "Fence",
-      "Retaining wall",
-      "Other",
-    ],
+    surfaceOptions: ["Roof", "Walls", "Fence", "Retaining wall", "Other"],
     servicesSectionTitle: "What softwashing covers",
     servicesSectionDescription:
       "Low-pressure treatment for the surfaces where mould and algae do the most damage.",

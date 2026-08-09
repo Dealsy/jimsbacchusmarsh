@@ -3,10 +3,10 @@
 import { GripVerticalIcon } from "lucide-react";
 import {
   createContext,
+  type ReactNode,
   useContext,
   useRef,
   useState,
-  type ReactNode,
 } from "react";
 
 import { cn } from "@/lib/utils";
@@ -70,9 +70,7 @@ export function SortableList({
   const [draggingIndex, setDraggingIndex] = useState<number | null>(null);
 
   return (
-    <SortableListContext
-      value={{ draggingIndex, setDraggingIndex, onReorder }}
-    >
+    <SortableListContext value={{ draggingIndex, setDraggingIndex, onReorder }}>
       <div className={cn("space-y-3", className)}>{children}</div>
     </SortableListContext>
   );
@@ -84,7 +82,11 @@ type SortableItemProps = {
   readonly className?: string;
 };
 
-export function SortableItem({ index, children, className }: SortableItemProps) {
+export function SortableItem({
+  index,
+  children,
+  className,
+}: SortableItemProps) {
   const { draggingIndex, onReorder } = useSortableListContext();
   const itemRef = useRef<HTMLDivElement>(null);
   const [isOver, setIsOver] = useState(false);

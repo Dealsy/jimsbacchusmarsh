@@ -28,10 +28,7 @@ export function AdminPageListSkeleton() {
 
       <div className="grid gap-4">
         {PAGE_CARD_KEYS.map((key) => (
-          <div
-            key={key}
-            className="rounded-2xl border bg-background p-6"
-          >
+          <div key={key} className="rounded-2xl border bg-background p-6">
             <div className="flex flex-wrap items-start justify-between gap-4">
               <div className="space-y-3">
                 <Skeleton className="h-7 w-40" />

@@ -1,11 +1,6 @@
-import { XIcon, CheckIcon } from "lucide-react";
+import { CheckIcon, XIcon } from "lucide-react";
 
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { resolveWedgeSection } from "@/lib/landing-page-content";
 import type { PublishedLandingPage } from "@/lib/types/landing-page";
 

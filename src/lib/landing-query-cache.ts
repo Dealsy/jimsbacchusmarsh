@@ -1,4 +1,7 @@
-import type { GalleryItem, PublishedLandingPage } from "@/lib/types/landing-page";
+import type {
+  GalleryItem,
+  PublishedLandingPage,
+} from "@/lib/types/landing-page";
 
 type CachedLanding = {
   readonly page: PublishedLandingPage;

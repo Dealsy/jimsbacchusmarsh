@@ -1,15 +1,12 @@
 "use client";
 
-import { usePreloadedQuery, type Preloaded } from "convex/react";
-
+import type { api } from "convex/_generated/api";
+import { type Preloaded, usePreloadedQuery } from "convex/react";
 import { ComingSoon } from "@/components/landing/coming-soon";
 import { LandingPageView } from "@/components/landing/landing-page-view";
-import { api } from "convex/_generated/api";
 
 type LandingPageClientProps = {
-  readonly preloadedPage: Preloaded<
-    typeof api.landingPages.getPublishedBySlug
-  >;
+  readonly preloadedPage: Preloaded<typeof api.landingPages.getPublishedBySlug>;
   readonly preloadedGallery: Preloaded<
     typeof api.landingPageGallery.listByPageSlug
   >;
@@ -26,11 +23,5 @@ export function LandingPageClient({
     return <ComingSoon />;
   }
 
-  return (
-    <LandingPageView
-      key={page.updatedAt}
-      page={page}
-      gallery={gallery}
-    />
-  );
+  return <LandingPageView key={page.updatedAt} page={page} gallery={gallery} />;
 }

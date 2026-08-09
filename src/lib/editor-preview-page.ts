@@ -1,4 +1,7 @@
-import type { EditorState, LoadedPage } from "@/components/admin/page-editor-types";
+import type {
+  EditorState,
+  LoadedPage,
+} from "@/components/admin/page-editor-types";
 import type { PublishedLandingPage } from "@/lib/types/landing-page";
 
 function trimStringList(values: readonly string[]): string[] {

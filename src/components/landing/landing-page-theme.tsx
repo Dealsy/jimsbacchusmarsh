@@ -1,9 +1,9 @@
 import type { ReactNode } from "react";
 
 import {
+  type LandingTheme,
   landingThemeToStyle,
   resolveLandingTheme,
-  type LandingTheme,
 } from "@/lib/landing-theme";
 
 type LandingPageThemeProps = {
@@ -11,10 +11,7 @@ type LandingPageThemeProps = {
   readonly children: ReactNode;
 };
 
-export function LandingPageTheme({
-  theme,
-  children,
-}: LandingPageThemeProps) {
+export function LandingPageTheme({ theme, children }: LandingPageThemeProps) {
   const resolved = resolveLandingTheme(theme);
 
   return (

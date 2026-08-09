@@ -1,23 +1,26 @@
 "use client";
 
+import { api } from "convex/_generated/api";
+import type { Id } from "convex/_generated/dataModel";
 import { useMutation, useQuery } from "convex/react";
 import { ArrowLeftIcon } from "lucide-react";
 import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
-
-import {
-  type CloseFields,
-  type FaqItem,
-  type GuaranteeFields,
-  type HowItWorksStep,
-  type OfferFields,
-  type OfferValueItem,
-  type ServiceItem,
-  type TestimonialItem,
-  type ThankYouFields,
-  type UrgencyFields,
-} from "@/components/admin/fields/editor-types";
+import { AdminPageEditorSkeleton } from "@/components/admin/admin-skeletons";
 import { EditorLivePreview } from "@/components/admin/editor-live-preview";
+import { EditorToolbar } from "@/components/admin/editor-toolbar";
+import type {
+  CloseFields,
+  FaqItem,
+  GuaranteeFields,
+  HowItWorksStep,
+  OfferFields,
+  OfferValueItem,
+  ServiceItem,
+  TestimonialItem,
+  ThankYouFields,
+  UrgencyFields,
+} from "@/components/admin/fields/editor-types";
 import { FaqEditor } from "@/components/admin/fields/faq-editor";
 import { HowItWorksEditor } from "@/components/admin/fields/how-it-works-editor";
 import { OfferValueItemsEditor } from "@/components/admin/fields/offer-value-items-editor";
@@ -25,31 +28,23 @@ import { ServicesEditor } from "@/components/admin/fields/services-editor";
 import { StringListEditor } from "@/components/admin/fields/string-list-editor";
 import { TestimonialsEditor } from "@/components/admin/fields/testimonials-editor";
 import { ThemeEditor } from "@/components/admin/fields/theme-editor";
-import { EditorToolbar } from "@/components/admin/editor-toolbar";
-import { AdminPageEditorSkeleton } from "@/components/admin/admin-skeletons";
 import { ImageUpload } from "@/components/admin/image-upload";
-import type { EditorState, LoadedPage } from "@/components/admin/page-editor-types";
-import {
-  SectionCard,
-  TabIntro,
-} from "@/components/admin/section-card";
+import type {
+  EditorState,
+  LoadedPage,
+} from "@/components/admin/page-editor-types";
+import { SectionCard, TabIntro } from "@/components/admin/section-card";
 import { Button } from "@/components/ui/button";
-import { LinkButton } from "@/components/ui/link-button";
-import {
-  Field,
-  FieldGroup,
-  FieldLabel,
-} from "@/components/ui/field";
-import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Field, FieldGroup, FieldLabel } from "@/components/ui/field";
+import { Input } from "@/components/ui/input";
+import { LinkButton } from "@/components/ui/link-button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
-import { api } from "convex/_generated/api";
-import type { Id } from "convex/_generated/dataModel";
 import {
   DEFAULT_LANDING_THEME,
-  normalizeHexColor,
   type LandingTheme,
+  normalizeHexColor,
 } from "@/lib/landing-theme";
 
 type PageEditorProps = {
@@ -156,12 +151,12 @@ function sanitizeClose(close: CloseFields): CloseFields | undefined {
 function sanitizeThankYou(thankYou: ThankYouFields): ThankYouFields {
   const nextSteps = sanitizeHowItWorks(thankYou.nextSteps);
   return {
-    headline:
-      thankYou.headline.trim() || "Thanks — we'll call you back today",
+    headline: thankYou.headline.trim() || "Thanks — we'll call you back today",
     body:
       thankYou.body.trim() ||
       "Your request is in. We'll be in touch shortly to arrange your free assessment.",
-    phonePrompt: thankYou.phonePrompt.trim() || "Need to speak with someone now?",
+    phonePrompt:
+      thankYou.phonePrompt.trim() || "Need to speak with someone now?",
     nextStepsTitle: thankYou.nextStepsTitle.trim() || "What happens next",
     useHowItWorksSteps: thankYou.useHowItWorksSteps,
     nextSteps,
@@ -170,8 +165,7 @@ function sanitizeThankYou(thankYou: ThankYouFields): ThankYouFields {
 
 function sanitizeTheme(theme: LandingTheme): LandingTheme {
   return {
-    primary:
-      normalizeHexColor(theme.primary) ?? DEFAULT_LANDING_THEME.primary,
+    primary: normalizeHexColor(theme.primary) ?? DEFAULT_LANDING_THEME.primary,
     heroFrom:
       normalizeHexColor(theme.heroFrom) ?? DEFAULT_LANDING_THEME.heroFrom,
     heroTo: normalizeHexColor(theme.heroTo) ?? DEFAULT_LANDING_THEME.heroTo,
@@ -228,8 +222,7 @@ function pageToEditorState(page: LoadedPage): EditorState {
       ps: page.close?.ps ?? "",
     },
     thankYou: {
-      headline:
-        page.thankYou?.headline ?? "Thanks — we'll call you back today",
+      headline: page.thankYou?.headline ?? "Thanks — we'll call you back today",
       body:
         page.thankYou?.body ??
         "Your request is in. We'll be in touch shortly to arrange your free assessment.",
@@ -480,7 +473,9 @@ export function PageEditor({ slug }: PageEditorProps) {
                   <FieldLabel>Page name</FieldLabel>
                   <Input
                     value={state.name}
-                    onChange={(event) => updateField("name", event.target.value)}
+                    onChange={(event) =>
+                      updateField("name", event.target.value)
+                    }
                   />
                 </Field>
                 <Field>

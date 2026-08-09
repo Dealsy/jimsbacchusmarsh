@@ -1,10 +1,7 @@
-import { LinkButton } from "@/components/ui/link-button";
 import { LeadForm } from "@/components/landing/lead-form";
 import { UrgencyBanner } from "@/components/landing/urgency-banner";
-import {
-  resolveOffer,
-  resolveUrgency,
-} from "@/lib/landing-page-content";
+import { LinkButton } from "@/components/ui/link-button";
+import { resolveOffer, resolveUrgency } from "@/lib/landing-page-content";
 import { formatPhoneHref, isPlaceholderPhone } from "@/lib/phone";
 import type { PublishedLandingPage } from "@/lib/types/landing-page";
 

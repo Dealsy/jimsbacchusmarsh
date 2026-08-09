@@ -8,7 +8,7 @@ import { Field, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 
-import { type HowItWorksStep } from "./editor-types";
+import type { HowItWorksStep } from "./editor-types";
 import { ListSection } from "./list-section";
 import {
   reorderList,
@@ -44,7 +44,9 @@ export function HowItWorksEditor({ values, onChange }: HowItWorksEditorProps) {
   }
 
   function removeItem(index: number) {
-    onChange(renumberSteps(values.filter((_, itemIndex) => itemIndex !== index)));
+    onChange(
+      renumberSteps(values.filter((_, itemIndex) => itemIndex !== index)),
+    );
   }
 
   function handleReorder(fromIndex: number, toIndex: number) {

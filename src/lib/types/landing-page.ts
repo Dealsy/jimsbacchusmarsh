@@ -1,6 +1,5 @@
-import type { FunctionReturnType } from "convex/server";
-
 import type { api } from "convex/_generated/api";
+import type { FunctionReturnType } from "convex/server";
 
 export type PublishedLandingPage = NonNullable<
   FunctionReturnType<typeof api.landingPages.getPublishedBySlug>

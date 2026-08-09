@@ -1,13 +1,15 @@
 "use client";
 
-import { useMemo } from "react";
+import { api } from "convex/_generated/api";
 import { useQuery } from "convex/react";
-
-import type { EditorState, LoadedPage } from "@/components/admin/page-editor-types";
+import { useMemo } from "react";
+import type {
+  EditorState,
+  LoadedPage,
+} from "@/components/admin/page-editor-types";
 import { LandingPageView } from "@/components/landing/landing-page-view";
 import { mergeEditorPreviewPage } from "@/lib/editor-preview-page";
 import type { GalleryItem } from "@/lib/types/landing-page";
-import { api } from "convex/_generated/api";
 
 type EditorLivePreviewProps = {
   readonly page: LoadedPage;

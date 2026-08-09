@@ -7,7 +7,7 @@ import { Field, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 
-import { type FaqItem } from "./editor-types";
+import type { FaqItem } from "./editor-types";
 import { ListSection } from "./list-section";
 import {
   reorderList,

@@ -11,10 +11,7 @@ import {
 } from "@/components/ui/native-select";
 import { Textarea } from "@/components/ui/textarea";
 
-import {
-  SERVICE_ICON_OPTIONS,
-  type ServiceItem,
-} from "./editor-types";
+import { SERVICE_ICON_OPTIONS, type ServiceItem } from "./editor-types";
 import { ListSection } from "./list-section";
 import {
   reorderList,

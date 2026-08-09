@@ -1,23 +1,23 @@
 import { v } from "convex/values";
 
 import type { Doc, Id } from "./_generated/dataModel";
-import { mutation, query } from "./_generated/server";
 import type { MutationCtx } from "./_generated/server";
-import { createPageFromTemplate } from "./lib/createPageFromTemplate";
+import { mutation, query } from "./_generated/server";
 import { describeAdminAuthFailure, requireAdmin } from "./lib/adminAuth";
-import { describeSlugError } from "./lib/slug";
-import {
-  createSoftwashingSeed,
-  SOFTWASHING_SLUG,
-} from "./lib/seedSoftwashingData";
+import { createPageFromTemplate } from "./lib/createPageFromTemplate";
 import {
   createPressureWashingSeed,
   PRESSURE_WASHING_SLUG,
 } from "./lib/seedPressureWashingData";
 import {
+  createSoftwashingSeed,
+  SOFTWASHING_SLUG,
+} from "./lib/seedSoftwashingData";
+import {
   createWindowCleaningSeed,
   WINDOW_CLEANING_SLUG,
 } from "./lib/seedWindowCleaningData";
+import { describeSlugError } from "./lib/slug";
 import { landingPageUpdateValidator } from "./lib/validators";
 
 type LandingPageDoc = Doc<"landingPages">;
@@ -296,7 +296,9 @@ export const debugAuth = query({
       subject: identity.subject,
       email: identity.email ?? null,
       primaryEmail:
-        typeof identity.primaryEmail === "string" ? identity.primaryEmail : null,
+        typeof identity.primaryEmail === "string"
+          ? identity.primaryEmail
+          : null,
       tokenIdentifier: identity.tokenIdentifier,
       claimKeys: Object.keys(identity).sort(),
       adminError: describeAdminAuthFailure(identity),
@@ -366,7 +368,11 @@ export const createPage = mutation({
 export const seedSoftwashing = mutation({
   args: {},
   handler: async (ctx) => {
-    return await seedPageIfMissing(ctx, SOFTWASHING_SLUG, createSoftwashingSeed);
+    return await seedPageIfMissing(
+      ctx,
+      SOFTWASHING_SLUG,
+      createSoftwashingSeed,
+    );
   },
 });
 
