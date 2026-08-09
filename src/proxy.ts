@@ -6,6 +6,7 @@ const isPublicRoute = createRouteMatcher([
   "/sign-up(.*)",
   // Published landing pages live at /:slug (e.g. /softwashing, /pressure-washing)
   "/((?!admin|sign-in|sign-up|api|_next)[^/.]+)",
+  "/((?!admin|sign-in|sign-up|api|_next)[^/.]+)/thank-you",
 ]);
 
 export default clerkMiddleware(async (auth, req) => {

@@ -69,6 +69,15 @@ export const howItWorksStepValidator = v.object({
   description: v.string(),
 });
 
+export const thankYouValidator = v.object({
+  headline: v.string(),
+  body: v.string(),
+  phonePrompt: v.optional(v.string()),
+  nextStepsTitle: v.optional(v.string()),
+  useHowItWorksSteps: v.optional(v.boolean()),
+  nextSteps: v.optional(v.array(howItWorksStepValidator)),
+});
+
 export const faqItemValidator = v.object({
   question: v.string(),
   answer: v.string(),
@@ -118,6 +127,7 @@ export const landingPageFields = {
   guarantee: v.optional(guaranteeValidator),
   urgency: v.optional(urgencyValidator),
   close: v.optional(closeValidator),
+  thankYou: v.optional(thankYouValidator),
   servicesSectionTitle: v.optional(v.string()),
   servicesSectionDescription: v.optional(v.string()),
   gallerySectionTitle: v.optional(v.string()),
@@ -152,6 +162,7 @@ export const landingPageUpdateValidator = v.object({
   guarantee: v.optional(guaranteeValidator),
   urgency: v.optional(urgencyValidator),
   close: v.optional(closeValidator),
+  thankYou: v.optional(thankYouValidator),
   servicesSectionTitle: v.optional(v.string()),
   servicesSectionDescription: v.optional(v.string()),
   gallerySectionTitle: v.optional(v.string()),

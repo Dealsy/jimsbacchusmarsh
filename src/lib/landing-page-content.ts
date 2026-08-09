@@ -6,6 +6,75 @@ type PublishedPage = NonNullable<
   FunctionReturnType<typeof api.landingPages.getPublishedBySlug>
 >;
 
+export type ResolvedThankYou = {
+  readonly headline: string;
+  readonly body: string;
+  readonly phonePrompt: string;
+  readonly nextStepsTitle: string;
+  readonly nextSteps: readonly {
+    readonly step: number;
+    readonly title: string;
+    readonly description: string;
+  }[];
+};
+
+const DEFAULT_THANK_YOU = {
+  headline: "Thanks — we'll call you back today",
+  body:
+    "Your request is in. We'll be in touch shortly to arrange your free assessment.",
+  phonePrompt: "Need to speak with someone now?",
+  nextStepsTitle: "What happens next",
+} as const;
+
+const DEFAULT_THANK_YOU_STEPS = [
+  {
+    step: 1,
+    title: "We call you back",
+    description:
+      "A local team member will reach out today to confirm your details.",
+  },
+  {
+    step: 2,
+    title: "Free on-site assessment",
+    description:
+      "We inspect the property and confirm the right approach for your job.",
+  },
+  {
+    step: 3,
+    title: "Clear quote upfront",
+    description:
+      "You get scope and pricing confirmed before any work begins.",
+  },
+] as const;
+
+export function resolveThankYou(page: PublishedPage): ResolvedThankYou {
+  const thankYou = page.thankYou;
+  const useHowItWorksSteps = thankYou?.useHowItWorksSteps ?? true;
+
+  let nextSteps: ResolvedThankYou["nextSteps"];
+  if (
+    !useHowItWorksSteps &&
+    thankYou?.nextSteps &&
+    thankYou.nextSteps.length > 0
+  ) {
+    nextSteps = [...thankYou.nextSteps].sort((a, b) => a.step - b.step);
+  } else if (page.howItWorks.length > 0) {
+    nextSteps = [...page.howItWorks].sort((a, b) => a.step - b.step);
+  } else {
+    nextSteps = DEFAULT_THANK_YOU_STEPS.map((step) => ({ ...step }));
+  }
+
+  return {
+    headline: thankYou?.headline?.trim() || DEFAULT_THANK_YOU.headline,
+    body: thankYou?.body?.trim() || DEFAULT_THANK_YOU.body,
+    phonePrompt:
+      thankYou?.phonePrompt?.trim() || DEFAULT_THANK_YOU.phonePrompt,
+    nextStepsTitle:
+      thankYou?.nextStepsTitle?.trim() || DEFAULT_THANK_YOU.nextStepsTitle,
+    nextSteps,
+  };
+}
+
 export type ResolvedOffer = {
   readonly headline: string;
   readonly reasonWhy: string | null;

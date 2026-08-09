@@ -14,6 +14,7 @@ import {
   type OfferValueItem,
   type ServiceItem,
   type TestimonialItem,
+  type ThankYouFields,
   type UrgencyFields,
 } from "@/components/admin/fields/editor-types";
 import { EditorLivePreview } from "@/components/admin/editor-live-preview";
@@ -152,6 +153,21 @@ function sanitizeClose(close: CloseFields): CloseFields | undefined {
   };
 }
 
+function sanitizeThankYou(thankYou: ThankYouFields): ThankYouFields {
+  const nextSteps = sanitizeHowItWorks(thankYou.nextSteps);
+  return {
+    headline:
+      thankYou.headline.trim() || "Thanks — we'll call you back today",
+    body:
+      thankYou.body.trim() ||
+      "Your request is in. We'll be in touch shortly to arrange your free assessment.",
+    phonePrompt: thankYou.phonePrompt.trim() || "Need to speak with someone now?",
+    nextStepsTitle: thankYou.nextStepsTitle.trim() || "What happens next",
+    useHowItWorksSteps: thankYou.useHowItWorksSteps,
+    nextSteps,
+  };
+}
+
 function sanitizeTheme(theme: LandingTheme): LandingTheme {
   return {
     primary:
@@ -210,6 +226,18 @@ function pageToEditorState(page: LoadedPage): EditorState {
     close: {
       warning: page.close?.warning ?? "",
       ps: page.close?.ps ?? "",
+    },
+    thankYou: {
+      headline:
+        page.thankYou?.headline ?? "Thanks — we'll call you back today",
+      body:
+        page.thankYou?.body ??
+        "Your request is in. We'll be in touch shortly to arrange your free assessment.",
+      phonePrompt:
+        page.thankYou?.phonePrompt ?? "Need to speak with someone now?",
+      nextStepsTitle: page.thankYou?.nextStepsTitle ?? "What happens next",
+      useHowItWorksSteps: page.thankYou?.useHowItWorksSteps ?? true,
+      nextSteps: (page.thankYou?.nextSteps ?? []).map((item) => ({ ...item })),
     },
     services: page.services.map((item) => ({ ...item })),
     howItWorks: page.howItWorks.map((item) => ({ ...item })),
@@ -337,6 +365,19 @@ export function PageEditor({ slug }: PageEditorProps) {
         guarantee: sanitizeGuarantee(currentState.guarantee),
         urgency: sanitizeUrgency(currentState.urgency),
         close: sanitizeClose(currentState.close),
+        thankYou: (() => {
+          const sanitized = sanitizeThankYou(currentState.thankYou);
+          return {
+            headline: sanitized.headline,
+            body: sanitized.body,
+            phonePrompt: sanitized.phonePrompt,
+            nextStepsTitle: sanitized.nextStepsTitle,
+            useHowItWorksSteps: sanitized.useHowItWorksSteps,
+            nextSteps: sanitized.useHowItWorksSteps
+              ? undefined
+              : sanitized.nextSteps,
+          };
+        })(),
         services: sanitizeServices(currentState.services),
         howItWorks: sanitizeHowItWorks(currentState.howItWorks),
         faq: sanitizeFaq(currentState.faq),
@@ -419,6 +460,7 @@ export function PageEditor({ slug }: PageEditorProps) {
           <TabsTrigger value="seo">SEO</TabsTrigger>
           <TabsTrigger value="hero">Hero</TabsTrigger>
           <TabsTrigger value="content">Content</TabsTrigger>
+          <TabsTrigger value="thank-you">Thank you</TabsTrigger>
           <TabsTrigger value="theme">Theme</TabsTrigger>
           <TabsTrigger value="gallery">Gallery</TabsTrigger>
           <TabsTrigger value="preview">Live preview</TabsTrigger>
@@ -938,6 +980,104 @@ export function PageEditor({ slug }: PageEditorProps) {
               />
             </TabsContent>
           </Tabs>
+        </TabsContent>
+
+        <TabsContent value="thank-you" className="space-y-6 pt-6">
+          <TabIntro
+            title="Thank-you page"
+            description="Shown after someone submits the quote form at /{slug}/thank-you."
+          />
+
+          <SectionCard title="Confirmation message">
+            <FieldGroup>
+              <Field>
+                <FieldLabel>Headline</FieldLabel>
+                <Input
+                  value={state.thankYou.headline}
+                  onChange={(event) =>
+                    updateField("thankYou", {
+                      ...state.thankYou,
+                      headline: event.target.value,
+                    })
+                  }
+                  placeholder="Thanks — we'll call you back today"
+                />
+              </Field>
+              <Field>
+                <FieldLabel>Body text</FieldLabel>
+                <Textarea
+                  value={state.thankYou.body}
+                  onChange={(event) =>
+                    updateField("thankYou", {
+                      ...state.thankYou,
+                      body: event.target.value,
+                    })
+                  }
+                  rows={3}
+                  placeholder="Your request is in. We'll be in touch shortly…"
+                />
+              </Field>
+              <Field>
+                <FieldLabel>Phone prompt</FieldLabel>
+                <Input
+                  value={state.thankYou.phonePrompt}
+                  onChange={(event) =>
+                    updateField("thankYou", {
+                      ...state.thankYou,
+                      phonePrompt: event.target.value,
+                    })
+                  }
+                  placeholder="Need to speak with someone now?"
+                />
+              </Field>
+            </FieldGroup>
+          </SectionCard>
+
+          <SectionCard title="What happens next">
+            <FieldGroup>
+              <Field>
+                <FieldLabel>Section title</FieldLabel>
+                <Input
+                  value={state.thankYou.nextStepsTitle}
+                  onChange={(event) =>
+                    updateField("thankYou", {
+                      ...state.thankYou,
+                      nextStepsTitle: event.target.value,
+                    })
+                  }
+                  placeholder="What happens next"
+                />
+              </Field>
+              <Field>
+                <div className="flex items-center gap-2">
+                  <Checkbox
+                    id="thank-you-use-how-it-works"
+                    checked={state.thankYou.useHowItWorksSteps}
+                    onCheckedChange={(checked) =>
+                      updateField("thankYou", {
+                        ...state.thankYou,
+                        useHowItWorksSteps: checked === true,
+                      })
+                    }
+                  />
+                  <FieldLabel htmlFor="thank-you-use-how-it-works">
+                    Use the same steps as the How it works section
+                  </FieldLabel>
+                </div>
+              </Field>
+              {!state.thankYou.useHowItWorksSteps ? (
+                <HowItWorksEditor
+                  values={state.thankYou.nextSteps}
+                  onChange={(values) =>
+                    updateField("thankYou", {
+                      ...state.thankYou,
+                      nextSteps: values,
+                    })
+                  }
+                />
+              ) : null}
+            </FieldGroup>
+          </SectionCard>
         </TabsContent>
 
         <TabsContent value="theme" className="space-y-6 pt-6">

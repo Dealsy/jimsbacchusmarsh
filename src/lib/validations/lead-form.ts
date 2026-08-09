@@ -16,9 +16,10 @@ export type LeadFormRawInput = {
   readonly suburb: string;
   readonly address: string;
   readonly surfaces: readonly string[];
-  readonly otherDescription: string;
+  readonly description: string;
   readonly website: string;
   readonly pageSlug: string;
+  readonly pageName: string;
   readonly leadServiceType: string;
 };
 
@@ -55,13 +56,14 @@ export function createLeadFormSchema(surfaceOptions: readonly string[]) {
           (values) => values.every((value) => surfaceSet.has(value)),
           "Invalid surface selection",
         ),
-      otherDescription: z
+      description: z
         .string()
         .trim()
         .max(500, "Description is too long")
         .optional(),
       website: z.string().optional(),
       pageSlug: z.string().min(1),
+      pageName: z.string().trim().max(120).optional(),
       leadServiceType: z.string().min(1),
     })
     .superRefine((data, ctx) => {
@@ -69,12 +71,12 @@ export function createLeadFormSchema(surfaceOptions: readonly string[]) {
         return;
       }
 
-      const description = data.otherDescription?.trim() ?? "";
+      const description = data.description?.trim() ?? "";
       if (description.length < 3) {
         ctx.addIssue({
           code: "custom",
           message: "Please describe the affected area",
-          path: ["otherDescription"],
+          path: ["description"],
         });
       }
     });
@@ -96,9 +98,10 @@ export function extractLeadFormValues(
     suburb: String(formData.get("suburb") ?? ""),
     address: String(formData.get("address") ?? ""),
     surfaces,
-    otherDescription: String(formData.get("otherDescription") ?? ""),
+    description: String(formData.get("description") ?? ""),
     website: String(formData.get("website") ?? ""),
     pageSlug: String(formData.get("pageSlug") ?? ""),
+    pageName: String(formData.get("pageName") ?? ""),
     leadServiceType: String(formData.get("leadServiceType") ?? ""),
   };
 }

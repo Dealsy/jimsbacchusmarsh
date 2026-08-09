@@ -2,6 +2,7 @@
 
 import { Resend } from "resend";
 
+import { buildLeadNotificationEmail } from "@/lib/emails/lead-notification-email";
 import {
   extractLeadFormValues,
   validateLeadForm,
@@ -16,15 +17,6 @@ export type SubmitLeadResult =
       error: string;
       fieldErrors?: LeadFormFieldErrors;
     };
-
-function escapeHtml(value: string): string {
-  return value
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#39;");
-}
 
 async function submitToLeadOs(
   values: LeadFormValues,
@@ -47,8 +39,8 @@ async function submitToLeadOs(
   const estimatedScope = [
     `Address: ${values.address}`,
     `Surfaces: ${values.surfaces.join(", ")}`,
-    values.otherDescription
-      ? `Other details: ${values.otherDescription}`
+    values.description
+      ? `Additional details: ${values.description}`
       : undefined,
     `Page: ${values.pageSlug}`,
     photoBase64 ? "Customer attached a photo with the form." : undefined,
@@ -95,26 +87,10 @@ async function submitToResend(
   }
 
   const resend = new Resend(resendApiKey);
-
-  const locationLabel = values.suburb?.trim() || values.address;
-
-  const plainText = [
-    "New softwash quote request",
-    "",
-    `Name: ${values.name}`,
-    `Phone: ${values.phone}`,
-    `Address: ${values.address}`,
-    values.suburb ? `Suburb: ${values.suburb}` : "",
-    `Surfaces: ${values.surfaces.join(", ")}`,
-    values.otherDescription
-      ? `Other details: ${values.otherDescription}`
-      : "",
-    `Service: ${values.leadServiceType}`,
-    `Page: ${values.pageSlug}`,
-    photoBase64 ? "Photo attached." : "",
-  ]
-    .filter(Boolean)
-    .join("\n");
+  const email = buildLeadNotificationEmail({
+    values,
+    hasPhoto: Boolean(photoBase64),
+  });
 
   const attachments =
     photoBase64 && photoMimeType
@@ -129,27 +105,9 @@ async function submitToResend(
   const { error } = await resend.emails.send({
     from: fromEmail,
     to: toEmail,
-    subject: `Softwash quote — ${values.name} — ${locationLabel}`,
-    text: plainText,
-    html: `
-      <h2>New softwash quote request</h2>
-      <p><strong>Name:</strong> ${escapeHtml(values.name)}</p>
-      <p><strong>Phone:</strong> ${escapeHtml(values.phone)}</p>
-      <p><strong>Address:</strong> ${escapeHtml(values.address)}</p>
-      ${
-        values.suburb
-          ? `<p><strong>Suburb:</strong> ${escapeHtml(values.suburb)}</p>`
-          : ""
-      }
-      <p><strong>Surfaces:</strong> ${escapeHtml(values.surfaces.join(", "))}</p>
-      ${
-        values.otherDescription
-          ? `<p><strong>Other details:</strong> ${escapeHtml(values.otherDescription)}</p>`
-          : ""
-      }
-      <p><strong>Service:</strong> ${escapeHtml(values.leadServiceType)}</p>
-      <p><strong>Page:</strong> ${escapeHtml(values.pageSlug)}</p>
-    `,
+    subject: email.subject,
+    text: email.text,
+    html: email.html,
     attachments,
   });
 

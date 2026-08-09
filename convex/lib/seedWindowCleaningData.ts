@@ -35,6 +35,8 @@ export const WINDOW_CLEANING_THEME: Theme = {
   accent: "#0ea5e9",
 };
 
+import { createDefaultThankYou } from "./defaultThankYou";
+
 export const WINDOW_CLEANING_SLUG = "window-cleaning";
 
 export function createWindowCleaningSeed(now: number) {
@@ -226,6 +228,7 @@ export function createWindowCleaningSeed(now: number) {
     guarantee,
     urgency,
     close,
+    thankYou: createDefaultThankYou(),
     hero,
     problem,
     wedge,

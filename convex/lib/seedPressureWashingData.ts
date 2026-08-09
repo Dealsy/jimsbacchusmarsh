@@ -35,6 +35,8 @@ export const PRESSURE_WASHING_THEME: Theme = {
   accent: "#f97316",
 };
 
+import { createDefaultThankYou } from "./defaultThankYou";
+
 export const PRESSURE_WASHING_SLUG = "pressure-washing";
 
 export function createPressureWashingSeed(now: number) {
@@ -226,6 +228,7 @@ export function createPressureWashingSeed(now: number) {
     guarantee,
     urgency,
     close,
+    thankYou: createDefaultThankYou(),
     hero,
     problem,
     wedge,

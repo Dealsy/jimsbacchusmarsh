@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef, useState, useTransition } from "react";
+import { useRouter } from "next/navigation";
 
 import { AddressAutocompleteField } from "@/components/landing/address-autocomplete-field";
 import { trackGoogleConversion } from "@/components/analytics/google-ads";
@@ -32,10 +33,10 @@ type LeadFormProps = {
 };
 
 export function LeadForm({ page }: LeadFormProps) {
+  const router = useRouter();
   const formRef = useRef<HTMLFormElement>(null);
   const [fieldErrors, setFieldErrors] = useState<LeadFormFieldErrors>({});
   const [formError, setFormError] = useState<string | null>(null);
-  const [success, setSuccess] = useState(false);
   const [selectedSurfaces, setSelectedSurfaces] = useState<string[]>([]);
   const [address, setAddress] = useState("");
   const [suburb, setSuburb] = useState("");
@@ -56,20 +57,11 @@ export function LeadForm({ page }: LeadFormProps) {
 
   function toggleSurface(surface: string, checked: boolean) {
     clearFieldError("surfaces");
-    clearFieldError("otherDescription");
+    clearFieldError("description");
 
     setSelectedSurfaces((current) => {
       if (checked) {
         return [...current, surface];
-      }
-
-      if (surface === OTHER_SURFACE_OPTION) {
-        const otherDescription = formRef.current?.elements.namedItem(
-          "otherDescription",
-        );
-        if (otherDescription instanceof HTMLTextAreaElement) {
-          otherDescription.value = "";
-        }
       }
 
       return current.filter((item) => item !== surface);
@@ -98,17 +90,13 @@ export function LeadForm({ page }: LeadFormProps) {
       const result = await submitLead(formData, page.surfaceOptions);
 
       if (result.success) {
-        setSuccess(true);
-        formRef.current?.reset();
-        setSelectedSurfaces([]);
-        setAddress("");
-        setSuburb("");
         trackMetaLead();
         trackGoogleConversion(
           page.googleAdsId ?? process.env.NEXT_PUBLIC_GOOGLE_ADS_ID,
           page.googleConversionLabel ??
             process.env.NEXT_PUBLIC_GOOGLE_CONVERSION_LABEL,
         );
+        router.push(`/${page.slug}/thank-you`);
         return;
       }
 
@@ -119,23 +107,6 @@ export function LeadForm({ page }: LeadFormProps) {
     });
   }
 
-  if (success) {
-    return (
-      <div className="rounded-2xl border bg-[color-mix(in_srgb,var(--landing-accent)_10%,white)] p-8 text-center dark:bg-[color-mix(in_srgb,var(--landing-accent)_15%,black)]">
-        <h3
-          className="font-heading text-xl font-semibold"
-          style={{ color: "var(--landing-accent)" }}
-        >
-          Thanks — we&apos;ll call you back today
-        </h3>
-        <p className="mt-2 text-muted-foreground">
-          Your request is in. We&apos;ll be in touch shortly to arrange your
-          free assessment.
-        </p>
-      </div>
-    );
-  }
-
   return (
     <form
       ref={formRef}
@@ -144,6 +115,7 @@ export function LeadForm({ page }: LeadFormProps) {
       className="space-y-6"
     >
       <input type="hidden" name="pageSlug" value={page.slug} />
+      <input type="hidden" name="pageName" value={page.name} />
       <input
         type="hidden"
         name="leadServiceType"
@@ -234,24 +206,35 @@ export function LeadForm({ page }: LeadFormProps) {
           ) : null}
         </FieldSet>
 
-        {showOtherDescription ? (
-          <Field data-invalid={Boolean(fieldErrors.otherDescription)}>
-            <FieldLabel htmlFor="otherDescription">
-              Describe the issue
-            </FieldLabel>
-            <Textarea
-              id="otherDescription"
-              name="otherDescription"
-              rows={4}
-              placeholder="Tell us what's affected and what you're seeing…"
-              aria-invalid={Boolean(fieldErrors.otherDescription)}
-              onChange={() => clearFieldError("otherDescription")}
-            />
-            {fieldErrors.otherDescription ? (
-              <FieldError>{fieldErrors.otherDescription}</FieldError>
+        <Field data-invalid={Boolean(fieldErrors.description)}>
+          <FieldLabel htmlFor="description">
+            {showOtherDescription
+              ? "Describe the issue"
+              : "Anything else we should know?"}
+            {!showOtherDescription ? (
+              <span className="font-normal text-muted-foreground">
+                {" "}
+                (optional)
+              </span>
             ) : null}
-          </Field>
-        ) : null}
+          </FieldLabel>
+          <Textarea
+            id="description"
+            name="description"
+            rows={4}
+            placeholder={
+              showOtherDescription
+                ? "Tell us what's affected and what you're seeing…"
+                : "Access notes, severity, preferred callback time, etc."
+            }
+            aria-invalid={Boolean(fieldErrors.description)}
+            aria-required={showOtherDescription}
+            onChange={() => clearFieldError("description")}
+          />
+          {fieldErrors.description ? (
+            <FieldError>{fieldErrors.description}</FieldError>
+          ) : null}
+        </Field>
 
         <Field data-invalid={Boolean(fieldErrors.photo)}>
           <FieldLabel htmlFor="photo">

@@ -48,6 +48,15 @@ export type CloseFields = {
   ps: string;
 };
 
+export type ThankYouFields = {
+  headline: string;
+  body: string;
+  phonePrompt: string;
+  nextStepsTitle: string;
+  useHowItWorksSteps: boolean;
+  nextSteps: HowItWorksStep[];
+};
+
 export const SERVICE_ICON_OPTIONS = [
   { value: "home", label: "Home / roof" },
   { value: "building", label: "Building" },

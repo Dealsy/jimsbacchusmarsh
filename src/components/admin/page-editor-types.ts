@@ -6,6 +6,7 @@ import type {
   OfferFields,
   ServiceItem,
   TestimonialItem,
+  ThankYouFields,
   UrgencyFields,
 } from "@/components/admin/fields/editor-types";
 import type { LandingTheme } from "@/lib/landing-theme";
@@ -41,6 +42,7 @@ export type EditorState = {
   guarantee: GuaranteeFields;
   urgency: UrgencyFields;
   close: CloseFields;
+  thankYou: ThankYouFields;
   services: ServiceItem[];
   howItWorks: HowItWorksStep[];
   faq: FaqItem[];

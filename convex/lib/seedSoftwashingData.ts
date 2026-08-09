@@ -14,6 +14,7 @@ import {
   urgencyValidator,
   wedgeValidator,
 } from "./validators";
+import { createDefaultThankYou } from "./defaultThankYou";
 
 type Hero = Infer<typeof heroValidator>;
 type Problem = Infer<typeof problemValidator>;
@@ -227,6 +228,7 @@ export function createSoftwashingSeed(now: number) {
     guarantee,
     urgency,
     close,
+    thankYou: createDefaultThankYou(),
     hero,
     problem,
     wedge,

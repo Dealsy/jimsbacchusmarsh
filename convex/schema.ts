@@ -14,6 +14,7 @@ import {
   serviceItemValidator,
   testimonialValidator,
   themeValidator,
+  thankYouValidator,
   urgencyValidator,
   wedgeValidator,
 } from "./lib/validators";
@@ -48,6 +49,7 @@ export default defineSchema({
     guarantee: v.optional(guaranteeValidator),
     urgency: v.optional(urgencyValidator),
     close: v.optional(closeValidator),
+    thankYou: v.optional(thankYouValidator),
     servicesSectionTitle: v.optional(v.string()),
     servicesSectionDescription: v.optional(v.string()),
     gallerySectionTitle: v.optional(v.string()),
