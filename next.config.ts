@@ -4,8 +4,8 @@ const nextConfig: NextConfig = {
   reactCompiler: true,
   experimental: {
     serverActions: {
-      // Lead form allows photos up to 5 MB; multipart encoding adds overhead.
-      bodySizeLimit: "6mb",
+      // Keep under Vercel's ~4.5 MB serverless body limit (photo + form fields).
+      bodySizeLimit: "4mb",
     },
   },
   images: {

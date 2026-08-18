@@ -10,6 +10,9 @@ import {
   validateLeadForm,
 } from "@/lib/validations/lead-form";
 
+/** Vercel serverless request bodies cap around 4.5 MB — stay under with multipart overhead. */
+const MAX_PHOTO_BYTES = 3 * 1024 * 1024;
+
 export type SubmitLeadResult =
   | { success: true }
   | {
@@ -30,49 +33,57 @@ async function submitToLeadOs(
     return false;
   }
 
-  const nameParts = values.name.trim().split(/\s+/);
-  const firstName = nameParts[0] ?? values.name;
-  const lastName = nameParts.slice(1).join(" ") || undefined;
+  try {
+    const nameParts = values.name.trim().split(/\s+/);
+    const firstName = nameParts[0] ?? values.name;
+    const lastName = nameParts.slice(1).join(" ") || undefined;
 
-  const locationLabel = values.suburb?.trim() || values.address;
+    const locationLabel = values.suburb?.trim() || values.address;
 
-  const estimatedScope = [
-    `Address: ${values.address}`,
-    `Surfaces: ${values.surfaces.join(", ")}`,
-    values.description
-      ? `Additional details: ${values.description}`
-      : undefined,
-    `Page: ${values.pageSlug}`,
-    photoBase64 ? "Customer attached a photo with the form." : undefined,
-  ]
-    .filter(Boolean)
-    .join("\n");
+    const estimatedScope = [
+      `Address: ${values.address}`,
+      `Surfaces: ${values.surfaces.join(", ")}`,
+      values.description
+        ? `Additional details: ${values.description}`
+        : undefined,
+      `Page: ${values.pageSlug}`,
+      photoBase64 ? "Customer attached a photo with the form." : undefined,
+    ]
+      .filter(Boolean)
+      .join("\n");
 
-  const response = await fetch(webhookUrl, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "x-lead-os-secret": webhookSecret,
-    },
-    body: JSON.stringify({
-      firstName,
-      lastName,
-      phone: values.phone,
-      suburb: locationLabel,
-      serviceType: values.leadServiceType,
-      propertyType: "residential",
-      estimatedScope,
-      photoBase64,
-      photoMimeType,
-    }),
-  });
+    const response = await fetch(webhookUrl, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "x-lead-os-secret": webhookSecret,
+      },
+      body: JSON.stringify({
+        firstName,
+        lastName,
+        phone: values.phone,
+        suburb: locationLabel,
+        serviceType: values.leadServiceType,
+        propertyType: "residential",
+        estimatedScope,
+        photoBase64,
+        photoMimeType,
+      }),
+    });
 
-  return response.ok;
+    return response.ok;
+  } catch (error) {
+    console.error(
+      "Lead OS webhook error:",
+      error instanceof Error ? error.message : error,
+    );
+    return false;
+  }
 }
 
 async function submitToResend(
   values: LeadFormValues,
-  photoBase64: string | undefined,
+  photoBuffer: Buffer | undefined,
   photoMimeType: string | undefined,
   photoFileName: string | undefined,
 ): Promise<boolean> {
@@ -82,104 +93,128 @@ async function submitToResend(
     process.env.RESEND_FROM_EMAIL ?? "Landing Pages <onboarding@resend.dev>";
 
   if (!resendApiKey || !toEmail) {
+    console.error(
+      "Resend lead form skipped: missing RESEND_API_KEY or CONTACT_TO_EMAIL",
+    );
     return false;
   }
 
-  const resend = new Resend(resendApiKey);
-  const email = buildLeadNotificationEmail({
-    values,
-    hasPhoto: Boolean(photoBase64),
-  });
+  try {
+    const resend = new Resend(resendApiKey);
+    const email = buildLeadNotificationEmail({
+      values,
+      hasPhoto: Boolean(photoBuffer),
+    });
 
-  const attachments =
-    photoBase64 && photoMimeType
-      ? [
-          {
-            filename: photoFileName ?? "affected-area.jpg",
-            content: photoBase64,
-          },
-        ]
-      : undefined;
+    const attachments =
+      photoBuffer && photoMimeType
+        ? [
+            {
+              filename: photoFileName ?? "affected-area.jpg",
+              content: photoBuffer,
+            },
+          ]
+        : undefined;
 
-  const { error } = await resend.emails.send({
-    from: fromEmail,
-    to: toEmail,
-    subject: email.subject,
-    text: email.text,
-    html: email.html,
-    attachments,
-  });
+    const { error } = await resend.emails.send({
+      from: fromEmail,
+      to: toEmail,
+      subject: email.subject,
+      text: email.text,
+      html: email.html,
+      attachments,
+    });
 
-  if (error) {
-    console.error("Resend lead form error:", error.message);
+    if (error) {
+      console.error("Resend lead form error:", error.message);
+      return false;
+    }
+
+    return true;
+  } catch (error) {
+    console.error(
+      "Resend lead form exception:",
+      error instanceof Error ? error.message : error,
+    );
     return false;
   }
-
-  return true;
 }
 
 export async function submitLead(
   formData: FormData,
   surfaceOptions: readonly string[],
 ): Promise<SubmitLeadResult> {
-  const surfacesRaw = formData.getAll("surfaces").map(String);
-  const rawValues = extractLeadFormValues(formData, surfacesRaw);
-  const validation = validateLeadForm(rawValues, surfaceOptions);
+  try {
+    const surfacesRaw = formData.getAll("surfaces").map(String);
+    const rawValues = extractLeadFormValues(formData, surfacesRaw);
+    const validation = validateLeadForm(rawValues, surfaceOptions);
 
-  if (!validation.success) {
-    return {
-      success: false,
-      error: "Please fix the errors below.",
-      fieldErrors: validation.fieldErrors,
-    };
-  }
+    if (!validation.success) {
+      return {
+        success: false,
+        error: "Please fix the errors below.",
+        fieldErrors: validation.fieldErrors,
+      };
+    }
 
-  const values = validation.data;
+    const values = validation.data;
 
-  if (values.website) {
+    if (values.website) {
+      return { success: true };
+    }
+
+    const photoFile = formData.get("photo");
+    let photoBuffer: Buffer | undefined;
+    let photoMimeType: string | undefined;
+    let photoFileName: string | undefined;
+    let photoBase64: string | undefined;
+
+    if (photoFile instanceof File && photoFile.size > 0) {
+      if (photoFile.size > MAX_PHOTO_BYTES) {
+        return {
+          success: false,
+          error: "Photo must be 3 MB or smaller.",
+          fieldErrors: { photo: "Photo must be 3 MB or smaller." },
+        };
+      }
+
+      if (!photoFile.type.startsWith("image/")) {
+        return {
+          success: false,
+          error: "Please upload an image file.",
+          fieldErrors: { photo: "Please upload an image file." },
+        };
+      }
+
+      photoBuffer = Buffer.from(await photoFile.arrayBuffer());
+      photoMimeType = photoFile.type;
+      photoFileName = photoFile.name;
+      photoBase64 = photoBuffer.toString("base64");
+    }
+
+    const [leadOsOk, resendOk] = await Promise.all([
+      submitToLeadOs(values, photoBase64, photoMimeType),
+      submitToResend(values, photoBuffer, photoMimeType, photoFileName),
+    ]);
+
+    if (!leadOsOk && !resendOk) {
+      return {
+        success: false,
+        error:
+          "We couldn't send your request right now. Please call us directly — we'll get back to you today.",
+      };
+    }
+
     return { success: true };
-  }
-
-  const photoFile = formData.get("photo");
-  let photoBase64: string | undefined;
-  let photoMimeType: string | undefined;
-  let photoFileName: string | undefined;
-
-  if (photoFile instanceof File && photoFile.size > 0) {
-    if (photoFile.size > 5 * 1024 * 1024) {
-      return {
-        success: false,
-        error: "Photo must be 5 MB or smaller.",
-        fieldErrors: { photo: "Photo must be 5 MB or smaller." },
-      };
-    }
-
-    if (!photoFile.type.startsWith("image/")) {
-      return {
-        success: false,
-        error: "Please upload an image file.",
-        fieldErrors: { photo: "Please upload an image file." },
-      };
-    }
-
-    const buffer = Buffer.from(await photoFile.arrayBuffer());
-    photoBase64 = buffer.toString("base64");
-    photoMimeType = photoFile.type;
-    photoFileName = photoFile.name;
-  }
-
-  const [leadOsOk, resendOk] = await Promise.all([
-    submitToLeadOs(values, photoBase64, photoMimeType),
-    submitToResend(values, photoBase64, photoMimeType, photoFileName),
-  ]);
-
-  if (!leadOsOk && !resendOk) {
+  } catch (error) {
+    console.error(
+      "submitLead failed:",
+      error instanceof Error ? error.message : error,
+    );
     return {
       success: false,
       error:
-        "We couldn't send your request right now. Please call us directly — we'll get back to you today.",
+        "Something went wrong sending your request. If you attached a photo, try again with a smaller image or no photo.",
     };
   }
-
-  return { success: true };
 }

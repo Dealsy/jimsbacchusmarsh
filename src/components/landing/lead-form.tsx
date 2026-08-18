@@ -1,6 +1,5 @@
 "use client";
 
-import { useRouter } from "next/navigation";
 import { useRef, useState, useTransition } from "react";
 import { trackGoogleConversion } from "@/components/analytics/google-ads";
 import { trackMetaLead } from "@/components/analytics/meta-pixel";
@@ -32,7 +31,6 @@ type LeadFormProps = {
 };
 
 export function LeadForm({ page }: LeadFormProps) {
-  const router = useRouter();
   const formRef = useRef<HTMLFormElement>(null);
   const [fieldErrors, setFieldErrors] = useState<LeadFormFieldErrors>({});
   const [formError, setFormError] = useState<string | null>(null);
@@ -86,22 +84,29 @@ export function LeadForm({ page }: LeadFormProps) {
     }
 
     startTransition(async () => {
-      const result = await submitLead(formData, page.surfaceOptions);
+      try {
+        const result = await submitLead(formData, page.surfaceOptions);
 
-      if (result.success) {
-        trackMetaLead();
-        trackGoogleConversion(
-          page.googleAdsId ?? process.env.NEXT_PUBLIC_GOOGLE_ADS_ID,
-          page.googleConversionLabel ??
-            process.env.NEXT_PUBLIC_GOOGLE_CONVERSION_LABEL,
+        if (result.success) {
+          trackMetaLead();
+          trackGoogleConversion(
+            page.googleAdsId ?? process.env.NEXT_PUBLIC_GOOGLE_ADS_ID,
+            page.googleConversionLabel ??
+              process.env.NEXT_PUBLIC_GOOGLE_CONVERSION_LABEL,
+          );
+          // Full navigation avoids client-router errors after multipart server actions.
+          window.location.assign(`/${page.slug}/thank-you`);
+          return;
+        }
+
+        setFormError(result.error);
+        if (result.fieldErrors) {
+          setFieldErrors(result.fieldErrors);
+        }
+      } catch {
+        setFormError(
+          "Something went wrong sending your request. If you attached a photo, try again with a smaller image or no photo.",
         );
-        router.push(`/${page.slug}/thank-you`);
-        return;
-      }
-
-      setFormError(result.error);
-      if (result.fieldErrors) {
-        setFieldErrors(result.fieldErrors);
       }
     });
   }
@@ -239,7 +244,7 @@ export function LeadForm({ page }: LeadFormProps) {
           <FieldLabel htmlFor="photo">
             Photo of affected area{" "}
             <span className="font-normal text-muted-foreground">
-              (optional)
+              (optional, max 3 MB)
             </span>
           </FieldLabel>
           <Input
