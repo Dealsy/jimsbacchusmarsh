@@ -7,6 +7,7 @@ import { ArrowLeftIcon } from "lucide-react";
 import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
 import { AdminPageEditorSkeleton } from "@/components/admin/admin-skeletons";
+import { capturePostHogEvent } from "@/components/analytics/posthog";
 import { EditorLivePreview } from "@/components/admin/editor-live-preview";
 import { EditorToolbar } from "@/components/admin/editor-toolbar";
 import type {
@@ -394,16 +395,25 @@ export function PageEditor({ slug }: PageEditorProps) {
     });
 
     setSaving(false);
+    if (result.success) {
+      capturePostHogEvent("landing_page_saved", { page_slug: slug });
+    }
     setMessage(result.success ? "Saved." : (result.error ?? "Save failed."));
   }
 
   async function handlePublish() {
     const result = await publishPage({ slug });
+    if (result.success) {
+      capturePostHogEvent("landing_page_published", { page_slug: slug });
+    }
     setMessage(result.success ? "Published." : (result.error ?? "Failed."));
   }
 
   async function handleUnpublish() {
     const result = await unpublishPage({ slug });
+    if (result.success) {
+      capturePostHogEvent("landing_page_unpublished", { page_slug: slug });
+    }
     setMessage(result.success ? "Unpublished." : (result.error ?? "Failed."));
   }
 
@@ -422,10 +432,20 @@ export function PageEditor({ slug }: PageEditorProps) {
       afterStorageId: newAfterId,
     });
 
+    capturePostHogEvent("landing_page_gallery_item_added", {
+      page_slug: slug,
+    });
     setNewBeforeId(undefined);
     setNewAfterId(undefined);
     setNewGalleryLabel("");
     setMessage("Gallery item added.");
+  }
+
+  async function handleRemoveGalleryItem(itemId: Id<"landingPageGallery">) {
+    await removeGallery({ itemId });
+    capturePostHogEvent("landing_page_gallery_item_removed", {
+      page_slug: slug,
+    });
   }
 
   return (
@@ -1130,7 +1150,7 @@ export function PageEditor({ slug }: PageEditorProps) {
                       type="button"
                       variant="destructive"
                       size="sm"
-                      onClick={() => removeGallery({ itemId: item._id })}
+                      onClick={() => handleRemoveGalleryItem(item._id)}
                     >
                       Remove
                     </Button>

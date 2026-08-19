@@ -12,6 +12,7 @@ import {
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { AdminPageListSkeleton } from "@/components/admin/admin-skeletons";
+import { capturePostHogEvent } from "@/components/analytics/posthog";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -116,6 +117,7 @@ export function PageList() {
       return;
     }
 
+    capturePostHogEvent("landing_page_created", { page_slug: result.slug });
     setAddDialogOpen(false);
     resetAddDialog();
     router.push(`/admin/${result.slug}`);
@@ -128,6 +130,10 @@ export function PageList() {
     const result = await seedMutations[mutation]({});
     if (!result.success) {
       setSeedError(result.error);
+    } else {
+      capturePostHogEvent("landing_page_template_seeded", {
+        template: mutation,
+      });
     }
 
     setSeedingKey(null);

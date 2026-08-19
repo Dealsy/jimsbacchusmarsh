@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef, useState, useTransition } from "react";
+import { capturePostHogEvent } from "@/components/analytics/posthog";
 import { AddressAutocompleteField } from "@/components/landing/address-autocomplete-field";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -86,6 +87,13 @@ export function LeadForm({ page }: LeadFormProps) {
         const result = await submitLead(formData, page.surfaceOptions);
 
         if (result.success) {
+          const photo = formData.get("photo");
+          capturePostHogEvent("lead_form_submitted", {
+            page_slug: page.slug,
+            service_type: page.leadServiceType,
+            selected_surface_count: selectedSurfaces.length,
+            has_photo: photo instanceof File && photo.size > 0,
+          });
           window.location.assign(`/${page.slug}/thank-you`);
           return;
         }
