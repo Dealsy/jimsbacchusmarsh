@@ -2,6 +2,7 @@ import { ClerkProvider } from "@clerk/nextjs";
 import type { Metadata } from "next";
 import { Raleway, Roboto } from "next/font/google";
 
+import { GoogleTag } from "@/components/analytics/google-tag";
 import { ConvexClientProvider } from "@/components/providers/convex-client-provider";
 import { Toaster } from "@/components/ui/toast";
 import { clerkAppearance } from "@/lib/clerk-appearance";
@@ -32,6 +33,8 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const gaMeasurementId = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID;
+
   return (
     <html
       lang="en"
@@ -42,6 +45,7 @@ export default function RootLayout({
       )}
     >
       <body className="min-h-full flex flex-col">
+        <GoogleTag measurementId={gaMeasurementId} />
         <ClerkProvider appearance={clerkAppearance}>
           <ConvexClientProvider>
             {children}

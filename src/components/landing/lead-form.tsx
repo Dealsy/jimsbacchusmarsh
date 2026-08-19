@@ -1,8 +1,6 @@
 "use client";
 
 import { useRef, useState, useTransition } from "react";
-import { trackGoogleConversion } from "@/components/analytics/google-ads";
-import { trackMetaLead } from "@/components/analytics/meta-pixel";
 import { AddressAutocompleteField } from "@/components/landing/address-autocomplete-field";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -88,13 +86,6 @@ export function LeadForm({ page }: LeadFormProps) {
         const result = await submitLead(formData, page.surfaceOptions);
 
         if (result.success) {
-          trackMetaLead();
-          trackGoogleConversion(
-            page.googleAdsId ?? process.env.NEXT_PUBLIC_GOOGLE_ADS_ID,
-            page.googleConversionLabel ??
-              process.env.NEXT_PUBLIC_GOOGLE_CONVERSION_LABEL,
-          );
-          // Full navigation avoids client-router errors after multipart server actions.
           window.location.assign(`/${page.slug}/thank-you`);
           return;
         }

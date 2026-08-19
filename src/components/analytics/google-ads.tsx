@@ -14,9 +14,20 @@ type GoogleAdsProps = {
   readonly conversionLabel?: string;
 };
 
+/** Google Ads (AW-…) config — gtag.js is loaded site-wide by GoogleTag. */
 export function GoogleAds({ adsId }: GoogleAdsProps) {
   if (!adsId) {
     return null;
+  }
+
+  const measurementId = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID;
+
+  if (measurementId) {
+    return (
+      <Script id={`google-ads-config-${adsId}`} strategy="afterInteractive">
+        {`gtag('config', '${adsId}');`}
+      </Script>
+    );
   }
 
   return (

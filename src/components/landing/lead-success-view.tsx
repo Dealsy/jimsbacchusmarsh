@@ -1,7 +1,10 @@
 import { CheckIcon } from "lucide-react";
 
+import { GoogleAds } from "@/components/analytics/google-ads";
+import { MetaPixel } from "@/components/analytics/meta-pixel";
 import { LandingPageTheme } from "@/components/landing/landing-page-theme";
 import { SiteFooter } from "@/components/landing/site-footer";
+import { ThankYouAnalytics } from "@/components/landing/thank-you-analytics";
 import { LinkButton } from "@/components/ui/link-button";
 import { resolveThankYou } from "@/lib/landing-page-content";
 import { formatPhoneHref, isPlaceholderPhone } from "@/lib/phone";
@@ -14,9 +17,14 @@ type LeadSuccessViewProps = {
 export function LeadSuccessView({ page }: LeadSuccessViewProps) {
   const thankYou = resolveThankYou(page);
   const showPhone = !isPlaceholderPhone(page.phone);
+  const metaPixelId = page.metaPixelId ?? process.env.NEXT_PUBLIC_META_PIXEL_ID;
+  const googleAdsId = page.googleAdsId ?? process.env.NEXT_PUBLIC_GOOGLE_ADS_ID;
 
   return (
     <LandingPageTheme theme={page.theme}>
+      <MetaPixel pixelId={metaPixelId} />
+      <GoogleAds adsId={googleAdsId} />
+      <ThankYouAnalytics page={page} />
       <main className="flex min-h-[100dvh] flex-col pb-14">
         <div className="mx-auto flex w-full max-w-2xl flex-1 flex-col items-center justify-center px-4 py-16 text-center">
           <div
