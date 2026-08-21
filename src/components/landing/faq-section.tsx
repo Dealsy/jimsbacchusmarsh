@@ -12,7 +12,7 @@ type FaqSectionProps = {
 
 export function FaqSection({ page }: FaqSectionProps) {
   return (
-    <section className="bg-muted/30 py-16 md:py-20">
+    <section data-landing-section="faq" className="bg-muted/30 py-16 md:py-20">
       <div className="mx-auto max-w-3xl space-y-10 px-4">
         <h2 className="text-center font-heading text-3xl font-bold tracking-tight md:text-4xl">
           Common questions

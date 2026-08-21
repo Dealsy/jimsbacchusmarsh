@@ -1,6 +1,7 @@
 "use client";
 
 import { GoogleAds } from "@/components/analytics/google-ads";
+import { LandingPageAnalytics } from "@/components/analytics/landing-page-analytics";
 import { MetaPixel } from "@/components/analytics/meta-pixel";
 import { BeforeAfterGallery } from "@/components/landing/before-after-gallery";
 import { CloseSection } from "@/components/landing/close-section";
@@ -33,6 +34,7 @@ export function LandingPageView({ page, gallery }: LandingPageViewProps) {
 
   return (
     <>
+      <LandingPageAnalytics pageSlug={page.slug} />
       <MetaPixel pixelId={metaPixelId} />
       <GoogleAds adsId={googleAdsId} />
       <LandingPageTheme theme={page.theme}>

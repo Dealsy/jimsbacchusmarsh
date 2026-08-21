@@ -22,7 +22,7 @@ export function OfferStackSection({ page }: OfferStackSectionProps) {
   const hasStack = hasOfferStackContent(offer);
 
   return (
-    <section className="bg-muted/30 py-16 md:py-20">
+    <section data-landing-section="offer" className="bg-muted/30 py-16 md:py-20">
       <div className="mx-auto max-w-3xl space-y-8 px-4">
         {urgency ? <UrgencyBanner message={urgency.message} /> : null}
 
@@ -106,6 +106,7 @@ export function OfferStackSection({ page }: OfferStackSectionProps) {
         <div className="text-center">
           <LinkButton
             href="#quote-form"
+            landingCtaLocation="offer"
             size="lg"
             className="h-auto px-8 py-3.5 text-lg font-semibold md:text-xl"
           >

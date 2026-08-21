@@ -31,6 +31,7 @@ type LeadFormProps = {
 
 export function LeadForm({ page }: LeadFormProps) {
   const formRef = useRef<HTMLFormElement>(null);
+  const hasTrackedFormStart = useRef(false);
   const [fieldErrors, setFieldErrors] = useState<LeadFormFieldErrors>({});
   const [formError, setFormError] = useState<string | null>(null);
   const [selectedSurfaces, setSelectedSurfaces] = useState<string[]>([]);
@@ -110,10 +111,29 @@ export function LeadForm({ page }: LeadFormProps) {
     });
   }
 
+  function handleFormFocusCapture(event: React.FocusEvent<HTMLFormElement>) {
+    if (hasTrackedFormStart.current) {
+      return;
+    }
+
+    const target = event.target;
+    if (!(target instanceof HTMLElement)) {
+      return;
+    }
+
+    if (target.name === "website") {
+      return;
+    }
+
+    hasTrackedFormStart.current = true;
+    capturePostHogEvent("form_started", { page_slug: page.slug });
+  }
+
   return (
     <form
       ref={formRef}
       onSubmit={handleSubmit}
+      onFocusCapture={handleFormFocusCapture}
       noValidate
       className="space-y-6"
     >

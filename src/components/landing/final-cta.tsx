@@ -16,7 +16,11 @@ export function FinalCta({ page }: FinalCtaProps) {
   const urgency = resolveUrgency(page);
 
   return (
-    <section id="quote-form" className="py-16 md:py-24">
+    <section
+      id="quote-form"
+      data-landing-section="form"
+      className="py-16 md:py-24"
+    >
       <div className="mx-auto grid max-w-6xl gap-12 px-4 lg:grid-cols-2 lg:items-start">
         <div className="space-y-6">
           <h2 className="font-heading text-3xl font-bold tracking-tight md:text-4xl">

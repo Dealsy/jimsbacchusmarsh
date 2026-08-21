@@ -23,7 +23,7 @@ export function StickyMobileBar({ phone, ctaLabel }: StickyMobileBarProps) {
             Call
           </LinkButton>
         ) : null}
-        <LinkButton href="#quote-form" className="flex-1">
+        <LinkButton href="#quote-form" landingCtaLocation="sticky_bar" className="flex-1">
           {ctaLabel}
         </LinkButton>
       </div>

@@ -25,7 +25,7 @@ export function CloseSection({ page }: CloseSectionProps) {
           </div>
         ) : null}
         <p className="text-lg leading-relaxed">{close.ps}</p>
-        <LinkButton href="#quote-form" size="lg">
+        <LinkButton href="#quote-form" landingCtaLocation="final_cta" size="lg">
           {page.ctaLabel}
         </LinkButton>
       </div>

@@ -13,6 +13,7 @@ export function Hero({ page }: HeroProps) {
 
   return (
     <section
+      data-landing-section="hero"
       className="relative overflow-hidden text-white"
       style={{
         background: `linear-gradient(to bottom, var(--landing-hero-from), var(--landing-hero-to))`,
@@ -48,6 +49,7 @@ export function Hero({ page }: HeroProps) {
           ) : null}
           <LinkButton
             href="#quote-form"
+            landingCtaLocation="hero"
             size="lg"
             className="h-auto px-8 py-3.5 text-lg font-semibold md:text-xl"
           >

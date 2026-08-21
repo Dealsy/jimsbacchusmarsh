@@ -6,6 +6,7 @@ import { cn } from "@/lib/utils";
 type LinkButtonProps = {
   readonly href: string;
   readonly children: React.ReactNode;
+  readonly landingCtaLocation?: string;
   readonly variant?:
     | "default"
     | "outline"
@@ -29,6 +30,7 @@ type LinkButtonProps = {
 export function LinkButton({
   href,
   children,
+  landingCtaLocation,
   variant = "default",
   size = "default",
   className,
@@ -38,6 +40,7 @@ export function LinkButton({
     <Link
       href={href}
       target={target}
+      data-landing-cta={landingCtaLocation}
       className={cn(buttonVariants({ variant, size }), className)}
     >
       {children}
