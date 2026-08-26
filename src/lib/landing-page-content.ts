@@ -79,6 +79,7 @@ export type ResolvedOffer = {
     readonly value: string | null;
   }[];
   readonly bonuses: readonly string[];
+  readonly webBookingDiscountPercent: number | null;
 };
 
 export type ResolvedGuarantee = {
@@ -96,6 +97,26 @@ export type ResolvedClose = {
   readonly ps: string;
 };
 
+export function parseWebBookingDiscountPercent(
+  value: number | string | null | undefined,
+): number | null {
+  if (value === null || value === undefined || value === "") {
+    return null;
+  }
+
+  const parsed = typeof value === "number" ? value : Number.parseInt(value, 10);
+  if (!Number.isFinite(parsed)) {
+    return null;
+  }
+
+  const rounded = Math.round(parsed);
+  if (rounded < 1 || rounded > 100) {
+    return null;
+  }
+
+  return rounded;
+}
+
 export function resolveOffer(page: PublishedPage): ResolvedOffer {
   if (page.offer) {
     return {
@@ -106,6 +127,9 @@ export function resolveOffer(page: PublishedPage): ResolvedOffer {
         value: item.value?.trim() || null,
       })),
       bonuses: page.offer.bonuses,
+      webBookingDiscountPercent: parseWebBookingDiscountPercent(
+        page.offer.webBookingDiscountPercent,
+      ),
     };
   }
 
@@ -114,6 +138,7 @@ export function resolveOffer(page: PublishedPage): ResolvedOffer {
     reasonWhy: null,
     valueItems: [],
     bonuses: [],
+    webBookingDiscountPercent: null,
   };
 }
 
@@ -187,7 +212,8 @@ export function hasOfferStackContent(offer: ResolvedOffer): boolean {
   return (
     offer.valueItems.length > 0 ||
     offer.bonuses.length > 0 ||
-    offer.reasonWhy !== null
+    offer.reasonWhy !== null ||
+    offer.webBookingDiscountPercent !== null
   );
 }
 

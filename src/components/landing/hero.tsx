@@ -19,7 +19,7 @@ export function Hero({ page }: HeroProps) {
         background: `linear-gradient(to bottom, var(--landing-hero-from), var(--landing-hero-to))`,
       }}
     >
-      <div className="mx-auto grid max-w-7xl gap-10 px-4 py-16 md:grid-cols-2 md:items-stretch md:py-24 lg:grid-cols-12 lg:gap-12">
+      <div className="mx-auto grid max-w-7xl gap-10 px-4 py-16 md:grid-cols-2 md:items-center md:py-24 lg:grid-cols-12 lg:gap-12">
         <div className="flex flex-col justify-center space-y-6 lg:col-span-5">
           {hero.audienceCallout ? (
             <p className="text-sm font-semibold uppercase tracking-wide text-white/80">
@@ -68,7 +68,7 @@ export function Hero({ page }: HeroProps) {
           </ul>
         </div>
         <div
-          className="relative aspect-[4/3] min-h-[280px] overflow-hidden rounded-2xl border border-white/10 shadow-2xl sm:min-h-[320px] md:aspect-auto md:h-full md:min-h-[400px] lg:col-span-7"
+          className="relative aspect-16/10 overflow-hidden rounded-2xl border border-white/10 shadow-2xl lg:col-span-7"
           style={{
             backgroundColor:
               "color-mix(in srgb, var(--landing-hero-from) 50%, transparent)",
@@ -81,7 +81,7 @@ export function Hero({ page }: HeroProps) {
               alt={`${page.name} — before and after`}
               fill
               unoptimized
-              className="object-cover"
+              className="object-cover object-center"
               priority
               sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 58vw"
             />

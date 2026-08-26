@@ -187,6 +187,7 @@ export function createPressureWashingSeed(now: number) {
       "Priority booking for quotes confirmed this week",
       "Honest advice — we'll tell you if pressure washing isn't the right fit",
     ],
+    webBookingDiscountPercent: 10,
   };
 
   const guarantee: Guarantee = {

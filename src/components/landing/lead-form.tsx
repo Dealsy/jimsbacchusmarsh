@@ -16,6 +16,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { submitLead } from "@/lib/actions/submit-lead";
+import { resolveOffer } from "@/lib/landing-page-content";
 import { formatPhoneHref, isPlaceholderPhone } from "@/lib/phone";
 import type { PublishedLandingPage } from "@/lib/types/landing-page";
 import {
@@ -27,9 +28,11 @@ import {
 
 type LeadFormProps = {
   readonly page: PublishedLandingPage;
+  readonly idPrefix: string;
+  readonly formLocation: string;
 };
 
-export function LeadForm({ page }: LeadFormProps) {
+export function LeadForm({ page, idPrefix, formLocation }: LeadFormProps) {
   const formRef = useRef<HTMLFormElement>(null);
   const hasTrackedFormStart = useRef(false);
   const [fieldErrors, setFieldErrors] = useState<LeadFormFieldErrors>({});
@@ -38,6 +41,14 @@ export function LeadForm({ page }: LeadFormProps) {
   const [address, setAddress] = useState("");
   const [suburb, setSuburb] = useState("");
   const [isPending, startTransition] = useTransition();
+  const offer = resolveOffer(page);
+  const discountPercent = offer.webBookingDiscountPercent;
+
+  const nameId = `${idPrefix}-name`;
+  const phoneId = `${idPrefix}-phone`;
+  const addressId = `${idPrefix}-address`;
+  const descriptionId = `${idPrefix}-description`;
+  const photoId = `${idPrefix}-photo`;
 
   const showOtherDescription = selectedSurfaces.includes(OTHER_SURFACE_OPTION);
 
@@ -94,6 +105,7 @@ export function LeadForm({ page }: LeadFormProps) {
             service_type: page.leadServiceType,
             selected_surface_count: selectedSurfaces.length,
             has_photo: photo instanceof File && photo.size > 0,
+            form_location: formLocation,
           });
           window.location.assign(`/${page.slug}/thank-you`);
           return;
@@ -126,7 +138,10 @@ export function LeadForm({ page }: LeadFormProps) {
     }
 
     hasTrackedFormStart.current = true;
-    capturePostHogEvent("form_started", { page_slug: page.slug });
+    capturePostHogEvent("form_started", {
+      page_slug: page.slug,
+      form_location: formLocation,
+    });
   }
 
   return (
@@ -144,6 +159,13 @@ export function LeadForm({ page }: LeadFormProps) {
         name="leadServiceType"
         value={page.leadServiceType}
       />
+      {discountPercent !== null ? (
+        <input
+          type="hidden"
+          name="webBookingDiscountPercent"
+          value={String(discountPercent)}
+        />
+      ) : null}
       <input
         type="text"
         name="website"
@@ -155,9 +177,9 @@ export function LeadForm({ page }: LeadFormProps) {
 
       <FieldGroup>
         <Field data-invalid={Boolean(fieldErrors.name)}>
-          <FieldLabel htmlFor="name">Name</FieldLabel>
+          <FieldLabel htmlFor={nameId}>Name</FieldLabel>
           <Input
-            id="name"
+            id={nameId}
             name="name"
             autoComplete="name"
             aria-invalid={Boolean(fieldErrors.name)}
@@ -169,9 +191,9 @@ export function LeadForm({ page }: LeadFormProps) {
         </Field>
 
         <Field data-invalid={Boolean(fieldErrors.phone)}>
-          <FieldLabel htmlFor="phone">Phone</FieldLabel>
+          <FieldLabel htmlFor={phoneId}>Phone</FieldLabel>
           <Input
-            id="phone"
+            id={phoneId}
             name="phone"
             type="tel"
             autoComplete="tel"
@@ -184,9 +206,9 @@ export function LeadForm({ page }: LeadFormProps) {
         </Field>
 
         <Field data-invalid={Boolean(fieldErrors.address)}>
-          <FieldLabel htmlFor="address">Property address</FieldLabel>
+          <FieldLabel htmlFor={addressId}>Property address</FieldLabel>
           <AddressAutocompleteField
-            id="address"
+            id={addressId}
             value={address}
             suburb={suburb}
             error={fieldErrors.address}
@@ -205,7 +227,7 @@ export function LeadForm({ page }: LeadFormProps) {
           <FieldLegend className="mb-0 px-0">Affected surface</FieldLegend>
           <div className="grid gap-3 sm:grid-cols-2">
             {page.surfaceOptions.map((surface) => {
-              const surfaceId = `surface-${surface.replace(/\s+/g, "-").toLowerCase()}`;
+              const surfaceId = `${idPrefix}-surface-${surface.replace(/\s+/g, "-").toLowerCase()}`;
               return (
                 <label
                   key={surface}
@@ -230,7 +252,7 @@ export function LeadForm({ page }: LeadFormProps) {
         </FieldSet>
 
         <Field data-invalid={Boolean(fieldErrors.description)}>
-          <FieldLabel htmlFor="description">
+          <FieldLabel htmlFor={descriptionId}>
             {showOtherDescription
               ? "Describe the issue"
               : "Anything else we should know?"}
@@ -242,7 +264,7 @@ export function LeadForm({ page }: LeadFormProps) {
             ) : null}
           </FieldLabel>
           <Textarea
-            id="description"
+            id={descriptionId}
             name="description"
             rows={4}
             placeholder={
@@ -260,14 +282,14 @@ export function LeadForm({ page }: LeadFormProps) {
         </Field>
 
         <Field data-invalid={Boolean(fieldErrors.photo)}>
-          <FieldLabel htmlFor="photo">
+          <FieldLabel htmlFor={photoId}>
             Photo of affected area{" "}
             <span className="font-normal text-muted-foreground">
               (optional, max 3 MB)
             </span>
           </FieldLabel>
           <Input
-            id="photo"
+            id={photoId}
             name="photo"
             type="file"
             accept="image/*"
@@ -297,6 +319,12 @@ export function LeadForm({ page }: LeadFormProps) {
               .
             </>
           ) : null}
+        </p>
+      ) : null}
+
+      {discountPercent !== null ? (
+        <p className="text-center text-sm text-muted-foreground">
+          Book from this page and save {discountPercent}% on the job.
         </p>
       ) : null}
 

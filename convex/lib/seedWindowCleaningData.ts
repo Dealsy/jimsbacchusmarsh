@@ -188,6 +188,7 @@ export function createWindowCleaningSeed(now: number) {
       "Priority booking for new clients this month",
       "Frame and sill wipe included on first full clean",
     ],
+    webBookingDiscountPercent: 10,
   };
 
   const guarantee: Guarantee = {

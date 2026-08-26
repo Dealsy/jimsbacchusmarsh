@@ -72,6 +72,13 @@ function buildDetailRows(
     });
   }
 
+  if (values.webBookingDiscountPercent) {
+    rows.push({
+      label: "Web booking discount",
+      value: `${values.webBookingDiscountPercent}% off the job`,
+    });
+  }
+
   return rows;
 }
 

@@ -7,7 +7,6 @@ import { ArrowLeftIcon } from "lucide-react";
 import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
 import { AdminPageEditorSkeleton } from "@/components/admin/admin-skeletons";
-import { capturePostHogEvent } from "@/components/analytics/posthog";
 import { EditorLivePreview } from "@/components/admin/editor-live-preview";
 import { EditorToolbar } from "@/components/admin/editor-toolbar";
 import type {
@@ -35,13 +34,24 @@ import type {
   LoadedPage,
 } from "@/components/admin/page-editor-types";
 import { SectionCard, TabIntro } from "@/components/admin/section-card";
+import { capturePostHogEvent } from "@/components/analytics/posthog";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Field, FieldGroup, FieldLabel } from "@/components/ui/field";
+import {
+  Field,
+  FieldDescription,
+  FieldGroup,
+  FieldLabel,
+} from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { LinkButton } from "@/components/ui/link-button";
+import {
+  NativeSelect,
+  NativeSelectOption,
+} from "@/components/ui/native-select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
+import { parseWebBookingDiscountPercent } from "@/lib/landing-page-content";
 import {
   DEFAULT_LANDING_THEME,
   type LandingTheme,
@@ -111,11 +121,15 @@ function sanitizeOfferValueItems(
 }
 
 function sanitizeOffer(offer: OfferFields): OfferFields {
+  const percent = parseWebBookingDiscountPercent(
+    offer.webBookingDiscountPercent,
+  );
   return {
     headline: offer.headline.trim(),
     reasonWhy: offer.reasonWhy.trim(),
     valueItems: sanitizeOfferValueItems(offer.valueItems),
     bonuses: trimStringList(offer.bonuses),
+    ...(percent !== null ? { webBookingDiscountPercent: percent } : {}),
   };
 }
 
@@ -209,6 +223,7 @@ function pageToEditorState(page: LoadedPage): EditorState {
       reasonWhy: page.offer?.reasonWhy ?? "",
       valueItems: (page.offer?.valueItems ?? []).map((item) => ({ ...item })),
       bonuses: [...(page.offer?.bonuses ?? [])],
+      webBookingDiscountPercent: page.offer?.webBookingDiscountPercent,
     },
     guarantee: {
       headline: page.guarantee?.headline ?? "",
@@ -266,6 +281,7 @@ export function PageEditor({ slug }: PageEditorProps) {
   const publishPage = useMutation(api.landingPages.publish);
   const unpublishPage = useMutation(api.landingPages.unpublish);
   const upsertGallery = useMutation(api.landingPageGallery.upsert);
+  const updateGalleryItem = useMutation(api.landingPageGallery.updateItem);
   const removeGallery = useMutation(api.landingPageGallery.remove);
 
   const [state, setState] = useState<EditorState | null>(null);
@@ -275,6 +291,7 @@ export function PageEditor({ slug }: PageEditorProps) {
   const [newBeforeId, setNewBeforeId] = useState<Id<"_storage"> | undefined>();
   const [newAfterId, setNewAfterId] = useState<Id<"_storage"> | undefined>();
   const [newGalleryLabel, setNewGalleryLabel] = useState("");
+  const [newGalleryCategory, setNewGalleryCategory] = useState("");
 
   const handleUploadingChange = useCallback((uploading: boolean) => {
     setActiveUploads((count) => {
@@ -428,6 +445,7 @@ export function PageEditor({ slug }: PageEditorProps) {
       pageId,
       sortOrder,
       label: newGalleryLabel.trim() || undefined,
+      category: newGalleryCategory.trim() || undefined,
       beforeStorageId: newBeforeId,
       afterStorageId: newAfterId,
     });
@@ -438,6 +456,7 @@ export function PageEditor({ slug }: PageEditorProps) {
     setNewBeforeId(undefined);
     setNewAfterId(undefined);
     setNewGalleryLabel("");
+    setNewGalleryCategory("");
     setMessage("Gallery item added.");
   }
 
@@ -445,6 +464,16 @@ export function PageEditor({ slug }: PageEditorProps) {
     await removeGallery({ itemId });
     capturePostHogEvent("landing_page_gallery_item_removed", {
       page_slug: slug,
+    });
+  }
+
+  async function handleUpdateGalleryCategory(
+    itemId: Id<"landingPageGallery">,
+    category: string,
+  ) {
+    await updateGalleryItem({
+      itemId,
+      category,
     });
   }
 
@@ -855,6 +884,31 @@ export function PageEditor({ slug }: PageEditorProps) {
                 </FieldGroup>
               </SectionCard>
 
+              <SectionCard title="Web booking discount">
+                <Field>
+                  <FieldLabel>Discount percent (optional)</FieldLabel>
+                  <Input
+                    type="number"
+                    min={1}
+                    max={100}
+                    value={state.offer.webBookingDiscountPercent ?? ""}
+                    onChange={(event) => {
+                      const raw = event.target.value;
+                      updateField("offer", {
+                        ...state.offer,
+                        webBookingDiscountPercent:
+                          raw === "" ? undefined : Number.parseInt(raw, 10),
+                      });
+                    }}
+                    placeholder="e.g. 10"
+                  />
+                  <FieldDescription>
+                    Shown on the offer card and stamped on leads. Leave blank to
+                    hide. 10 means 10% off the job when booked from this page.
+                  </FieldDescription>
+                </Field>
+              </SectionCard>
+
               <OfferValueItemsEditor
                 values={state.offer.valueItems}
                 onChange={(valueItems) =>
@@ -1184,6 +1238,39 @@ export function PageEditor({ slug }: PageEditorProps) {
                       </div>
                     ) : null}
                   </div>
+                  <Field className="mt-4">
+                    <FieldLabel>Category</FieldLabel>
+                    <NativeSelect
+                      className="w-full"
+                      value={item.category ?? ""}
+                      onChange={(event) =>
+                        void handleUpdateGalleryCategory(
+                          item._id,
+                          event.target.value,
+                        )
+                      }
+                    >
+                      <NativeSelectOption value="">
+                        Uncategorized
+                      </NativeSelectOption>
+                      {item.category &&
+                      !state.services.some(
+                        (service) => service.title.trim() === item.category,
+                      ) ? (
+                        <NativeSelectOption value={item.category}>
+                          {item.category}
+                        </NativeSelectOption>
+                      ) : null}
+                      {state.services
+                        .map((service) => service.title.trim())
+                        .filter(Boolean)
+                        .map((title) => (
+                          <NativeSelectOption key={title} value={title}>
+                            {title}
+                          </NativeSelectOption>
+                        ))}
+                    </NativeSelect>
+                  </Field>
                 </SectionCard>
               ))}
             </div>
@@ -1206,6 +1293,27 @@ export function PageEditor({ slug }: PageEditorProps) {
                 onChange={(event) => setNewGalleryLabel(event.target.value)}
                 placeholder="e.g. Roof clean — Bacchus Marsh"
               />
+            </Field>
+            <Field>
+              <FieldLabel>Category</FieldLabel>
+              <NativeSelect
+                className="w-full"
+                value={newGalleryCategory}
+                onChange={(event) => setNewGalleryCategory(event.target.value)}
+              >
+                <NativeSelectOption value="">Uncategorized</NativeSelectOption>
+                {state.services
+                  .map((service) => service.title.trim())
+                  .filter(Boolean)
+                  .map((title) => (
+                    <NativeSelectOption key={title} value={title}>
+                      {title}
+                    </NativeSelectOption>
+                  ))}
+              </NativeSelect>
+              <FieldDescription>
+                Matches a service card so visitors can filter before & afters.
+              </FieldDescription>
             </Field>
             <div className="grid gap-6 md:grid-cols-2">
               <ImageUpload

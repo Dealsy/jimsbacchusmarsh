@@ -21,6 +21,7 @@ export type LeadFormRawInput = {
   readonly pageSlug: string;
   readonly pageName: string;
   readonly leadServiceType: string;
+  readonly webBookingDiscountPercent?: number;
 };
 
 export function createLeadFormSchema(surfaceOptions: readonly string[]) {
@@ -61,6 +62,7 @@ export function createLeadFormSchema(surfaceOptions: readonly string[]) {
       pageSlug: z.string().min(1),
       pageName: z.string().trim().max(120).optional(),
       leadServiceType: z.string().min(1),
+      webBookingDiscountPercent: z.number().int().min(1).max(100).optional(),
     })
     .superRefine((data, ctx) => {
       if (!data.surfaces.includes(OTHER_SURFACE_OPTION)) {
@@ -88,6 +90,9 @@ export function extractLeadFormValues(
   formData: FormData,
   surfaces: readonly string[],
 ): LeadFormRawInput {
+  const discountRaw = String(formData.get("webBookingDiscountPercent") ?? "");
+  const parsedDiscount = Number.parseInt(discountRaw, 10);
+
   return {
     name: String(formData.get("name") ?? ""),
     phone: String(formData.get("phone") ?? ""),
@@ -99,6 +104,12 @@ export function extractLeadFormValues(
     pageSlug: String(formData.get("pageSlug") ?? ""),
     pageName: String(formData.get("pageName") ?? ""),
     leadServiceType: String(formData.get("leadServiceType") ?? ""),
+    webBookingDiscountPercent:
+      Number.isFinite(parsedDiscount) &&
+      parsedDiscount >= 1 &&
+      parsedDiscount <= 100
+        ? parsedDiscount
+        : undefined,
   };
 }
 

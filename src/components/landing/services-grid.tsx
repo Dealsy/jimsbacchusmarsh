@@ -15,9 +15,13 @@ const iconMap = {
 
 type ServicesGridProps = {
   readonly page: PublishedLandingPage;
+  readonly onSelectGalleryCategory: (category: string) => void;
 };
 
-export function ServicesGrid({ page }: ServicesGridProps) {
+export function ServicesGrid({
+  page,
+  onSelectGalleryCategory,
+}: ServicesGridProps) {
   const section = resolveServicesSection(page);
 
   return (
@@ -36,17 +40,27 @@ export function ServicesGrid({ page }: ServicesGridProps) {
               const Icon =
                 iconMap[service.icon as keyof typeof iconMap] ?? HomeIcon;
               return (
-                <Card key={service.title} className="bg-background">
-                  <CardHeader>
-                    <Icon className="mb-2 size-8 text-primary" />
-                    <CardTitle className="text-lg">{service.title}</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-sm leading-relaxed text-muted-foreground">
-                      {service.description}
-                    </p>
-                  </CardContent>
-                </Card>
+                <button
+                  key={service.title}
+                  type="button"
+                  className="rounded-2xl text-left outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50"
+                  onClick={() => onSelectGalleryCategory(service.title)}
+                >
+                  <Card className="h-full bg-background transition-shadow hover:shadow-md">
+                    <CardHeader>
+                      <Icon className="mb-2 size-8 text-primary" />
+                      <CardTitle className="text-lg">{service.title}</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <p className="text-sm leading-relaxed text-muted-foreground">
+                        {service.description}
+                      </p>
+                      <p className="mt-3 text-sm font-medium text-primary">
+                        See before & afters
+                      </p>
+                    </CardContent>
+                  </Card>
+                </button>
               );
             })}
           </div>

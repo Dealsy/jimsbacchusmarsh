@@ -17,7 +17,7 @@ export function FinalCta({ page }: FinalCtaProps) {
 
   return (
     <section
-      id="quote-form"
+      id="quote-form-footer"
       data-landing-section="form"
       className="py-16 md:py-24"
     >
@@ -44,7 +44,7 @@ export function FinalCta({ page }: FinalCtaProps) {
         <div className="space-y-4">
           {urgency ? <UrgencyBanner message={urgency.message} /> : null}
           <div className="rounded-2xl border bg-card p-6 shadow-sm md:p-8">
-            <LeadForm page={page} />
+            <LeadForm page={page} idPrefix="footer" formLocation="footer" />
           </div>
         </div>
       </div>

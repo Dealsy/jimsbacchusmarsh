@@ -27,6 +27,7 @@ export const offerValidator = v.object({
   reasonWhy: v.optional(v.string()),
   valueItems: v.array(offerValueItemValidator),
   bonuses: v.array(v.string()),
+  webBookingDiscountPercent: v.optional(v.number()),
 });
 
 export const guaranteeValidator = v.object({

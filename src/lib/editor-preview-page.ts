@@ -2,6 +2,7 @@ import type {
   EditorState,
   LoadedPage,
 } from "@/components/admin/page-editor-types";
+import { parseWebBookingDiscountPercent } from "@/lib/landing-page-content";
 import type { PublishedLandingPage } from "@/lib/types/landing-page";
 
 function trimStringList(values: readonly string[]): string[] {
@@ -64,6 +65,9 @@ export function mergeEditorPreviewPage(
         }))
         .filter((item) => item.label),
       bonuses: trimStringList(state.offer.bonuses),
+      webBookingDiscountPercent:
+        parseWebBookingDiscountPercent(state.offer.webBookingDiscountPercent) ??
+        undefined,
     },
     guarantee:
       state.guarantee.headline.trim() || state.guarantee.body.trim()

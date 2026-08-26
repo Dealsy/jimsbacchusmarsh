@@ -61,6 +61,7 @@ export default defineSchema({
     pageId: v.id("landingPages"),
     sortOrder: v.number(),
     label: v.optional(v.string()),
+    category: v.optional(v.string()),
     beforeStorageId: v.id("_storage"),
     afterStorageId: v.id("_storage"),
   }).index("by_pageId", ["pageId"]),

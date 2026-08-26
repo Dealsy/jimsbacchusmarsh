@@ -31,6 +31,7 @@ export type OfferFields = {
   reasonWhy: string;
   valueItems: OfferValueItem[];
   bonuses: string[];
+  webBookingDiscountPercent?: number;
 };
 
 export type GuaranteeFields = {

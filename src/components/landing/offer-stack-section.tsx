@@ -1,6 +1,6 @@
 import { CheckIcon, GiftIcon } from "lucide-react";
 
-import { LinkButton } from "@/components/ui/link-button";
+import { LeadForm } from "@/components/landing/lead-form";
 import {
   hasOfferStackContent,
   resolveOffer,
@@ -22,7 +22,11 @@ export function OfferStackSection({ page }: OfferStackSectionProps) {
   const hasStack = hasOfferStackContent(offer);
 
   return (
-    <section data-landing-section="offer" className="bg-muted/30 py-16 md:py-20">
+    <section
+      id="quote-form"
+      data-landing-section="offer"
+      className="bg-muted/30 py-16 md:py-20"
+    >
       <div className="mx-auto max-w-3xl space-y-8 px-4">
         {urgency ? <UrgencyBanner message={urgency.message} /> : null}
 
@@ -75,10 +79,26 @@ export function OfferStackSection({ page }: OfferStackSectionProps) {
               </div>
             ) : null}
 
+            {offer.webBookingDiscountPercent !== null ? (
+              <p
+                className={
+                  offer.valueItems.length > 0
+                    ? "mt-4 rounded-xl border border-primary/20 bg-primary/5 px-4 py-3 text-center text-sm font-medium"
+                    : "rounded-xl border border-primary/20 bg-primary/5 px-4 py-3 text-center text-sm font-medium"
+                }
+              >
+                <span className="text-primary">
+                  {offer.webBookingDiscountPercent}% off the job
+                </span>{" "}
+                when you book from this page
+              </p>
+            ) : null}
+
             {offer.bonuses.length > 0 ? (
               <div
                 className={
-                  offer.valueItems.length > 0
+                  offer.valueItems.length > 0 ||
+                  offer.webBookingDiscountPercent !== null
                     ? "mt-6 space-y-3 border-t pt-6"
                     : "space-y-3"
                 }
@@ -103,15 +123,8 @@ export function OfferStackSection({ page }: OfferStackSectionProps) {
           </div>
         ) : null}
 
-        <div className="text-center">
-          <LinkButton
-            href="#quote-form"
-            landingCtaLocation="offer"
-            size="lg"
-            className="h-auto px-8 py-3.5 text-lg font-semibold md:text-xl"
-          >
-            {page.ctaLabel}
-          </LinkButton>
+        <div className="rounded-2xl border bg-card p-6 shadow-sm md:p-8">
+          <LeadForm page={page} idPrefix="offer" formLocation="offer" />
         </div>
       </div>
     </section>

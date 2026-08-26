@@ -47,6 +47,9 @@ async function submitToLeadOs(
         ? `Additional details: ${values.description}`
         : undefined,
       `Page: ${values.pageSlug}`,
+      values.webBookingDiscountPercent
+        ? `Web booking discount: ${values.webBookingDiscountPercent}% off the job`
+        : undefined,
       photoBase64 ? "Customer attached a photo with the form." : undefined,
     ]
       .filter(Boolean)

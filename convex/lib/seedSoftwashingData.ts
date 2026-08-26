@@ -185,6 +185,7 @@ export function createSoftwashingSeed(now: number) {
       "Priority booking for assessments booked this week",
       "Honest advice — we'll tell you if softwashing isn't the right fit",
     ],
+    webBookingDiscountPercent: 10,
   };
 
   const guarantee: Guarantee = {

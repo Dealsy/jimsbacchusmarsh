@@ -16,9 +16,14 @@ export default clerkMiddleware(
     }
   },
   {
-    // Clerk loads JS via /__clerk/* when Frontend API proxy is enabled in the dashboard.
+    // Production-only: Clerk Dashboard registers the live origin as a Frontend API
+    // proxy. Localhost is not registered, so enabling this here returns
+    // `host_invalid` JSON for /__clerk/* (and can break the handshake on load).
     frontendApiProxy: {
-      enabled: true,
+      enabled: (url) => {
+        const hostname = url.hostname;
+        return hostname !== "localhost" && hostname !== "127.0.0.1";
+      },
     },
   },
 );

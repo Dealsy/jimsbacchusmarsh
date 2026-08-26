@@ -1,24 +1,44 @@
 import { v } from "convex/values";
 
+import type { Doc, Id } from "./_generated/dataModel";
 import { mutation, query } from "./_generated/server";
 import { requireAdmin } from "./lib/adminAuth";
+
+const galleryItemReturnValidator = v.object({
+  _id: v.id("landingPageGallery"),
+  sortOrder: v.number(),
+  label: v.optional(v.string()),
+  category: v.optional(v.string()),
+  beforeUrl: v.union(v.string(), v.null()),
+  afterUrl: v.union(v.string(), v.null()),
+});
+
+const upsertResultValidator = v.union(
+  v.object({
+    success: v.literal(true),
+    itemId: v.id("landingPageGallery"),
+  }),
+  v.object({
+    success: v.literal(false),
+    error: v.string(),
+  }),
+);
+
+const mutationResultValidator = v.union(
+  v.object({ success: v.literal(true) }),
+  v.object({
+    success: v.literal(false),
+    error: v.string(),
+  }),
+);
 
 async function resolveGalleryItem(
   ctx: {
     storage: {
-      getUrl: (
-        id: import("./_generated/dataModel").Id<"_storage">,
-      ) => Promise<string | null>;
+      getUrl: (id: Id<"_storage">) => Promise<string | null>;
     };
   },
-  item: {
-    _id: import("./_generated/dataModel").Id<"landingPageGallery">;
-    pageId: import("./_generated/dataModel").Id<"landingPages">;
-    sortOrder: number;
-    label?: string;
-    beforeStorageId: import("./_generated/dataModel").Id<"_storage">;
-    afterStorageId: import("./_generated/dataModel").Id<"_storage">;
-  },
+  item: Doc<"landingPageGallery">,
 ) {
   const [beforeUrl, afterUrl] = await Promise.all([
     ctx.storage.getUrl(item.beforeStorageId),
@@ -29,6 +49,7 @@ async function resolveGalleryItem(
     _id: item._id,
     sortOrder: item.sortOrder,
     label: item.label,
+    category: item.category,
     beforeUrl,
     afterUrl,
   };
@@ -36,6 +57,7 @@ async function resolveGalleryItem(
 
 export const listByPageSlug = query({
   args: { slug: v.string(), includeDraft: v.optional(v.boolean()) },
+  returns: v.array(galleryItemReturnValidator),
   handler: async (ctx, args) => {
     const page = await ctx.db
       .query("landingPages")
@@ -70,6 +92,7 @@ export const listByPageSlug = query({
 
 export const listByPageId = query({
   args: { pageId: v.id("landingPages") },
+  returns: v.array(galleryItemReturnValidator),
   handler: async (ctx, args) => {
     const identity = await requireAdmin(ctx);
     if (!identity) {
@@ -94,21 +117,26 @@ export const upsert = mutation({
     itemId: v.optional(v.id("landingPageGallery")),
     sortOrder: v.number(),
     label: v.optional(v.string()),
+    category: v.optional(v.string()),
     beforeStorageId: v.id("_storage"),
     afterStorageId: v.id("_storage"),
   },
+  returns: upsertResultValidator,
   handler: async (ctx, args) => {
     const identity = await requireAdmin(ctx);
     if (!identity) {
       return { success: false as const, error: "Unauthorized" };
     }
 
+    const category = args.category?.trim() || undefined;
+
     if (args.itemId) {
-      await ctx.db.patch(args.itemId, {
+      await ctx.db.patch("landingPageGallery", args.itemId, {
         sortOrder: args.sortOrder,
         label: args.label,
         beforeStorageId: args.beforeStorageId,
         afterStorageId: args.afterStorageId,
+        ...(category ? { category } : {}),
       });
       return { success: true as const, itemId: args.itemId };
     }
@@ -117,6 +145,7 @@ export const upsert = mutation({
       pageId: args.pageId,
       sortOrder: args.sortOrder,
       label: args.label,
+      ...(category ? { category } : {}),
       beforeStorageId: args.beforeStorageId,
       afterStorageId: args.afterStorageId,
     });
@@ -125,15 +154,68 @@ export const upsert = mutation({
   },
 });
 
-export const remove = mutation({
-  args: { itemId: v.id("landingPageGallery") },
+export const updateItem = mutation({
+  args: {
+    itemId: v.id("landingPageGallery"),
+    label: v.optional(v.string()),
+    category: v.optional(v.string()),
+  },
+  returns: mutationResultValidator,
   handler: async (ctx, args) => {
     const identity = await requireAdmin(ctx);
     if (!identity) {
       return { success: false as const, error: "Unauthorized" };
     }
 
-    await ctx.db.delete(args.itemId);
+    const item = await ctx.db.get("landingPageGallery", args.itemId);
+    if (!item) {
+      return { success: false as const, error: "Gallery item not found" };
+    }
+
+    const nextLabel =
+      args.label === undefined ? item.label : args.label.trim() || undefined;
+    const nextCategory =
+      args.category === undefined
+        ? item.category
+        : args.category.trim() || undefined;
+
+    const nextValue: {
+      pageId: Doc<"landingPageGallery">["pageId"];
+      sortOrder: number;
+      beforeStorageId: Doc<"landingPageGallery">["beforeStorageId"];
+      afterStorageId: Doc<"landingPageGallery">["afterStorageId"];
+      label?: string;
+      category?: string;
+    } = {
+      pageId: item.pageId,
+      sortOrder: item.sortOrder,
+      beforeStorageId: item.beforeStorageId,
+      afterStorageId: item.afterStorageId,
+    };
+
+    if (nextLabel) {
+      nextValue.label = nextLabel;
+    }
+    if (nextCategory) {
+      nextValue.category = nextCategory;
+    }
+
+    await ctx.db.replace("landingPageGallery", args.itemId, nextValue);
+
+    return { success: true as const };
+  },
+});
+
+export const remove = mutation({
+  args: { itemId: v.id("landingPageGallery") },
+  returns: mutationResultValidator,
+  handler: async (ctx, args) => {
+    const identity = await requireAdmin(ctx);
+    if (!identity) {
+      return { success: false as const, error: "Unauthorized" };
+    }
+
+    await ctx.db.delete("landingPageGallery", args.itemId);
     return { success: true as const };
   },
 });
