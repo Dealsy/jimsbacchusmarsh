@@ -1,19 +1,8 @@
-import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
-
-const isPublicRoute = createRouteMatcher([
-  "/",
-  "/sign-in(.*)",
-  "/sign-up(.*)",
-  // Published landing pages live at /:slug (e.g. /softwashing, /pressure-washing)
-  "/((?!admin|sign-in|sign-up|api|_next)[^/.]+)",
-  "/((?!admin|sign-in|sign-up|api|_next)[^/.]+)/thank-you",
-]);
+import { clerkMiddleware } from "@clerk/nextjs/server";
 
 export default clerkMiddleware(
-  async (auth, req) => {
-    if (!isPublicRoute(req)) {
-      await auth.protect();
-    }
+  async () => {
+    // Session handshake only. Protect resources in layouts/pages, not by path.
   },
   {
     // Production-only: Clerk Dashboard registers the live origin as a Frontend API

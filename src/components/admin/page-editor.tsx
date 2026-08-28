@@ -22,6 +22,10 @@ import type {
   UrgencyFields,
 } from "@/components/admin/fields/editor-types";
 import { FaqEditor } from "@/components/admin/fields/faq-editor";
+import {
+  GalleryCategoryField,
+  galleryCategoryOptions,
+} from "@/components/admin/fields/gallery-category-field";
 import { HowItWorksEditor } from "@/components/admin/fields/how-it-works-editor";
 import { OfferValueItemsEditor } from "@/components/admin/fields/offer-value-items-editor";
 import { ServicesEditor } from "@/components/admin/fields/services-editor";
@@ -45,10 +49,6 @@ import {
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { LinkButton } from "@/components/ui/link-button";
-import {
-  NativeSelect,
-  NativeSelectOption,
-} from "@/components/ui/native-select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
 import { parseWebBookingDiscountPercent } from "@/lib/landing-page-content";
@@ -292,6 +292,9 @@ export function PageEditor({ slug }: PageEditorProps) {
   const [newAfterId, setNewAfterId] = useState<Id<"_storage"> | undefined>();
   const [newGalleryLabel, setNewGalleryLabel] = useState("");
   const [newGalleryCategory, setNewGalleryCategory] = useState("");
+  const [createdGalleryCategories, setCreatedGalleryCategories] = useState<
+    string[]
+  >([]);
 
   const handleUploadingChange = useCallback((uploading: boolean) => {
     setActiveUploads((count) => {
@@ -326,6 +329,11 @@ export function PageEditor({ slug }: PageEditorProps) {
   }
 
   const pageId = page._id;
+  const galleryCategories = galleryCategoryOptions(
+    state.services.map((service) => service.title),
+    gallery?.map((item) => item.category) ?? [],
+    createdGalleryCategories,
+  );
 
   function updateField<K extends keyof EditorState>(
     key: K,
@@ -475,6 +483,12 @@ export function PageEditor({ slug }: PageEditorProps) {
       itemId,
       category,
     });
+  }
+
+  function handleCreateGalleryCategory(category: string) {
+    setCreatedGalleryCategories((current) =>
+      current.includes(category) ? current : [...current, category],
+    );
   }
 
   return (
@@ -1238,39 +1252,17 @@ export function PageEditor({ slug }: PageEditorProps) {
                       </div>
                     ) : null}
                   </div>
-                  <Field className="mt-4">
-                    <FieldLabel>Category</FieldLabel>
-                    <NativeSelect
-                      className="w-full"
+                  <div className="mt-4">
+                    <GalleryCategoryField
                       value={item.category ?? ""}
-                      onChange={(event) =>
-                        void handleUpdateGalleryCategory(
-                          item._id,
-                          event.target.value,
-                        )
+                      categories={galleryCategories}
+                      onChange={(category) =>
+                        void handleUpdateGalleryCategory(item._id, category)
                       }
-                    >
-                      <NativeSelectOption value="">
-                        Uncategorized
-                      </NativeSelectOption>
-                      {item.category &&
-                      !state.services.some(
-                        (service) => service.title.trim() === item.category,
-                      ) ? (
-                        <NativeSelectOption value={item.category}>
-                          {item.category}
-                        </NativeSelectOption>
-                      ) : null}
-                      {state.services
-                        .map((service) => service.title.trim())
-                        .filter(Boolean)
-                        .map((title) => (
-                          <NativeSelectOption key={title} value={title}>
-                            {title}
-                          </NativeSelectOption>
-                        ))}
-                    </NativeSelect>
-                  </Field>
+                      onCreateCategory={handleCreateGalleryCategory}
+                      showHelp={false}
+                    />
+                  </div>
                 </SectionCard>
               ))}
             </div>
@@ -1294,27 +1286,12 @@ export function PageEditor({ slug }: PageEditorProps) {
                 placeholder="e.g. Roof clean — Bacchus Marsh"
               />
             </Field>
-            <Field>
-              <FieldLabel>Category</FieldLabel>
-              <NativeSelect
-                className="w-full"
-                value={newGalleryCategory}
-                onChange={(event) => setNewGalleryCategory(event.target.value)}
-              >
-                <NativeSelectOption value="">Uncategorized</NativeSelectOption>
-                {state.services
-                  .map((service) => service.title.trim())
-                  .filter(Boolean)
-                  .map((title) => (
-                    <NativeSelectOption key={title} value={title}>
-                      {title}
-                    </NativeSelectOption>
-                  ))}
-              </NativeSelect>
-              <FieldDescription>
-                Matches a service card so visitors can filter before & afters.
-              </FieldDescription>
-            </Field>
+            <GalleryCategoryField
+              value={newGalleryCategory}
+              categories={galleryCategories}
+              onChange={setNewGalleryCategory}
+              onCreateCategory={handleCreateGalleryCategory}
+            />
             <div className="grid gap-6 md:grid-cols-2">
               <ImageUpload
                 label="Before"

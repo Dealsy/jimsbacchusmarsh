@@ -1,13 +1,16 @@
 import { UserButton } from "@clerk/nextjs";
+import { auth } from "@clerk/nextjs/server";
 import Link from "next/link";
 
 export const dynamic = "force-dynamic";
 
-export default function AdminLayout({
+export default async function AdminLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  await auth.protect();
+
   return (
     <div className="min-h-screen bg-muted/20">
       <header className="border-b bg-background">
