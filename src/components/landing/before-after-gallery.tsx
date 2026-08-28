@@ -1,5 +1,6 @@
 "use client";
 
+import { ChevronLeftIcon, ChevronRightIcon } from "lucide-react";
 import Image from "next/image";
 import { useState } from "react";
 
@@ -22,12 +23,6 @@ const GALLERY_THUMB_SIZES = "30vw";
 const GALLERY_LIGHTBOX_SIZES = "90vw";
 
 type GalleryLightboxSide = "before" | "after";
-
-type GalleryLightbox = {
-  readonly url: string;
-  readonly side: GalleryLightboxSide;
-  readonly caption: string | undefined;
-};
 
 type BeforeAfterGalleryProps = {
   readonly page: PublishedLandingPage;
@@ -69,6 +64,22 @@ function galleryPhotosFromItems(
     });
   }
   return photos;
+}
+
+type OpenableGalleryPhoto = GalleryPhotoEntry & {
+  readonly url: string;
+};
+
+function openableGalleryPhotos(
+  photos: readonly GalleryPhotoEntry[],
+): OpenableGalleryPhoto[] {
+  return photos.filter((photo): photo is OpenableGalleryPhoto =>
+    Boolean(photo.url),
+  );
+}
+
+function lightboxTitleFor(side: GalleryLightboxSide): string {
+  return side === "after" ? "After" : "Before";
 }
 
 function galleryCategories(
@@ -170,12 +181,37 @@ export function BeforeAfterGallery({
       ? items
       : items.filter((item) => item.category === selectedCategory);
   const visiblePhotos = galleryPhotosFromItems(visibleItems);
-  const [lightbox, setLightbox] = useState<GalleryLightbox | null>(null);
-  const lightboxTitle = lightbox
-    ? lightbox.side === "after"
-      ? "After"
-      : "Before"
+  const lightboxPhotos = openableGalleryPhotos(visiblePhotos);
+  const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
+  const lightboxPhoto =
+    lightboxIndex === null ? undefined : lightboxPhotos[lightboxIndex];
+  const lightboxTitle = lightboxPhoto
+    ? lightboxTitleFor(lightboxPhoto.side)
     : "Photo";
+  const canBrowseLightbox = lightboxPhotos.length > 1;
+
+  function openLightbox(photo: GalleryPhotoEntry) {
+    if (!photo.url) {
+      return;
+    }
+    const index = lightboxPhotos.findIndex(
+      (candidate) =>
+        candidate.itemId === photo.itemId && candidate.side === photo.side,
+    );
+    if (index < 0) {
+      return;
+    }
+    setLightboxIndex(index);
+  }
+
+  function stepLightbox(delta: number) {
+    setLightboxIndex((current) => {
+      if (current === null || lightboxPhotos.length === 0) {
+        return current;
+      }
+      return (current + delta + lightboxPhotos.length) % lightboxPhotos.length;
+    });
+  }
 
   return (
     <section id={GALLERY_SECTION_ID} className="py-16 md:py-20">
@@ -239,16 +275,7 @@ export function BeforeAfterGallery({
                     url={photo.url}
                     alt={`${photo.side === "after" ? "After" : "Before"} — ${page.name}`}
                     side={photo.side}
-                    onOpen={() => {
-                      if (!photo.url) {
-                        return;
-                      }
-                      setLightbox({
-                        url: photo.url,
-                        side: photo.side,
-                        caption: photo.caption,
-                      });
-                    }}
+                    onOpen={() => openLightbox(photo)}
                   />
                   {photo.caption ? (
                     <figcaption className="text-sm font-medium">
@@ -263,35 +290,71 @@ export function BeforeAfterGallery({
       </div>
 
       <Dialog
-        open={lightbox !== null}
+        open={lightboxPhoto !== undefined}
         onOpenChange={(open) => {
           if (!open) {
-            setLightbox(null);
+            setLightboxIndex(null);
           }
         }}
       >
-        <DialogContent className="max-h-[90vh] w-full gap-3 p-4 sm:max-w-[min(96vw,80rem)]">
+        <DialogContent
+          className="max-h-[90vh] w-full gap-3 p-4 sm:max-w-[min(96vw,80rem)]"
+          onKeyDown={(event) => {
+            if (event.key === "ArrowLeft") {
+              event.preventDefault();
+              stepLightbox(-1);
+            }
+            if (event.key === "ArrowRight") {
+              event.preventDefault();
+              stepLightbox(1);
+            }
+          }}
+        >
           <DialogHeader>
             <DialogTitle>
-              {lightbox?.caption
-                ? `${lightboxTitle} — ${lightbox.caption}`
+              {lightboxPhoto?.caption
+                ? `${lightboxTitle} — ${lightboxPhoto.caption}`
                 : lightboxTitle}
             </DialogTitle>
             <DialogDescription className="sr-only">
               Full-size gallery photo
             </DialogDescription>
           </DialogHeader>
-          {lightbox ? (
+          {lightboxPhoto ? (
             <div className="relative h-[min(75vh,70vw)] w-full overflow-hidden rounded-xl bg-black">
               <Image
-                key={lightbox.url}
-                src={lightbox.url}
-                alt={`${lightboxTitle}${lightbox.caption ? ` — ${lightbox.caption}` : ""}`}
+                key={lightboxPhoto.url}
+                src={lightboxPhoto.url}
+                alt={`${lightboxTitle}${lightboxPhoto.caption ? ` — ${lightboxPhoto.caption}` : ""}`}
                 fill
                 unoptimized
                 className="object-contain"
                 sizes={GALLERY_LIGHTBOX_SIZES}
               />
+              {canBrowseLightbox ? (
+                <>
+                  <Button
+                    type="button"
+                    variant="secondary"
+                    size="icon"
+                    className="absolute top-1/2 left-2 z-10 -translate-y-1/2 rounded-full bg-background/90"
+                    aria-label="Previous photo"
+                    onClick={() => stepLightbox(-1)}
+                  >
+                    <ChevronLeftIcon />
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="secondary"
+                    size="icon"
+                    className="absolute top-1/2 right-2 z-10 -translate-y-1/2 rounded-full bg-background/90"
+                    aria-label="Next photo"
+                    onClick={() => stepLightbox(1)}
+                  >
+                    <ChevronRightIcon />
+                  </Button>
+                </>
+              ) : null}
             </div>
           ) : null}
         </DialogContent>
