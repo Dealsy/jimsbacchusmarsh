@@ -84,24 +84,28 @@ export function createWindowCleaningSeed(now: number) {
   const services: ServiceItem[] = [
     {
       title: "Single Storey",
+      slug: "single-storey",
       description:
         "All accessible windows, frames, and sills — inside and out where agreed.",
       icon: "home",
     },
     {
       title: "Double Storey",
+      slug: "double-storey",
       description:
         "Upper-level glass cleaned safely with proper access equipment — no DIY ladder risk.",
       icon: "building",
     },
     {
       title: "Shopfronts & Offices",
+      slug: "shopfronts-offices",
       description:
         "Commercial windows that represent your business — scheduled or one-off cleans.",
       icon: "building",
     },
     {
       title: "Screens & Tracks",
+      slug: "screens-tracks",
       description:
         "Flyscreens, sliding tracks, and sills — the details that make glass look truly clean.",
       icon: "layers",

@@ -1,7 +1,11 @@
 import { BuildingIcon, Fence, HomeIcon, LayersIcon } from "lucide-react";
+import Link from "next/link";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { resolveServicesSection } from "@/lib/landing-page-content";
+import {
+  resolveServiceSlug,
+  resolveServicesSection,
+} from "@/lib/landing-page-content";
 import type { PublishedLandingPage } from "@/lib/types/landing-page";
 
 import { LandingLogoBand } from "./landing-logo-band";
@@ -15,13 +19,9 @@ const iconMap = {
 
 type ServicesGridProps = {
   readonly page: PublishedLandingPage;
-  readonly onSelectGalleryCategory: (category: string) => void;
 };
 
-export function ServicesGrid({
-  page,
-  onSelectGalleryCategory,
-}: ServicesGridProps) {
+export function ServicesGrid({ page }: ServicesGridProps) {
   const section = resolveServicesSection(page);
 
   return (
@@ -39,12 +39,12 @@ export function ServicesGrid({
             {page.services.map((service) => {
               const Icon =
                 iconMap[service.icon as keyof typeof iconMap] ?? HomeIcon;
+              const serviceSlug = resolveServiceSlug(service);
               return (
-                <button
+                <Link
                   key={service.title}
-                  type="button"
+                  href={`/${page.slug}/${serviceSlug}`}
                   className="rounded-2xl text-left outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50"
-                  onClick={() => onSelectGalleryCategory(service.title)}
                 >
                   <Card className="h-full bg-background transition-shadow hover:shadow-md">
                     <CardHeader>
@@ -56,11 +56,11 @@ export function ServicesGrid({
                         {service.description}
                       </p>
                       <p className="mt-3 text-sm font-medium text-primary">
-                        See before & afters
+                        Learn more
                       </p>
                     </CardContent>
                   </Card>
-                </button>
+                </Link>
               );
             })}
           </div>

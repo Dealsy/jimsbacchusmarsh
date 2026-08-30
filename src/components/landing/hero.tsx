@@ -1,7 +1,7 @@
 import { MapPinIcon, ShieldCheckIcon, SparklesIcon } from "lucide-react";
 import Image from "next/image";
+import { LeadForm } from "@/components/landing/lead-form";
 import { Badge } from "@/components/ui/badge";
-import { LinkButton } from "@/components/ui/link-button";
 import type { PublishedLandingPage } from "@/lib/types/landing-page";
 
 type HeroProps = {
@@ -9,7 +9,7 @@ type HeroProps = {
 };
 
 export function Hero({ page }: HeroProps) {
-  const { hero, ctaLabel } = page;
+  const { hero } = page;
 
   return (
     <section
@@ -47,14 +47,14 @@ export function Hero({ page }: HeroProps) {
               ))}
             </ul>
           ) : null}
-          <LinkButton
-            href="#quote-form"
-            landingCtaLocation="hero"
-            size="lg"
-            className="h-auto px-8 py-3.5 text-lg font-semibold md:text-xl"
-          >
-            {ctaLabel}
-          </LinkButton>
+          <div className="rounded-2xl bg-card p-4 text-card-foreground shadow-lg md:p-5">
+            <LeadForm
+              page={page}
+              idPrefix="hero"
+              formLocation="hero"
+              variant="compact"
+            />
+          </div>
           <ul className="flex flex-wrap gap-3 pt-2">
             {hero.trustStrip.map((item) => (
               <li

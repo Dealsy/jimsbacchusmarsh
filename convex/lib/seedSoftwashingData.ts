@@ -81,24 +81,28 @@ export function createSoftwashingSeed(now: number) {
   const services: ServiceItem[] = [
     {
       title: "Roofs",
+      slug: "roofs",
       description:
         "Tiled and metal roofs with black streaks, lichen, and algae — treated safely without dislodging tiles or pointing.",
       icon: "home",
     },
     {
       title: "House Exteriors",
+      slug: "house-exteriors",
       description:
         "Rendered and painted walls, including south-facing and shaded areas where mould loves to grow.",
       icon: "building",
     },
     {
       title: "Colorbond Fencing & Cladding",
+      slug: "colorbond-fencing-cladding",
       description:
         "Green algae and grime on fences and cladding — cleaned without scratching or stripping the coating.",
       icon: "fence",
     },
     {
       title: "Retaining Walls",
+      slug: "retaining-walls",
       description:
         "Mould and algae on concrete and timber retaining walls — restored without damage from high pressure.",
       icon: "layers",

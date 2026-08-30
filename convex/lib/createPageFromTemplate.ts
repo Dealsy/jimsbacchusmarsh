@@ -1,5 +1,6 @@
 import type { Doc } from "../_generated/dataModel";
 import { createSoftwashingSeed } from "./seedSoftwashingData";
+import { slugify } from "./slug";
 
 type LandingPageInsert = Omit<Doc<"landingPages">, "_id" | "_creationTime">;
 
@@ -51,11 +52,15 @@ export function createPageFromTemplate(
         "Edit positive comparison point 3 in admin",
       ],
     },
-    services: base.services.map((service, index) => ({
-      ...service,
-      title: `Service ${index + 1}`,
-      description: "Edit this service description in admin.",
-    })),
+    services: base.services.map((service, index) => {
+      const title = `Service ${index + 1}`;
+      return {
+        ...service,
+        title,
+        description: "Edit this service description in admin.",
+        slug: slugify(title),
+      };
+    }),
     faq: base.faq.map((_item, index) => ({
       question: `FAQ question ${index + 1} — edit in admin`,
       answer: "Edit this FAQ answer in admin.",

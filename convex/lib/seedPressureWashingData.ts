@@ -83,24 +83,28 @@ export function createPressureWashingSeed(now: number) {
   const services: ServiceItem[] = [
     {
       title: "Driveways & Paths",
+      slug: "driveways-paths",
       description:
         "Concrete, exposed aggregate, and pavers — oil stains, tyre marks, and years of grime lifted without damage.",
       icon: "layers",
     },
     {
       title: "Decks & Timber",
+      slug: "decks-timber",
       description:
         "Timber decks and pergolas cleaned at safe pressure to restore colour without splintering boards.",
       icon: "home",
     },
     {
       title: "House Exteriors",
+      slug: "house-exteriors",
       description:
         "Brick, render, and cladding where high-pressure cleaning is the right tool — not mould treatment.",
       icon: "building",
     },
     {
       title: "Fences & Gates",
+      slug: "fences-gates",
       description:
         "Colorbond, timber, and picket fences — grime and mildew removed evenly across the whole run.",
       icon: "fence",

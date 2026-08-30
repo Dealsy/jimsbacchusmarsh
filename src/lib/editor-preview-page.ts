@@ -87,11 +87,20 @@ export function mergeEditorPreviewPage(
         }
       : undefined,
     services: state.services
-      .map((item) => ({
-        title: item.title.trim(),
-        description: item.description.trim(),
-        icon: item.icon?.trim() || undefined,
-      }))
+      .map((item) => {
+        const title = item.title.trim();
+        const whatsIncluded = trimStringList(item.whatsIncluded ?? []);
+        return {
+          title,
+          description: item.description.trim(),
+          icon: item.icon?.trim() || undefined,
+          slug: item.slug?.trim() || undefined,
+          pageHeadline: item.pageHeadline?.trim() || undefined,
+          pageIntro: item.pageIntro?.trim() || undefined,
+          pageBody: item.pageBody?.trim() || undefined,
+          whatsIncluded: whatsIncluded.length > 0 ? whatsIncluded : undefined,
+        };
+      })
       .filter((item) => item.title || item.description),
     howItWorks: state.howItWorks
       .map((item, index) => ({

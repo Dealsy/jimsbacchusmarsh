@@ -1,5 +1,7 @@
 export const RESERVED_SLUGS = new Set(["admin", "sign-in", "sign-up", "api"]);
 
+export const RESERVED_CHILD_SLUGS = new Set(["thank-you"]);
+
 const SLUG_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 
 export function slugify(name: string): string {
@@ -25,7 +27,7 @@ export function describeSlugError(slug: string): string | null {
   if (!isValidSlug(slug)) {
     return "Use lowercase letters, numbers, and hyphens only (e.g. gutter-cleaning).";
   }
-  if (RESERVED_SLUGS.has(slug)) {
+  if (RESERVED_SLUGS.has(slug) || RESERVED_CHILD_SLUGS.has(slug)) {
     return `"${slug}" is reserved and cannot be used.`;
   }
   return null;

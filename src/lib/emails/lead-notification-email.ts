@@ -53,17 +53,18 @@ function buildDetailRows(
       value: values.phone,
       htmlValue: `<a href="${escapeHtml(formatPhoneHref(values.phone))}" style="color:#111827;text-decoration:none;">${escapeHtml(values.phone)}</a>`,
     },
-    { label: "Address", value: values.address },
+    { label: "Suburb", value: values.suburb },
   ];
 
-  if (values.suburb?.trim()) {
-    rows.push({ label: "Suburb", value: values.suburb.trim() });
+  if (values.serviceTitle?.trim()) {
+    rows.push({ label: "Service", value: values.serviceTitle.trim() });
   }
 
-  rows.push(
-    { label: "Surfaces", value: values.surfaces.join(", ") },
-    { label: "Photo attached", value: hasPhoto ? "Yes" : "No" },
-  );
+  if (values.surfaces.length > 0) {
+    rows.push({ label: "Surfaces", value: values.surfaces.join(", ") });
+  }
+
+  rows.push({ label: "Photo attached", value: hasPhoto ? "Yes" : "No" });
 
   if (values.description?.trim()) {
     rows.push({
@@ -88,7 +89,7 @@ export function buildLeadNotificationEmail(
   const { values, hasPhoto } = input;
   const submittedAt = input.submittedAt ?? new Date();
   const pageLabel = getPageLabel(values);
-  const locationLabel = values.suburb?.trim() || values.address;
+  const locationLabel = values.suburb.trim();
   const detailRows = buildDetailRows(values, hasPhoto);
 
   const subject = `[${pageLabel}] New lead — ${values.name} — ${locationLabel}`;

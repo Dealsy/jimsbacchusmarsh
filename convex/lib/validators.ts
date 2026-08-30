@@ -62,6 +62,11 @@ export const serviceItemValidator = v.object({
   title: v.string(),
   description: v.string(),
   icon: v.optional(v.string()),
+  slug: v.optional(v.string()),
+  pageHeadline: v.optional(v.string()),
+  pageIntro: v.optional(v.string()),
+  pageBody: v.optional(v.string()),
+  whatsIncluded: v.optional(v.array(v.string())),
 });
 
 export const howItWorksStepValidator = v.object({

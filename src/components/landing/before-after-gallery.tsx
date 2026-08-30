@@ -29,6 +29,7 @@ type BeforeAfterGalleryProps = {
   readonly items: readonly GalleryItem[];
   readonly selectedCategory: string | null;
   readonly onSelectCategory: (category: string | null) => void;
+  readonly hideCategoryFilters?: boolean;
 };
 
 type GalleryPhotoProps = {
@@ -173,6 +174,7 @@ export function BeforeAfterGallery({
   items,
   selectedCategory,
   onSelectCategory,
+  hideCategoryFilters = false,
 }: BeforeAfterGalleryProps) {
   const section = resolveGallerySection(page);
   const categories = galleryCategories(items, page.services);
@@ -223,7 +225,7 @@ export function BeforeAfterGallery({
           <p className="text-muted-foreground">{section.description}</p>
         </div>
         <div className="flex flex-col gap-8 md:flex-row md:items-start md:gap-10">
-          {categories.length > 0 ? (
+          {categories.length > 0 && !hideCategoryFilters ? (
             <div className="flex flex-wrap justify-center gap-2 md:w-52 md:shrink-0 md:flex-col md:justify-start">
               <Button
                 type="button"

@@ -57,6 +57,7 @@ import {
   type LandingTheme,
   normalizeHexColor,
 } from "@/lib/landing-theme";
+import { RESERVED_CHILD_SLUGS, slugify } from "@/lib/slug";
 
 type PageEditorProps = {
   readonly slug: string;
@@ -66,13 +67,40 @@ function trimStringList(values: readonly string[]): string[] {
   return values.map((value) => value.trim()).filter(Boolean);
 }
 
+function persistServiceSlug(
+  title: string,
+  rawSlug: string | undefined,
+): string {
+  const fromInput = rawSlug?.trim();
+  if (
+    fromInput &&
+    !RESERVED_CHILD_SLUGS.has(fromInput) &&
+    !fromInput.includes("/")
+  ) {
+    return slugify(fromInput) || slugify(title);
+  }
+  const fromTitle = slugify(title);
+  return RESERVED_CHILD_SLUGS.has(fromTitle)
+    ? `${fromTitle}-service`
+    : fromTitle;
+}
+
 function sanitizeServices(values: readonly ServiceItem[]): ServiceItem[] {
   return values
-    .map((item) => ({
-      title: item.title.trim(),
-      description: item.description.trim(),
-      icon: item.icon?.trim() || undefined,
-    }))
+    .map((item) => {
+      const title = item.title.trim();
+      const whatsIncluded = trimStringList(item.whatsIncluded ?? []);
+      return {
+        title,
+        description: item.description.trim(),
+        icon: item.icon?.trim() || undefined,
+        slug: persistServiceSlug(title, item.slug),
+        pageHeadline: item.pageHeadline?.trim() || undefined,
+        pageIntro: item.pageIntro?.trim() || undefined,
+        pageBody: item.pageBody?.trim() || undefined,
+        whatsIncluded: whatsIncluded.length > 0 ? whatsIncluded : undefined,
+      };
+    })
     .filter((item) => item.title || item.description);
 }
 
@@ -248,7 +276,14 @@ function pageToEditorState(page: LoadedPage): EditorState {
       useHowItWorksSteps: page.thankYou?.useHowItWorksSteps ?? true,
       nextSteps: (page.thankYou?.nextSteps ?? []).map((item) => ({ ...item })),
     },
-    services: page.services.map((item) => ({ ...item })),
+    services: page.services.map((item) => ({
+      ...item,
+      slug: item.slug ?? "",
+      pageHeadline: item.pageHeadline ?? "",
+      pageIntro: item.pageIntro ?? "",
+      pageBody: item.pageBody ?? "",
+      whatsIncluded: item.whatsIncluded ?? [],
+    })),
     howItWorks: page.howItWorks.map((item) => ({ ...item })),
     faq: page.faq.map((item) => ({ ...item })),
     testimonials: page.testimonials.map((item) => ({

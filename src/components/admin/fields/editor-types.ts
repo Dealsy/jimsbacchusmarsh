@@ -2,6 +2,11 @@ export type ServiceItem = {
   title: string;
   description: string;
   icon?: string;
+  slug?: string;
+  pageHeadline?: string;
+  pageIntro?: string;
+  pageBody?: string;
+  whatsIncluded?: string[];
 };
 
 export type HowItWorksStep = {

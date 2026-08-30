@@ -30,23 +30,10 @@ type LandingPageViewProps = {
   readonly gallery: readonly GalleryItem[];
 };
 
-const GALLERY_SECTION_ID = "before-after";
-
 export function LandingPageView({ page, gallery }: LandingPageViewProps) {
   const metaPixelId = page.metaPixelId ?? process.env.NEXT_PUBLIC_META_PIXEL_ID;
   const googleAdsId = page.googleAdsId ?? process.env.NEXT_PUBLIC_GOOGLE_ADS_ID;
   const [galleryCategory, setGalleryCategory] = useState<string | null>(null);
-
-  function scrollToGallery(): void {
-    document
-      .getElementById(GALLERY_SECTION_ID)
-      ?.scrollIntoView({ behavior: "smooth", block: "start" });
-  }
-
-  function handleSelectGalleryCategory(category: string): void {
-    setGalleryCategory(category);
-    scrollToGallery();
-  }
 
   return (
     <>
@@ -66,10 +53,7 @@ export function LandingPageView({ page, gallery }: LandingPageViewProps) {
             onSelectCategory={setGalleryCategory}
           />
           <OfferStackSection page={page} />
-          <ServicesGrid
-            page={page}
-            onSelectGalleryCategory={handleSelectGalleryCategory}
-          />
+          <ServicesGrid page={page} />
           <TestimonialsSection page={page} />
           <GuaranteeSection page={page} />
           <HowItWorks page={page} />

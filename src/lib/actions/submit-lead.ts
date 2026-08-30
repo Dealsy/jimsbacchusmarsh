@@ -38,11 +38,14 @@ async function submitToLeadOs(
     const firstName = nameParts[0] ?? values.name;
     const lastName = nameParts.slice(1).join(" ") || undefined;
 
-    const locationLabel = values.suburb?.trim() || values.address;
+    const locationLabel = values.suburb.trim();
 
     const estimatedScope = [
-      `Address: ${values.address}`,
-      `Surfaces: ${values.surfaces.join(", ")}`,
+      `Suburb: ${values.suburb}`,
+      values.serviceTitle ? `Service: ${values.serviceTitle}` : undefined,
+      values.surfaces.length > 0
+        ? `Surfaces: ${values.surfaces.join(", ")}`
+        : undefined,
       values.description
         ? `Additional details: ${values.description}`
         : undefined,

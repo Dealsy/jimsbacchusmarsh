@@ -1,5 +1,6 @@
 import type { api } from "convex/_generated/api";
 import type { FunctionReturnType } from "convex/server";
+import { RESERVED_CHILD_SLUGS, slugify } from "@/lib/slug";
 
 type PublishedPage = NonNullable<
   FunctionReturnType<typeof api.landingPages.getPublishedBySlug>
@@ -283,4 +284,30 @@ export function resolveGallerySection(
     description:
       page.gallerySectionDescription?.trim() || DEFAULT_GALLERY.description,
   };
+}
+
+export type LandingPageService = PublishedPage["services"][number];
+
+export function resolveServiceSlug(service: {
+  readonly slug?: string;
+  readonly title: string;
+}): string {
+  const stored = service.slug?.trim();
+  if (stored) {
+    return stored;
+  }
+  return slugify(service.title);
+}
+
+export function findServiceBySlug(
+  services: readonly LandingPageService[],
+  serviceSlug: string,
+): LandingPageService | undefined {
+  return services.find(
+    (service) => resolveServiceSlug(service) === serviceSlug,
+  );
+}
+
+export function isReservedChildSlug(slug: string): boolean {
+  return RESERVED_CHILD_SLUGS.has(slug);
 }

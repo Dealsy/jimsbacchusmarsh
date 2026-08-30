@@ -2,7 +2,6 @@
 
 import { useRef, useState, useTransition } from "react";
 import { capturePostHogEvent } from "@/components/analytics/posthog";
-import { AddressAutocompleteField } from "@/components/landing/address-autocomplete-field";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
@@ -22,6 +21,7 @@ import type { PublishedLandingPage } from "@/lib/types/landing-page";
 import {
   extractLeadFormValues,
   type LeadFormFieldErrors,
+  type LeadFormVariant,
   OTHER_SURFACE_OPTION,
   validateLeadForm,
 } from "@/lib/validations/lead-form";
@@ -30,23 +30,30 @@ type LeadFormProps = {
   readonly page: PublishedLandingPage;
   readonly idPrefix: string;
   readonly formLocation: string;
+  readonly variant?: LeadFormVariant;
+  readonly serviceTitle?: string;
 };
 
-export function LeadForm({ page, idPrefix, formLocation }: LeadFormProps) {
+export function LeadForm({
+  page,
+  idPrefix,
+  formLocation,
+  variant = "full",
+  serviceTitle,
+}: LeadFormProps) {
   const formRef = useRef<HTMLFormElement>(null);
   const hasTrackedFormStart = useRef(false);
   const [fieldErrors, setFieldErrors] = useState<LeadFormFieldErrors>({});
   const [formError, setFormError] = useState<string | null>(null);
   const [selectedSurfaces, setSelectedSurfaces] = useState<string[]>([]);
-  const [address, setAddress] = useState("");
-  const [suburb, setSuburb] = useState("");
   const [isPending, startTransition] = useTransition();
   const offer = resolveOffer(page);
   const discountPercent = offer.webBookingDiscountPercent;
+  const isCompact = variant === "compact";
 
   const nameId = `${idPrefix}-name`;
   const phoneId = `${idPrefix}-phone`;
-  const addressId = `${idPrefix}-address`;
+  const suburbId = `${idPrefix}-suburb`;
   const descriptionId = `${idPrefix}-description`;
   const photoId = `${idPrefix}-photo`;
 
@@ -150,7 +157,7 @@ export function LeadForm({ page, idPrefix, formLocation }: LeadFormProps) {
       onSubmit={handleSubmit}
       onFocusCapture={handleFormFocusCapture}
       noValidate
-      className="space-y-6"
+      className={isCompact ? "space-y-4" : "space-y-6"}
     >
       <input type="hidden" name="pageSlug" value={page.slug} />
       <input type="hidden" name="pageName" value={page.name} />
@@ -159,6 +166,10 @@ export function LeadForm({ page, idPrefix, formLocation }: LeadFormProps) {
         name="leadServiceType"
         value={page.leadServiceType}
       />
+      <input type="hidden" name="formVariant" value={variant} />
+      {serviceTitle ? (
+        <input type="hidden" name="serviceTitle" value={serviceTitle} />
+      ) : null}
       {discountPercent !== null ? (
         <input
           type="hidden"
@@ -205,102 +216,106 @@ export function LeadForm({ page, idPrefix, formLocation }: LeadFormProps) {
           ) : null}
         </Field>
 
-        <Field data-invalid={Boolean(fieldErrors.address)}>
-          <FieldLabel htmlFor={addressId}>Property address</FieldLabel>
-          <AddressAutocompleteField
-            id={addressId}
-            value={address}
-            suburb={suburb}
-            error={fieldErrors.address}
-            onChange={({ address: nextAddress, suburb: nextSuburb }) => {
-              setAddress(nextAddress);
-              setSuburb(nextSuburb);
-              clearFieldError("address");
-            }}
-          />
-        </Field>
-
-        <FieldSet
-          data-invalid={Boolean(fieldErrors.surfaces)}
-          className="gap-3 border-0 p-0"
-        >
-          <FieldLegend className="mb-0 px-0">Affected surface</FieldLegend>
-          <div className="grid gap-3 sm:grid-cols-2">
-            {page.surfaceOptions.map((surface) => {
-              const surfaceId = `${idPrefix}-surface-${surface.replace(/\s+/g, "-").toLowerCase()}`;
-              return (
-                <label
-                  key={surface}
-                  htmlFor={surfaceId}
-                  className="flex cursor-pointer items-center gap-2 rounded-lg border p-3 has-checked:border-primary has-checked:bg-primary/5"
-                >
-                  <Checkbox
-                    id={surfaceId}
-                    checked={selectedSurfaces.includes(surface)}
-                    onCheckedChange={(checked) =>
-                      toggleSurface(surface, checked === true)
-                    }
-                  />
-                  <span className="text-sm">{surface}</span>
-                </label>
-              );
-            })}
-          </div>
-          {fieldErrors.surfaces ? (
-            <FieldError>{fieldErrors.surfaces}</FieldError>
-          ) : null}
-        </FieldSet>
-
-        <Field data-invalid={Boolean(fieldErrors.description)}>
-          <FieldLabel htmlFor={descriptionId}>
-            {showOtherDescription
-              ? "Describe the issue"
-              : "Anything else we should know?"}
-            {!showOtherDescription ? (
-              <span className="font-normal text-muted-foreground">
-                {" "}
-                (optional)
-              </span>
-            ) : null}
-          </FieldLabel>
-          <Textarea
-            id={descriptionId}
-            name="description"
-            rows={4}
-            placeholder={
-              showOtherDescription
-                ? "Tell us what's affected and what you're seeing…"
-                : "Access notes, severity, preferred callback time, etc."
-            }
-            aria-invalid={Boolean(fieldErrors.description)}
-            aria-required={showOtherDescription}
-            onChange={() => clearFieldError("description")}
-          />
-          {fieldErrors.description ? (
-            <FieldError>{fieldErrors.description}</FieldError>
-          ) : null}
-        </Field>
-
-        <Field data-invalid={Boolean(fieldErrors.photo)}>
-          <FieldLabel htmlFor={photoId}>
-            Photo of affected area{" "}
-            <span className="font-normal text-muted-foreground">
-              (optional, max 3 MB)
-            </span>
-          </FieldLabel>
+        <Field data-invalid={Boolean(fieldErrors.suburb)}>
+          <FieldLabel htmlFor={suburbId}>Suburb</FieldLabel>
           <Input
-            id={photoId}
-            name="photo"
-            type="file"
-            accept="image/*"
-            className="cursor-pointer file:cursor-pointer"
-            aria-invalid={Boolean(fieldErrors.photo)}
-            onChange={() => clearFieldError("photo")}
+            id={suburbId}
+            name="suburb"
+            autoComplete="address-level2"
+            placeholder="Your suburb"
+            aria-invalid={Boolean(fieldErrors.suburb)}
+            onChange={() => clearFieldError("suburb")}
           />
-          {fieldErrors.photo ? (
-            <FieldError>{fieldErrors.photo}</FieldError>
+          {fieldErrors.suburb ? (
+            <FieldError>{fieldErrors.suburb}</FieldError>
           ) : null}
         </Field>
+
+        {isCompact ? null : (
+          <>
+            <FieldSet
+              data-invalid={Boolean(fieldErrors.surfaces)}
+              className="gap-3 border-0 p-0"
+            >
+              <FieldLegend className="mb-0 px-0">Affected surface</FieldLegend>
+              <div className="grid gap-3 sm:grid-cols-2">
+                {page.surfaceOptions.map((surface) => {
+                  const surfaceId = `${idPrefix}-surface-${surface.replace(/\s+/g, "-").toLowerCase()}`;
+                  return (
+                    <label
+                      key={surface}
+                      htmlFor={surfaceId}
+                      className="flex cursor-pointer items-center gap-2 rounded-lg border p-3 has-checked:border-primary has-checked:bg-primary/5"
+                    >
+                      <Checkbox
+                        id={surfaceId}
+                        checked={selectedSurfaces.includes(surface)}
+                        onCheckedChange={(checked) =>
+                          toggleSurface(surface, checked === true)
+                        }
+                      />
+                      <span className="text-sm">{surface}</span>
+                    </label>
+                  );
+                })}
+              </div>
+              {fieldErrors.surfaces ? (
+                <FieldError>{fieldErrors.surfaces}</FieldError>
+              ) : null}
+            </FieldSet>
+
+            <Field data-invalid={Boolean(fieldErrors.description)}>
+              <FieldLabel htmlFor={descriptionId}>
+                {showOtherDescription
+                  ? "Describe the issue"
+                  : "Anything else we should know?"}
+                {!showOtherDescription ? (
+                  <span className="font-normal text-muted-foreground">
+                    {" "}
+                    (optional)
+                  </span>
+                ) : null}
+              </FieldLabel>
+              <Textarea
+                id={descriptionId}
+                name="description"
+                rows={4}
+                placeholder={
+                  showOtherDescription
+                    ? "Tell us what's affected and what you're seeing…"
+                    : "Access notes, severity, preferred callback time, etc."
+                }
+                aria-invalid={Boolean(fieldErrors.description)}
+                aria-required={showOtherDescription}
+                onChange={() => clearFieldError("description")}
+              />
+              {fieldErrors.description ? (
+                <FieldError>{fieldErrors.description}</FieldError>
+              ) : null}
+            </Field>
+
+            <Field data-invalid={Boolean(fieldErrors.photo)}>
+              <FieldLabel htmlFor={photoId}>
+                Photo of affected area{" "}
+                <span className="font-normal text-muted-foreground">
+                  (optional, max 3 MB)
+                </span>
+              </FieldLabel>
+              <Input
+                id={photoId}
+                name="photo"
+                type="file"
+                accept="image/*"
+                className="cursor-pointer file:cursor-pointer"
+                aria-invalid={Boolean(fieldErrors.photo)}
+                onChange={() => clearFieldError("photo")}
+              />
+              {fieldErrors.photo ? (
+                <FieldError>{fieldErrors.photo}</FieldError>
+              ) : null}
+            </Field>
+          </>
+        )}
       </FieldGroup>
 
       {formError ? (
