@@ -19,8 +19,8 @@ export function Hero({ page }: HeroProps) {
         background: `linear-gradient(to bottom, var(--landing-hero-from), var(--landing-hero-to))`,
       }}
     >
-      <div className="mx-auto grid max-w-7xl gap-10 px-4 py-16 md:grid-cols-2 md:items-center md:py-24 lg:grid-cols-12 lg:gap-12">
-        <div className="flex flex-col justify-center space-y-6 lg:col-span-5">
+      <div className="mx-auto grid max-w-7xl gap-10 px-4 py-16 md:grid-cols-12 md:items-stretch md:py-24 lg:gap-12">
+        <div className="order-1 flex flex-col justify-center space-y-6 md:col-span-5">
           {hero.audienceCallout ? (
             <p className="text-sm font-semibold uppercase tracking-wide text-white/80">
               {hero.audienceCallout}
@@ -47,14 +47,6 @@ export function Hero({ page }: HeroProps) {
               ))}
             </ul>
           ) : null}
-          <div className="rounded-2xl bg-card p-4 text-card-foreground shadow-lg md:p-5">
-            <LeadForm
-              page={page}
-              idPrefix="hero"
-              formLocation="hero"
-              variant="compact"
-            />
-          </div>
           <ul className="flex flex-wrap gap-3 pt-2">
             {hero.trustStrip.map((item) => (
               <li
@@ -68,7 +60,7 @@ export function Hero({ page }: HeroProps) {
           </ul>
         </div>
         <div
-          className="relative aspect-16/10 overflow-hidden rounded-2xl border border-white/10 shadow-2xl lg:col-span-7"
+          className="relative order-3 aspect-16/10 min-h-0 overflow-hidden rounded-2xl border border-white/10 shadow-2xl md:order-2 md:col-span-7 md:aspect-auto md:h-full"
           style={{
             backgroundColor:
               "color-mix(in srgb, var(--landing-hero-from) 50%, transparent)",
@@ -93,6 +85,15 @@ export function Hero({ page }: HeroProps) {
               </p>
             </div>
           )}
+        </div>
+        <div className="order-2 rounded-2xl bg-card p-4 text-card-foreground shadow-lg md:order-3 md:col-span-12 md:p-5">
+          <LeadForm
+            page={page}
+            idPrefix="hero"
+            formLocation="hero"
+            variant="compact"
+            layout="row"
+          />
         </div>
       </div>
     </section>

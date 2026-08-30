@@ -31,6 +31,7 @@ type LeadFormProps = {
   readonly idPrefix: string;
   readonly formLocation: string;
   readonly variant?: LeadFormVariant;
+  readonly layout?: "stack" | "row";
   readonly serviceTitle?: string;
 };
 
@@ -39,6 +40,7 @@ export function LeadForm({
   idPrefix,
   formLocation,
   variant = "full",
+  layout = "stack",
   serviceTitle,
 }: LeadFormProps) {
   const formRef = useRef<HTMLFormElement>(null);
@@ -50,6 +52,7 @@ export function LeadForm({
   const offer = resolveOffer(page);
   const discountPercent = offer.webBookingDiscountPercent;
   const isCompact = variant === "compact";
+  const isRowLayout = isCompact && layout === "row";
 
   const nameId = `${idPrefix}-name`;
   const phoneId = `${idPrefix}-phone`;
@@ -113,6 +116,8 @@ export function LeadForm({
             selected_surface_count: selectedSurfaces.length,
             has_photo: photo instanceof File && photo.size > 0,
             form_location: formLocation,
+            form_variant: variant,
+            service_title: serviceTitle,
           });
           window.location.assign(`/${page.slug}/thank-you`);
           return;
@@ -147,7 +152,10 @@ export function LeadForm({
     hasTrackedFormStart.current = true;
     capturePostHogEvent("form_started", {
       page_slug: page.slug,
+      service_type: page.leadServiceType,
       form_location: formLocation,
+      form_variant: variant,
+      service_title: serviceTitle,
     });
   }
 
@@ -157,7 +165,9 @@ export function LeadForm({
       onSubmit={handleSubmit}
       onFocusCapture={handleFormFocusCapture}
       noValidate
-      className={isCompact ? "space-y-4" : "space-y-6"}
+      className={
+        isRowLayout ? "space-y-3" : isCompact ? "space-y-4" : "space-y-6"
+      }
     >
       <input type="hidden" name="pageSlug" value={page.slug} />
       <input type="hidden" name="pageName" value={page.name} />
@@ -186,7 +196,13 @@ export function LeadForm({
         aria-hidden
       />
 
-      <FieldGroup>
+      <FieldGroup
+        className={
+          isRowLayout
+            ? "gap-3 md:grid md:grid-cols-[1fr_1fr_1fr_auto] md:items-end"
+            : undefined
+        }
+      >
         <Field data-invalid={Boolean(fieldErrors.name)}>
           <FieldLabel htmlFor={nameId}>Name</FieldLabel>
           <Input
@@ -316,6 +332,16 @@ export function LeadForm({
             </Field>
           </>
         )}
+        {isRowLayout ? (
+          <Button
+            type="submit"
+            size="lg"
+            className="w-full md:w-auto md:min-w-48"
+            disabled={isPending}
+          >
+            {isPending ? "Sending…" : page.ctaLabel}
+          </Button>
+        ) : null}
       </FieldGroup>
 
       {formError ? (
@@ -343,9 +369,11 @@ export function LeadForm({
         </p>
       ) : null}
 
-      <Button type="submit" size="lg" className="w-full" disabled={isPending}>
-        {isPending ? "Sending…" : page.ctaLabel}
-      </Button>
+      {isRowLayout ? null : (
+        <Button type="submit" size="lg" className="w-full" disabled={isPending}>
+          {isPending ? "Sending…" : page.ctaLabel}
+        </Button>
+      )}
     </form>
   );
 }

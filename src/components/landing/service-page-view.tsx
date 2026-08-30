@@ -48,6 +48,7 @@ export function ServicePageView({
       <LandingPageTheme theme={page.theme}>
         <main className="pb-32 md:pb-14">
           <section
+            data-landing-section="hero"
             className="border-b py-10 md:py-14"
             style={{
               background: `linear-gradient(to bottom, var(--landing-hero-from), var(--landing-hero-to))`,
@@ -110,7 +111,10 @@ export function ServicePageView({
             />
           ) : null}
 
-          <section className="bg-muted/30 py-16 md:py-20">
+          <section
+            data-landing-section="form"
+            className="bg-muted/30 py-16 md:py-20"
+          >
             <div className="mx-auto max-w-xl space-y-6 px-4">
               <div className="space-y-2 text-center">
                 <h2 className="font-heading text-3xl font-bold tracking-tight">

@@ -5,6 +5,7 @@ import { useEffect, useRef } from "react";
 import { trackGoogleConversion } from "@/components/analytics/google-ads";
 import { trackGoogleLead } from "@/components/analytics/google-tag";
 import { trackMetaLead } from "@/components/analytics/meta-pixel";
+import { capturePostHogEvent } from "@/components/analytics/posthog";
 import type { PublishedLandingPage } from "@/lib/types/landing-page";
 
 type ThankYouAnalyticsProps = {
@@ -21,6 +22,10 @@ export function ThankYouAnalytics({ page }: ThankYouAnalyticsProps) {
     }
     tracked.current = true;
 
+    capturePostHogEvent("thank_you_viewed", {
+      page_slug: page.slug,
+      service_type: page.leadServiceType,
+    });
     trackGoogleLead(page.slug);
     trackMetaLead();
     trackGoogleConversion(
@@ -28,7 +33,12 @@ export function ThankYouAnalytics({ page }: ThankYouAnalyticsProps) {
       page.googleConversionLabel ??
         process.env.NEXT_PUBLIC_GOOGLE_CONVERSION_LABEL,
     );
-  }, [page.slug, page.googleAdsId, page.googleConversionLabel]);
+  }, [
+    page.slug,
+    page.leadServiceType,
+    page.googleAdsId,
+    page.googleConversionLabel,
+  ]);
 
   return null;
 }
