@@ -35,6 +35,18 @@ type LeadFormProps = {
   readonly serviceTitle?: string;
 };
 
+/** Keep error copy from collapsing the row when messages appear or clear. */
+function ReservedFieldError({ message }: { readonly message?: string }) {
+  return (
+    <div
+      className="min-h-5 text-sm font-normal text-destructive"
+      role={message ? "alert" : undefined}
+    >
+      {message}
+    </div>
+  );
+}
+
 export function LeadForm({
   page,
   idPrefix,
@@ -199,50 +211,92 @@ export function LeadForm({
       <FieldGroup
         className={
           isRowLayout
-            ? "gap-3 md:grid md:grid-cols-[1fr_1fr_1fr_auto] md:items-end"
+            ? "gap-3 md:grid md:grid-cols-[1fr_1fr_1fr_auto] md:grid-rows-[auto_auto_minmax(1.25rem,auto)] md:items-stretch md:gap-x-3 md:gap-y-1.5"
             : undefined
         }
       >
-        <Field data-invalid={Boolean(fieldErrors.name)}>
+        <Field
+          data-invalid={Boolean(fieldErrors.name)}
+          className={
+            isRowLayout
+              ? "md:row-span-3 md:grid md:grid-rows-subgrid md:gap-0"
+              : undefined
+          }
+        >
           <FieldLabel htmlFor={nameId}>Name</FieldLabel>
-          <Input
-            id={nameId}
-            name="name"
-            autoComplete="name"
-            aria-invalid={Boolean(fieldErrors.name)}
-            onChange={() => clearFieldError("name")}
-          />
-          {fieldErrors.name ? (
+          <div className="relative min-h-9">
+            <Input
+              id={nameId}
+              name="name"
+              autoComplete="name"
+              data-lpignore="true"
+              data-1p-ignore="true"
+              data-bwignore="true"
+              aria-invalid={Boolean(fieldErrors.name)}
+              onChange={() => clearFieldError("name")}
+            />
+          </div>
+          {isCompact ? (
+            <ReservedFieldError message={fieldErrors.name} />
+          ) : fieldErrors.name ? (
             <FieldError>{fieldErrors.name}</FieldError>
           ) : null}
         </Field>
 
-        <Field data-invalid={Boolean(fieldErrors.phone)}>
+        <Field
+          data-invalid={Boolean(fieldErrors.phone)}
+          className={
+            isRowLayout
+              ? "md:row-span-3 md:grid md:grid-rows-subgrid md:gap-0"
+              : undefined
+          }
+        >
           <FieldLabel htmlFor={phoneId}>Phone</FieldLabel>
-          <Input
-            id={phoneId}
-            name="phone"
-            type="tel"
-            autoComplete="tel"
-            aria-invalid={Boolean(fieldErrors.phone)}
-            onChange={() => clearFieldError("phone")}
-          />
-          {fieldErrors.phone ? (
+          <div className="relative min-h-9">
+            <Input
+              id={phoneId}
+              name="phone"
+              type="tel"
+              autoComplete="tel"
+              data-lpignore="true"
+              data-1p-ignore="true"
+              data-bwignore="true"
+              aria-invalid={Boolean(fieldErrors.phone)}
+              onChange={() => clearFieldError("phone")}
+            />
+          </div>
+          {isCompact ? (
+            <ReservedFieldError message={fieldErrors.phone} />
+          ) : fieldErrors.phone ? (
             <FieldError>{fieldErrors.phone}</FieldError>
           ) : null}
         </Field>
 
-        <Field data-invalid={Boolean(fieldErrors.suburb)}>
+        <Field
+          data-invalid={Boolean(fieldErrors.suburb)}
+          className={
+            isRowLayout
+              ? "md:row-span-3 md:grid md:grid-rows-subgrid md:gap-0"
+              : undefined
+          }
+        >
           <FieldLabel htmlFor={suburbId}>Suburb</FieldLabel>
-          <Input
-            id={suburbId}
-            name="suburb"
-            autoComplete="address-level2"
-            placeholder="Your suburb"
-            aria-invalid={Boolean(fieldErrors.suburb)}
-            onChange={() => clearFieldError("suburb")}
-          />
-          {fieldErrors.suburb ? (
+          <div className="relative min-h-9">
+            <Input
+              id={suburbId}
+              name="suburb"
+              autoComplete="address-level2"
+              placeholder="Your suburb"
+              data-lpignore="true"
+              data-1p-ignore="true"
+              data-bwignore="true"
+              aria-invalid={Boolean(fieldErrors.suburb)}
+              onChange={() => clearFieldError("suburb")}
+            />
+          </div>
+          {isCompact ? (
+            <ReservedFieldError message={fieldErrors.suburb} />
+          ) : fieldErrors.suburb ? (
             <FieldError>{fieldErrors.suburb}</FieldError>
           ) : null}
         </Field>
@@ -336,7 +390,7 @@ export function LeadForm({
           <Button
             type="submit"
             size="lg"
-            className="w-full md:w-auto md:min-w-48"
+            className="w-full md:col-start-4 md:row-start-2 md:h-9 md:w-auto md:min-w-48 md:self-start"
             disabled={isPending}
           >
             {isPending ? "Sending…" : page.ctaLabel}
