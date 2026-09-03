@@ -20,7 +20,7 @@ export function Hero({ page }: HeroProps) {
       }}
     >
       {hero.imageUrl ? (
-        <>
+        <div className="pointer-events-none absolute inset-0 hidden md:block">
           <Image
             key={hero.imageUrl}
             src={hero.imageUrl}
@@ -39,10 +39,10 @@ export function Hero({ page }: HeroProps) {
                 "linear-gradient(to right, color-mix(in srgb, var(--landing-hero-from) 62%, transparent) 0%, color-mix(in srgb, var(--landing-hero-from) 32%, transparent) 42%, color-mix(in srgb, var(--landing-hero-to) 12%, transparent) 100%)",
             }}
           />
-        </>
+        </div>
       ) : null}
-      <div className="relative z-10 mx-auto grid min-h-[32rem] max-w-7xl gap-10 px-4 py-16 md:min-h-[38rem] md:grid-cols-12 md:items-center md:py-24 lg:gap-12">
-        <div className="relative flex flex-col justify-center space-y-6 drop-shadow-md md:col-span-6">
+      <div className="relative z-10 mx-auto flex max-w-7xl flex-col gap-8 px-4 py-10 md:grid md:min-h-[38rem] md:grid-cols-12 md:items-center md:gap-10 md:py-24 lg:gap-12">
+        <div className="flex flex-col justify-center space-y-5 md:col-span-6 md:space-y-6 md:drop-shadow-md">
           {hero.audienceCallout ? (
             <p className="text-sm font-semibold uppercase tracking-wide text-white/80">
               {hero.audienceCallout}
@@ -55,10 +55,10 @@ export function Hero({ page }: HeroProps) {
               {page.serviceAreas.join(" · ")}
             </Badge>
           )}
-          <h1 className="font-heading text-4xl font-bold leading-tight tracking-tight md:text-5xl">
+          <h1 className="font-heading text-3xl font-bold leading-tight tracking-tight md:text-5xl">
             {hero.headline}
           </h1>
-          <p className="text-lg text-white/90 md:text-xl">{hero.subheadline}</p>
+          <p className="text-base text-white/90 md:text-xl">{hero.subheadline}</p>
           {hero.intrigueBullets && hero.intrigueBullets.length > 0 ? (
             <ul className="space-y-2 text-left text-sm text-white/85 md:text-base">
               {hero.intrigueBullets.map((bullet) => (
@@ -69,7 +69,7 @@ export function Hero({ page }: HeroProps) {
               ))}
             </ul>
           ) : null}
-          <ul className="flex flex-wrap gap-3 pt-2">
+          <ul className="hidden flex-wrap gap-3 pt-2 md:flex">
             {hero.trustStrip.map((item) => (
               <li
                 key={item}
