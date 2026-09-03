@@ -31,20 +31,19 @@ export function Hero({ page }: HeroProps) {
             priority
             sizes="100vw"
           />
-          <div className="absolute inset-0 bg-black/25" />
           <div
             className="absolute inset-0"
             style={{
               background:
-                "linear-gradient(to right, color-mix(in srgb, var(--landing-hero-from) 62%, transparent) 0%, color-mix(in srgb, var(--landing-hero-from) 32%, transparent) 42%, color-mix(in srgb, var(--landing-hero-to) 12%, transparent) 100%)",
+                "linear-gradient(to right, color-mix(in srgb, var(--landing-hero-from) 82%, transparent) 0%, color-mix(in srgb, var(--landing-hero-from) 58%, transparent) 38%, color-mix(in srgb, var(--landing-hero-from) 22%, transparent) 58%, color-mix(in srgb, var(--landing-hero-to) 10%, transparent) 100%)",
             }}
           />
         </div>
       ) : null}
       <div className="relative z-10 mx-auto flex max-w-7xl flex-col gap-8 px-4 py-10 md:grid md:min-h-[38rem] md:grid-cols-12 md:items-center md:gap-10 md:py-24 lg:gap-12">
-        <div className="flex flex-col justify-center space-y-5 md:col-span-6 md:space-y-6 md:drop-shadow-md">
+        <div className="relative flex flex-col justify-center space-y-5 drop-shadow-[0_2px_10px_rgba(0,0,0,0.85)] md:col-span-6 md:space-y-6">
           {hero.audienceCallout ? (
-            <p className="text-sm font-semibold uppercase tracking-wide text-white/80">
+            <p className="text-sm font-semibold uppercase tracking-wide text-white/90">
               {hero.audienceCallout}
             </p>
           ) : (
@@ -58,9 +57,9 @@ export function Hero({ page }: HeroProps) {
           <h1 className="font-heading text-3xl font-bold leading-tight tracking-tight md:text-5xl">
             {hero.headline}
           </h1>
-          <p className="text-base text-white/90 md:text-xl">{hero.subheadline}</p>
+          <p className="text-base text-white md:text-xl">{hero.subheadline}</p>
           {hero.intrigueBullets && hero.intrigueBullets.length > 0 ? (
-            <ul className="space-y-2 text-left text-sm text-white/85 md:text-base">
+            <ul className="space-y-2 text-left text-sm text-white/95 md:text-base">
               {hero.intrigueBullets.map((bullet) => (
                 <li key={bullet} className="flex items-start gap-2">
                   <span className="mt-1.5 size-1.5 shrink-0 rounded-full bg-white/70" />
