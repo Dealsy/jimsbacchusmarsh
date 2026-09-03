@@ -53,59 +53,42 @@ export function createLeadFormSchema(
           "Invalid surface selection",
         );
 
-  return z
-    .object({
-      name: z
-        .string()
-        .trim()
-        .min(1, "Please enter your name")
-        .max(100, "Name is too long"),
-      phone: z
-        .string()
-        .trim()
-        .min(1, "Please enter your phone number")
-        .min(8, "Please enter a valid phone number")
-        .max(20, "Phone number is too long"),
-      suburb: z
-        .string()
-        .trim()
-        .min(1, "Please enter your suburb")
-        .max(80, "Suburb is too long"),
-      surfaces: surfacesSchema,
-      description: z
-        .string()
-        .trim()
-        .max(500, "Description is too long")
-        .optional(),
-      website: z.string().optional(),
-      pageSlug: z.string().min(1),
-      pageName: z.string().trim().max(120).optional(),
-      leadServiceType: z.string().min(1),
-      formVariant: z.union([z.literal("full"), z.literal("compact")]),
-      serviceTitle: z.string().trim().max(120).optional(),
-      webBookingDiscountPercent: z.number().int().min(1).max(100).optional(),
-    })
-    .superRefine((data, ctx) => {
-      if (!data.surfaces.includes(OTHER_SURFACE_OPTION)) {
-        return;
-      }
-
-      const description = data.description?.trim() ?? "";
-      if (description.length < 3) {
-        ctx.addIssue({
-          code: "custom",
-          message: "Please describe the affected area",
-          path: ["description"],
-        });
-      }
-    });
+  return z.object({
+    name: z
+      .string()
+      .trim()
+      .min(1, "Please enter your name")
+      .max(100, "Name is too long"),
+    phone: z
+      .string()
+      .trim()
+      .min(1, "Please enter your phone number")
+      .min(8, "Please enter a valid phone number")
+      .max(20, "Phone number is too long"),
+    suburb: z
+      .string()
+      .trim()
+      .min(1, "Please enter your suburb")
+      .max(80, "Suburb is too long"),
+    surfaces: surfacesSchema,
+    description: z
+      .string()
+      .trim()
+      .max(500, "Description is too long")
+      .optional(),
+    website: z.string().optional(),
+    pageSlug: z.string().min(1),
+    pageName: z.string().trim().max(120).optional(),
+    leadServiceType: z.string().min(1),
+    formVariant: z.union([z.literal("full"), z.literal("compact")]),
+    serviceTitle: z.string().trim().max(120).optional(),
+    webBookingDiscountPercent: z.number().int().min(1).max(100).optional(),
+  });
 }
 
 export type LeadFormValues = z.infer<ReturnType<typeof createLeadFormSchema>>;
 
-export type LeadFormFieldErrors = Partial<
-  Record<keyof LeadFormValues | "photo", string>
->;
+export type LeadFormFieldErrors = Partial<Record<keyof LeadFormValues, string>>;
 
 function parseFormVariant(value: FormDataEntryValue | null): LeadFormVariant {
   return value === "compact" ? "compact" : "full";

@@ -13,7 +13,6 @@ import {
   FieldSet,
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import { submitLead } from "@/lib/actions/submit-lead";
 import { resolveOffer } from "@/lib/landing-page-content";
 import { formatPhoneHref, isPlaceholderPhone } from "@/lib/phone";
@@ -22,7 +21,6 @@ import {
   extractLeadFormValues,
   type LeadFormFieldErrors,
   type LeadFormVariant,
-  OTHER_SURFACE_OPTION,
   validateLeadForm,
 } from "@/lib/validations/lead-form";
 
@@ -69,10 +67,6 @@ export function LeadForm({
   const nameId = `${idPrefix}-name`;
   const phoneId = `${idPrefix}-phone`;
   const suburbId = `${idPrefix}-suburb`;
-  const descriptionId = `${idPrefix}-description`;
-  const photoId = `${idPrefix}-photo`;
-
-  const showOtherDescription = selectedSurfaces.includes(OTHER_SURFACE_OPTION);
 
   function clearFieldError(field: keyof LeadFormFieldErrors) {
     setFieldErrors((current) => {
@@ -87,7 +81,6 @@ export function LeadForm({
 
   function toggleSurface(surface: string, checked: boolean) {
     clearFieldError("surfaces");
-    clearFieldError("description");
 
     setSelectedSurfaces((current) => {
       if (checked) {
@@ -121,12 +114,10 @@ export function LeadForm({
         const result = await submitLead(formData, page.surfaceOptions);
 
         if (result.success) {
-          const photo = formData.get("photo");
           capturePostHogEvent("lead_form_submitted", {
             page_slug: page.slug,
             service_type: page.leadServiceType,
             selected_surface_count: selectedSurfaces.length,
-            has_photo: photo instanceof File && photo.size > 0,
             form_location: formLocation,
             form_variant: variant,
             service_title: serviceTitle,
@@ -141,7 +132,7 @@ export function LeadForm({
         }
       } catch {
         setFormError(
-          "Something went wrong sending your request. If you attached a photo, try again with a smaller image or no photo.",
+          "Something went wrong sending your request. Please try again.",
         );
       }
     });
@@ -302,89 +293,36 @@ export function LeadForm({
         </Field>
 
         {isCompact ? null : (
-          <>
-            <FieldSet
-              data-invalid={Boolean(fieldErrors.surfaces)}
-              className="gap-3 border-0 p-0"
-            >
-              <FieldLegend className="mb-0 px-0">Affected surface</FieldLegend>
-              <div className="grid gap-3 sm:grid-cols-2">
-                {page.surfaceOptions.map((surface) => {
-                  const surfaceId = `${idPrefix}-surface-${surface.replace(/\s+/g, "-").toLowerCase()}`;
-                  return (
-                    <label
-                      key={surface}
-                      htmlFor={surfaceId}
-                      className="flex cursor-pointer items-center gap-2 rounded-lg border p-3 has-checked:border-primary has-checked:bg-primary/5"
-                    >
-                      <Checkbox
-                        id={surfaceId}
-                        checked={selectedSurfaces.includes(surface)}
-                        onCheckedChange={(checked) =>
-                          toggleSurface(surface, checked === true)
-                        }
-                      />
-                      <span className="text-sm">{surface}</span>
-                    </label>
-                  );
-                })}
-              </div>
-              {fieldErrors.surfaces ? (
-                <FieldError>{fieldErrors.surfaces}</FieldError>
-              ) : null}
-            </FieldSet>
-
-            <Field data-invalid={Boolean(fieldErrors.description)}>
-              <FieldLabel htmlFor={descriptionId}>
-                {showOtherDescription
-                  ? "Describe the issue"
-                  : "Anything else we should know?"}
-                {!showOtherDescription ? (
-                  <span className="font-normal text-muted-foreground">
-                    {" "}
-                    (optional)
-                  </span>
-                ) : null}
-              </FieldLabel>
-              <Textarea
-                id={descriptionId}
-                name="description"
-                rows={4}
-                placeholder={
-                  showOtherDescription
-                    ? "Tell us what's affected and what you're seeing…"
-                    : "Access notes, severity, preferred callback time, etc."
-                }
-                aria-invalid={Boolean(fieldErrors.description)}
-                aria-required={showOtherDescription}
-                onChange={() => clearFieldError("description")}
-              />
-              {fieldErrors.description ? (
-                <FieldError>{fieldErrors.description}</FieldError>
-              ) : null}
-            </Field>
-
-            <Field data-invalid={Boolean(fieldErrors.photo)}>
-              <FieldLabel htmlFor={photoId}>
-                Photo of affected area{" "}
-                <span className="font-normal text-muted-foreground">
-                  (optional, max 3 MB)
-                </span>
-              </FieldLabel>
-              <Input
-                id={photoId}
-                name="photo"
-                type="file"
-                accept="image/*"
-                className="cursor-pointer file:cursor-pointer"
-                aria-invalid={Boolean(fieldErrors.photo)}
-                onChange={() => clearFieldError("photo")}
-              />
-              {fieldErrors.photo ? (
-                <FieldError>{fieldErrors.photo}</FieldError>
-              ) : null}
-            </Field>
-          </>
+          <FieldSet
+            data-invalid={Boolean(fieldErrors.surfaces)}
+            className="gap-3 border-0 p-0"
+          >
+            <FieldLegend className="mb-0 px-0">Affected surface</FieldLegend>
+            <div className="grid gap-3 sm:grid-cols-2">
+              {page.surfaceOptions.map((surface) => {
+                const surfaceId = `${idPrefix}-surface-${surface.replace(/\s+/g, "-").toLowerCase()}`;
+                return (
+                  <label
+                    key={surface}
+                    htmlFor={surfaceId}
+                    className="flex cursor-pointer items-center gap-2 rounded-lg border p-3 has-checked:border-primary has-checked:bg-primary/5"
+                  >
+                    <Checkbox
+                      id={surfaceId}
+                      checked={selectedSurfaces.includes(surface)}
+                      onCheckedChange={(checked) =>
+                        toggleSurface(surface, checked === true)
+                      }
+                    />
+                    <span className="text-sm">{surface}</span>
+                  </label>
+                );
+              })}
+            </div>
+            {fieldErrors.surfaces ? (
+              <FieldError>{fieldErrors.surfaces}</FieldError>
+            ) : null}
+          </FieldSet>
         )}
         {isRowLayout ? (
           <Button

@@ -221,6 +221,22 @@ function optionalTrim(value: string): string | undefined {
   return trimmed || undefined;
 }
 
+function parseGoogleRating(value: string): number | undefined {
+  const parsed = Number.parseFloat(value.trim());
+  if (!Number.isFinite(parsed) || parsed < 0 || parsed > 5) {
+    return undefined;
+  }
+  return parsed;
+}
+
+function parseGoogleReviewCount(value: string): number | undefined {
+  const parsed = Number.parseInt(value.trim(), 10);
+  if (!Number.isFinite(parsed) || parsed < 0) {
+    return undefined;
+  }
+  return parsed;
+}
+
 function pageToEditorState(page: LoadedPage): EditorState {
   return {
     name: page.name,
@@ -293,6 +309,13 @@ function pageToEditorState(page: LoadedPage): EditorState {
     metaPixelId: page.metaPixelId ?? "",
     googleAdsId: page.googleAdsId ?? "",
     googleConversionLabel: page.googleConversionLabel ?? "",
+    googleReviewUrl: page.googleReviewUrl ?? "",
+    googleRating:
+      typeof page.googleRating === "number" ? String(page.googleRating) : "",
+    googleReviewCount:
+      typeof page.googleReviewCount === "number"
+        ? String(page.googleReviewCount)
+        : "",
     leadServiceType: page.leadServiceType,
     surfaceOptions: [...page.surfaceOptions],
     heroImageStorageId: page.hero.imageStorageId,
@@ -386,79 +409,90 @@ export function PageEditor({ slug }: PageEditorProps) {
     setSaving(true);
     setMessage(null);
 
-    const result = await updatePage({
-      slug,
-      updates: {
-        name: currentState.name.trim(),
-        seoTitle: currentState.seoTitle.trim(),
-        seoDescription: currentState.seoDescription.trim(),
-        businessName: currentState.businessName.trim(),
-        phone: currentState.phone.trim(),
-        serviceAreas: trimStringList(currentState.serviceAreas),
-        offerText: sanitizeOffer(currentState.offer).headline,
-        ctaLabel: currentState.ctaLabel.trim(),
-        hero: {
-          headline: currentState.heroHeadline.trim(),
-          subheadline: currentState.heroSubheadline.trim(),
-          trustStrip: trimStringList(currentState.trustStrip),
-          imageStorageId: currentState.heroImageStorageId,
-          logoStorageId: currentState.heroLogoStorageId,
-          audienceCallout: currentState.heroAudienceCallout.trim() || undefined,
-          intrigueBullets: trimStringList(currentState.heroIntrigueBullets),
+    try {
+      const result = await updatePage({
+        slug,
+        updates: {
+          name: currentState.name.trim(),
+          seoTitle: currentState.seoTitle.trim(),
+          seoDescription: currentState.seoDescription.trim(),
+          businessName: currentState.businessName.trim(),
+          phone: currentState.phone.trim(),
+          serviceAreas: trimStringList(currentState.serviceAreas),
+          offerText: sanitizeOffer(currentState.offer).headline,
+          ctaLabel: currentState.ctaLabel.trim(),
+          hero: {
+            headline: currentState.heroHeadline.trim(),
+            subheadline: currentState.heroSubheadline.trim(),
+            trustStrip: trimStringList(currentState.trustStrip),
+            imageStorageId: currentState.heroImageStorageId,
+            logoStorageId: currentState.heroLogoStorageId,
+            audienceCallout:
+              currentState.heroAudienceCallout.trim() || undefined,
+            intrigueBullets: trimStringList(currentState.heroIntrigueBullets),
+          },
+          problem: { body: currentState.problemBody.trim() },
+          wedge: {
+            headline: optionalTrim(currentState.wedgeHeadline),
+            description: optionalTrim(currentState.wedgeDescription),
+            negativeTitle: optionalTrim(currentState.wedgeNegativeTitle),
+            positiveTitle: optionalTrim(currentState.wedgePositiveTitle),
+            pressureWashPoints: trimStringList(currentState.pressurePoints),
+            softwashPoints: trimStringList(currentState.softwashPoints),
+          },
+          offer: sanitizeOffer(currentState.offer),
+          guarantee: sanitizeGuarantee(currentState.guarantee),
+          urgency: sanitizeUrgency(currentState.urgency),
+          close: sanitizeClose(currentState.close),
+          thankYou: (() => {
+            const sanitized = sanitizeThankYou(currentState.thankYou);
+            return {
+              headline: sanitized.headline,
+              body: sanitized.body,
+              phonePrompt: sanitized.phonePrompt,
+              nextStepsTitle: sanitized.nextStepsTitle,
+              useHowItWorksSteps: sanitized.useHowItWorksSteps,
+              nextSteps: sanitized.useHowItWorksSteps
+                ? undefined
+                : sanitized.nextSteps,
+            };
+          })(),
+          services: sanitizeServices(currentState.services),
+          howItWorks: sanitizeHowItWorks(currentState.howItWorks),
+          faq: sanitizeFaq(currentState.faq),
+          testimonials: sanitizeTestimonials(currentState.testimonials),
+          metaPixelId: currentState.metaPixelId.trim() || undefined,
+          googleAdsId: currentState.googleAdsId.trim() || undefined,
+          googleConversionLabel:
+            currentState.googleConversionLabel.trim() || undefined,
+          googleReviewUrl: currentState.googleReviewUrl.trim() || undefined,
+          googleRating: parseGoogleRating(currentState.googleRating),
+          googleReviewCount: parseGoogleReviewCount(
+            currentState.googleReviewCount,
+          ),
+          leadServiceType: currentState.leadServiceType.trim(),
+          surfaceOptions: trimStringList(currentState.surfaceOptions),
+          servicesSectionTitle: optionalTrim(currentState.servicesSectionTitle),
+          servicesSectionDescription: optionalTrim(
+            currentState.servicesSectionDescription,
+          ),
+          gallerySectionTitle: optionalTrim(currentState.gallerySectionTitle),
+          gallerySectionDescription: optionalTrim(
+            currentState.gallerySectionDescription,
+          ),
+          theme: sanitizeTheme(currentState.theme),
         },
-        problem: { body: currentState.problemBody.trim() },
-        wedge: {
-          headline: optionalTrim(currentState.wedgeHeadline),
-          description: optionalTrim(currentState.wedgeDescription),
-          negativeTitle: optionalTrim(currentState.wedgeNegativeTitle),
-          positiveTitle: optionalTrim(currentState.wedgePositiveTitle),
-          pressureWashPoints: trimStringList(currentState.pressurePoints),
-          softwashPoints: trimStringList(currentState.softwashPoints),
-        },
-        offer: sanitizeOffer(currentState.offer),
-        guarantee: sanitizeGuarantee(currentState.guarantee),
-        urgency: sanitizeUrgency(currentState.urgency),
-        close: sanitizeClose(currentState.close),
-        thankYou: (() => {
-          const sanitized = sanitizeThankYou(currentState.thankYou);
-          return {
-            headline: sanitized.headline,
-            body: sanitized.body,
-            phonePrompt: sanitized.phonePrompt,
-            nextStepsTitle: sanitized.nextStepsTitle,
-            useHowItWorksSteps: sanitized.useHowItWorksSteps,
-            nextSteps: sanitized.useHowItWorksSteps
-              ? undefined
-              : sanitized.nextSteps,
-          };
-        })(),
-        services: sanitizeServices(currentState.services),
-        howItWorks: sanitizeHowItWorks(currentState.howItWorks),
-        faq: sanitizeFaq(currentState.faq),
-        testimonials: sanitizeTestimonials(currentState.testimonials),
-        metaPixelId: currentState.metaPixelId.trim() || undefined,
-        googleAdsId: currentState.googleAdsId.trim() || undefined,
-        googleConversionLabel:
-          currentState.googleConversionLabel.trim() || undefined,
-        leadServiceType: currentState.leadServiceType.trim(),
-        surfaceOptions: trimStringList(currentState.surfaceOptions),
-        servicesSectionTitle: optionalTrim(currentState.servicesSectionTitle),
-        servicesSectionDescription: optionalTrim(
-          currentState.servicesSectionDescription,
-        ),
-        gallerySectionTitle: optionalTrim(currentState.gallerySectionTitle),
-        gallerySectionDescription: optionalTrim(
-          currentState.gallerySectionDescription,
-        ),
-        theme: sanitizeTheme(currentState.theme),
-      },
-    });
+      });
 
-    setSaving(false);
-    if (result.success) {
-      capturePostHogEvent("landing_page_saved", { page_slug: slug });
+      setMessage(result.success ? "Saved." : (result.error ?? "Save failed."));
+      if (result.success) {
+        capturePostHogEvent("landing_page_saved", { page_slug: slug });
+      }
+    } catch {
+      setMessage("Save failed.");
+    } finally {
+      setSaving(false);
     }
-    setMessage(result.success ? "Saved." : (result.error ?? "Save failed."));
   }
 
   async function handlePublish() {
@@ -678,7 +712,7 @@ export function PageEditor({ slug }: PageEditorProps) {
         <TabsContent value="hero" className="space-y-6 pt-6">
           <TabIntro
             title="Top of page"
-            description="The first thing visitors see — headline, trust badges, and hero photo."
+            description="The first thing visitors see — headline, trust badges, and a full-bleed background photo behind the quote form."
           />
 
           <SectionCard title="Headline & intro">
@@ -752,9 +786,12 @@ export function PageEditor({ slug }: PageEditorProps) {
             />
           </SectionCard>
 
-          <SectionCard title="Hero photo">
+          <SectionCard
+            title="Hero background"
+            description="Full-bleed photo behind the headline and quote form. A dark overlay is applied so the text stays readable."
+          >
             <ImageUpload
-              label="Upload hero image"
+              label="Upload hero background"
               currentUrl={page.hero.imageUrl}
               storageId={state.heroImageStorageId}
               onUploadingChange={handleUploadingChange}
@@ -1092,6 +1129,49 @@ export function PageEditor({ slug }: PageEditorProps) {
             </TabsContent>
 
             <TabsContent value="reviews" className="space-y-6">
+              <SectionCard
+                title="Google reviews badge"
+                description="Shown under the hero, above the Fully Insured bar. Hidden until a review URL is set."
+              >
+                <FieldGroup>
+                  <Field>
+                    <FieldLabel>Google reviews URL</FieldLabel>
+                    <Input
+                      value={state.googleReviewUrl}
+                      onChange={(event) =>
+                        updateField("googleReviewUrl", event.target.value)
+                      }
+                      placeholder="https://maps.google.com/..."
+                    />
+                  </Field>
+                  <Field>
+                    <FieldLabel>Rating</FieldLabel>
+                    <Input
+                      value={state.googleRating}
+                      onChange={(event) =>
+                        updateField("googleRating", event.target.value)
+                      }
+                      placeholder="e.g. 5"
+                      inputMode="decimal"
+                    />
+                    <p className="text-xs text-muted-foreground">
+                      Number from 0 to 5. Leave blank to show the link without a
+                      score.
+                    </p>
+                  </Field>
+                  <Field>
+                    <FieldLabel>Review count</FieldLabel>
+                    <Input
+                      value={state.googleReviewCount}
+                      onChange={(event) =>
+                        updateField("googleReviewCount", event.target.value)
+                      }
+                      placeholder="e.g. 12"
+                      inputMode="numeric"
+                    />
+                  </Field>
+                </FieldGroup>
+              </SectionCard>
               <TestimonialsEditor
                 values={state.testimonials}
                 onChange={(values) => updateField("testimonials", values)}

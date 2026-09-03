@@ -1,4 +1,4 @@
-import { MapPinIcon, ShieldCheckIcon, SparklesIcon } from "lucide-react";
+import { MapPinIcon, ShieldCheckIcon } from "lucide-react";
 import Image from "next/image";
 import { LeadForm } from "@/components/landing/lead-form";
 import { Badge } from "@/components/ui/badge";
@@ -19,8 +19,30 @@ export function Hero({ page }: HeroProps) {
         background: `linear-gradient(to bottom, var(--landing-hero-from), var(--landing-hero-to))`,
       }}
     >
-      <div className="mx-auto grid max-w-7xl gap-10 px-4 py-16 md:grid-cols-12 md:items-stretch md:py-24 lg:gap-12">
-        <div className="order-1 flex flex-col justify-center space-y-6 md:col-span-5">
+      {hero.imageUrl ? (
+        <>
+          <Image
+            key={hero.imageUrl}
+            src={hero.imageUrl}
+            alt=""
+            fill
+            unoptimized
+            className="object-contain object-[10%_50%] scale-[1.45] origin-[22%_80%]"
+            priority
+            sizes="100vw"
+          />
+          <div className="absolute inset-0 bg-black/25" />
+          <div
+            className="absolute inset-0"
+            style={{
+              background:
+                "linear-gradient(to right, color-mix(in srgb, var(--landing-hero-from) 62%, transparent) 0%, color-mix(in srgb, var(--landing-hero-from) 32%, transparent) 42%, color-mix(in srgb, var(--landing-hero-to) 12%, transparent) 100%)",
+            }}
+          />
+        </>
+      ) : null}
+      <div className="relative z-10 mx-auto grid min-h-[32rem] max-w-7xl gap-10 px-4 py-16 md:min-h-[38rem] md:grid-cols-12 md:items-center md:py-24 lg:gap-12">
+        <div className="relative flex flex-col justify-center space-y-6 drop-shadow-md md:col-span-6">
           {hero.audienceCallout ? (
             <p className="text-sm font-semibold uppercase tracking-wide text-white/80">
               {hero.audienceCallout}
@@ -59,41 +81,8 @@ export function Hero({ page }: HeroProps) {
             ))}
           </ul>
         </div>
-        <div
-          className="relative order-3 aspect-16/10 min-h-0 overflow-hidden rounded-2xl border border-white/10 shadow-2xl md:order-2 md:col-span-7 md:aspect-auto md:h-full"
-          style={{
-            backgroundColor:
-              "color-mix(in srgb, var(--landing-hero-from) 50%, transparent)",
-          }}
-        >
-          {hero.imageUrl ? (
-            <Image
-              key={hero.imageUrl}
-              src={hero.imageUrl}
-              alt={`${page.name} — before and after`}
-              fill
-              unoptimized
-              className="object-cover object-center"
-              priority
-              sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 58vw"
-            />
-          ) : (
-            <div className="flex h-full flex-col items-center justify-center gap-3 p-8 text-center text-white/60">
-              <SparklesIcon className="size-10 opacity-50" />
-              <p className="text-sm">
-                [PLACEHOLDER — Matt to supply hero before/after photo]
-              </p>
-            </div>
-          )}
-        </div>
-        <div className="order-2 rounded-2xl bg-card p-4 text-card-foreground shadow-lg md:order-3 md:col-span-12 md:p-5">
-          <LeadForm
-            page={page}
-            idPrefix="hero"
-            formLocation="hero"
-            variant="compact"
-            layout="row"
-          />
+        <div className="rounded-2xl bg-card p-5 text-card-foreground shadow-lg md:col-span-5 md:col-start-8 md:p-6">
+          <LeadForm page={page} idPrefix="hero" formLocation="hero" />
         </div>
       </div>
     </section>

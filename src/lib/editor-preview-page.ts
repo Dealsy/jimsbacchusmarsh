@@ -14,6 +14,22 @@ function optionalTrim(value: string): string | undefined {
   return trimmed || undefined;
 }
 
+function parseGoogleRating(value: string): number | undefined {
+  const parsed = Number.parseFloat(value.trim());
+  if (!Number.isFinite(parsed) || parsed < 0 || parsed > 5) {
+    return undefined;
+  }
+  return parsed;
+}
+
+function parseGoogleReviewCount(value: string): number | undefined {
+  const parsed = Number.parseInt(value.trim(), 10);
+  if (!Number.isFinite(parsed) || parsed < 0) {
+    return undefined;
+  }
+  return parsed;
+}
+
 export function mergeEditorPreviewPage(
   page: LoadedPage,
   state: EditorState,
@@ -125,6 +141,9 @@ export function mergeEditorPreviewPage(
     metaPixelId: state.metaPixelId.trim() || undefined,
     googleAdsId: state.googleAdsId.trim() || undefined,
     googleConversionLabel: state.googleConversionLabel.trim() || undefined,
+    googleReviewUrl: state.googleReviewUrl.trim() || undefined,
+    googleRating: parseGoogleRating(state.googleRating),
+    googleReviewCount: parseGoogleReviewCount(state.googleReviewCount),
     leadServiceType: state.leadServiceType.trim(),
     surfaceOptions: trimStringList(state.surfaceOptions),
     servicesSectionTitle: optionalTrim(state.servicesSectionTitle),

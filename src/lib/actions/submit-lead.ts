@@ -180,7 +180,6 @@ export async function submitLead(
         return {
           success: false,
           error: "Photo must be 3 MB or smaller.",
-          fieldErrors: { photo: "Photo must be 3 MB or smaller." },
         };
       }
 
@@ -188,7 +187,6 @@ export async function submitLead(
         return {
           success: false,
           error: "Please upload an image file.",
-          fieldErrors: { photo: "Please upload an image file." },
         };
       }
 
@@ -220,7 +218,7 @@ export async function submitLead(
     return {
       success: false,
       error:
-        "Something went wrong sending your request. If you attached a photo, try again with a smaller image or no photo.",
+        "Something went wrong sending your request. Please try again, or call us directly.",
     };
   }
 }

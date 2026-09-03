@@ -50,6 +50,9 @@ export type EditorState = {
   metaPixelId: string;
   googleAdsId: string;
   googleConversionLabel: string;
+  googleReviewUrl: string;
+  googleRating: string;
+  googleReviewCount: string;
   leadServiceType: string;
   surfaceOptions: string[];
   heroImageStorageId?: Id<"_storage">;

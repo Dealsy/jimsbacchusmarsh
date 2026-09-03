@@ -138,6 +138,9 @@ export const landingPageFields = {
   servicesSectionDescription: v.optional(v.string()),
   gallerySectionTitle: v.optional(v.string()),
   gallerySectionDescription: v.optional(v.string()),
+  googleReviewUrl: v.optional(v.string()),
+  googleRating: v.optional(v.number()),
+  googleReviewCount: v.optional(v.number()),
   updatedAt: v.number(),
 };
 
@@ -173,4 +176,7 @@ export const landingPageUpdateValidator = v.object({
   servicesSectionDescription: v.optional(v.string()),
   gallerySectionTitle: v.optional(v.string()),
   gallerySectionDescription: v.optional(v.string()),
+  googleReviewUrl: v.optional(v.string()),
+  googleRating: v.optional(v.number()),
+  googleReviewCount: v.optional(v.number()),
 });
