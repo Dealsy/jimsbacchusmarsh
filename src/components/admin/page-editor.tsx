@@ -2,6 +2,10 @@
 
 import { api } from "convex/_generated/api";
 import type { Id } from "convex/_generated/dataModel";
+import {
+  DEFAULT_REASON_OPTIONS,
+  DEFAULT_REASON_QUESTION,
+} from "convex/lib/reasonQuestionDefaults";
 import { useMutation, useQuery } from "convex/react";
 import { ArrowLeftIcon } from "lucide-react";
 import Link from "next/link";
@@ -318,6 +322,11 @@ function pageToEditorState(page: LoadedPage): EditorState {
         : "",
     leadServiceType: page.leadServiceType,
     surfaceOptions: [...page.surfaceOptions],
+    reasonQuestion: page.reasonQuestion?.trim() || DEFAULT_REASON_QUESTION,
+    reasonOptions:
+      page.reasonOptions && page.reasonOptions.length > 0
+        ? [...page.reasonOptions]
+        : [...DEFAULT_REASON_OPTIONS],
     heroImageStorageId: page.hero.imageStorageId,
     heroLogoStorageId: page.hero.logoStorageId,
     theme: sanitizeTheme({
@@ -472,6 +481,8 @@ export function PageEditor({ slug }: PageEditorProps) {
           ),
           leadServiceType: currentState.leadServiceType.trim(),
           surfaceOptions: trimStringList(currentState.surfaceOptions),
+          reasonQuestion: currentState.reasonQuestion.trim() || undefined,
+          reasonOptions: trimStringList(currentState.reasonOptions),
           servicesSectionTitle: optionalTrim(currentState.servicesSectionTitle),
           servicesSectionDescription: optionalTrim(
             currentState.servicesSectionDescription,
@@ -668,6 +679,31 @@ export function PageEditor({ slug }: PageEditorProps) {
             values={state.surfaceOptions}
             onChange={(values) => updateField("surfaceOptions", values)}
             placeholder="e.g. Roof"
+            addLabel="Add option"
+          />
+
+          <SectionCard
+            title="Main reason question"
+            description="Shown above the surface choices on the quote form."
+          >
+            <Field>
+              <FieldLabel>Question</FieldLabel>
+              <Input
+                value={state.reasonQuestion}
+                onChange={(event) =>
+                  updateField("reasonQuestion", event.target.value)
+                }
+                placeholder={DEFAULT_REASON_QUESTION}
+              />
+            </Field>
+          </SectionCard>
+
+          <StringListEditor
+            label="Main reason options"
+            description="Single-choice answers for why they're getting the job done."
+            values={state.reasonOptions}
+            onChange={(values) => updateField("reasonOptions", values)}
+            placeholder="e.g. The place just looks tired"
             addLabel="Add option"
           />
         </TabsContent>

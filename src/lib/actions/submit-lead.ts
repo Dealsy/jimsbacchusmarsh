@@ -43,6 +43,7 @@ async function submitToLeadOs(
     const estimatedScope = [
       `Suburb: ${values.suburb}`,
       values.serviceTitle ? `Service: ${values.serviceTitle}` : undefined,
+      values.mainReason ? `Main reason: ${values.mainReason}` : undefined,
       values.surfaces.length > 0
         ? `Surfaces: ${values.surfaces.join(", ")}`
         : undefined,
@@ -149,11 +150,16 @@ async function submitToResend(
 export async function submitLead(
   formData: FormData,
   surfaceOptions: readonly string[],
+  reasonOptions: readonly string[] = [],
 ): Promise<SubmitLeadResult> {
   try {
     const surfacesRaw = formData.getAll("surfaces").map(String);
     const rawValues = extractLeadFormValues(formData, surfacesRaw);
-    const validation = validateLeadForm(rawValues, surfaceOptions);
+    const validation = validateLeadForm(
+      rawValues,
+      surfaceOptions,
+      reasonOptions,
+    );
 
     if (!validation.success) {
       return {

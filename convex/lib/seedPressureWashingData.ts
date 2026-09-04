@@ -14,6 +14,10 @@ import type {
   urgencyValidator,
   wedgeValidator,
 } from "./validators";
+import {
+  DEFAULT_REASON_OPTIONS,
+  DEFAULT_REASON_QUESTION,
+} from "./reasonQuestionDefaults";
 
 type Hero = Infer<typeof heroValidator>;
 type Problem = Infer<typeof problemValidator>;
@@ -250,6 +254,8 @@ export function createPressureWashingSeed(now: number) {
       "House exterior",
       "Other",
     ],
+    reasonQuestion: DEFAULT_REASON_QUESTION,
+    reasonOptions: [...DEFAULT_REASON_OPTIONS],
     servicesSectionTitle: "What pressure washing covers",
     servicesSectionDescription:
       "Hard surfaces where grime, oil, and weathering build up — restored with commercial-grade equipment.",

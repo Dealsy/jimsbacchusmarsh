@@ -146,6 +146,8 @@ export function mergeEditorPreviewPage(
     googleReviewCount: parseGoogleReviewCount(state.googleReviewCount),
     leadServiceType: state.leadServiceType.trim(),
     surfaceOptions: trimStringList(state.surfaceOptions),
+    reasonQuestion: optionalTrim(state.reasonQuestion),
+    reasonOptions: trimStringList(state.reasonOptions),
     servicesSectionTitle: optionalTrim(state.servicesSectionTitle),
     servicesSectionDescription: optionalTrim(state.servicesSectionDescription),
     gallerySectionTitle: optionalTrim(state.gallerySectionTitle),

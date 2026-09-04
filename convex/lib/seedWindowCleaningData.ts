@@ -14,6 +14,10 @@ import type {
   urgencyValidator,
   wedgeValidator,
 } from "./validators";
+import {
+  DEFAULT_REASON_OPTIONS,
+  DEFAULT_REASON_QUESTION,
+} from "./reasonQuestionDefaults";
 
 type Hero = Infer<typeof heroValidator>;
 type Problem = Infer<typeof problemValidator>;
@@ -251,6 +255,8 @@ export function createWindowCleaningSeed(now: number) {
       "Exterior only",
       "Other",
     ],
+    reasonQuestion: DEFAULT_REASON_QUESTION,
+    reasonOptions: [...DEFAULT_REASON_OPTIONS],
     servicesSectionTitle: "What window cleaning covers",
     servicesSectionDescription:
       "Residential and commercial glass — inside, outside, and the details most people miss.",

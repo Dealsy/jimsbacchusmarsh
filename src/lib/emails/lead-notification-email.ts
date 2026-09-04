@@ -60,6 +60,10 @@ function buildDetailRows(
     rows.push({ label: "Service", value: values.serviceTitle.trim() });
   }
 
+  if (values.mainReason?.trim()) {
+    rows.push({ label: "Main reason", value: values.mainReason.trim() });
+  }
+
   if (values.surfaces.length > 0) {
     rows.push({ label: "Surfaces", value: values.surfaces.join(", ") });
   }

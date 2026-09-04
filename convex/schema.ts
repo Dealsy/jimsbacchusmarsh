@@ -44,6 +44,8 @@ export default defineSchema({
     googleConversionLabel: v.optional(v.string()),
     leadServiceType: v.string(),
     surfaceOptions: v.array(v.string()),
+    reasonQuestion: v.optional(v.string()),
+    reasonOptions: v.optional(v.array(v.string())),
     theme: v.optional(themeValidator),
     offer: v.optional(offerValidator),
     guarantee: v.optional(guaranteeValidator),

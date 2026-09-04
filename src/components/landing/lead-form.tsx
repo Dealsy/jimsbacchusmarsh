@@ -1,5 +1,6 @@
 "use client";
 
+import { DEFAULT_REASON_QUESTION } from "convex/lib/reasonQuestionDefaults";
 import { useRef, useState, useTransition } from "react";
 import { capturePostHogEvent } from "@/components/analytics/posthog";
 import { Button } from "@/components/ui/button";
@@ -13,6 +14,7 @@ import {
   FieldSet,
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { submitLead } from "@/lib/actions/submit-lead";
 import { resolveOffer } from "@/lib/landing-page-content";
 import { formatPhoneHref, isPlaceholderPhone } from "@/lib/phone";
@@ -58,11 +60,16 @@ export function LeadForm({
   const [fieldErrors, setFieldErrors] = useState<LeadFormFieldErrors>({});
   const [formError, setFormError] = useState<string | null>(null);
   const [selectedSurfaces, setSelectedSurfaces] = useState<string[]>([]);
+  const [selectedReason, setSelectedReason] = useState("");
   const [isPending, startTransition] = useTransition();
   const offer = resolveOffer(page);
   const discountPercent = offer.webBookingDiscountPercent;
   const isCompact = variant === "compact";
   const isRowLayout = isCompact && layout === "row";
+  const reasonOptions =
+    page.reasonOptions?.filter((option) => option.trim().length > 0) ?? [];
+  const reasonQuestion =
+    page.reasonQuestion?.trim() || DEFAULT_REASON_QUESTION;
 
   const nameId = `${idPrefix}-name`;
   const phoneId = `${idPrefix}-phone`;
@@ -100,9 +107,16 @@ export function LeadForm({
     for (const surface of selectedSurfaces) {
       formData.append("surfaces", surface);
     }
+    if (selectedReason) {
+      formData.set("mainReason", selectedReason);
+    }
 
     const rawValues = extractLeadFormValues(formData, selectedSurfaces);
-    const validation = validateLeadForm(rawValues, page.surfaceOptions);
+    const validation = validateLeadForm(
+      rawValues,
+      page.surfaceOptions,
+      reasonOptions,
+    );
 
     if (!validation.success) {
       setFieldErrors(validation.fieldErrors);
@@ -111,7 +125,11 @@ export function LeadForm({
 
     startTransition(async () => {
       try {
-        const result = await submitLead(formData, page.surfaceOptions);
+        const result = await submitLead(
+          formData,
+          page.surfaceOptions,
+          reasonOptions,
+        );
 
         if (result.success) {
           capturePostHogEvent("lead_form_submitted", {
@@ -206,6 +224,81 @@ export function LeadForm({
             : undefined
         }
       >
+        {reasonOptions.length > 0 ? (
+          <FieldSet
+            data-invalid={Boolean(fieldErrors.mainReason)}
+            className={
+              isRowLayout
+                ? "gap-3 border-0 p-0 md:col-span-4"
+                : "gap-3 border-0 p-0"
+            }
+          >
+            <FieldLegend className="mb-0 px-0">{reasonQuestion}</FieldLegend>
+            <RadioGroup
+              value={selectedReason}
+              onValueChange={(value) => {
+                if (typeof value !== "string" || value.length === 0) {
+                  return;
+                }
+                setSelectedReason(value);
+                clearFieldError("mainReason");
+              }}
+              className="gap-2"
+              aria-invalid={Boolean(fieldErrors.mainReason)}
+            >
+              {reasonOptions.map((reason) => {
+                const reasonId = `${idPrefix}-reason-${reason.replace(/\s+/g, "-").toLowerCase()}`;
+                return (
+                  <label
+                    key={reason}
+                    htmlFor={reasonId}
+                    className="flex cursor-pointer items-center gap-2 rounded-lg border p-3 has-data-checked:border-primary has-data-checked:bg-primary/5"
+                  >
+                    <RadioGroupItem id={reasonId} value={reason} />
+                    <span className="text-sm">{reason}</span>
+                  </label>
+                );
+              })}
+            </RadioGroup>
+            {fieldErrors.mainReason ? (
+              <FieldError>{fieldErrors.mainReason}</FieldError>
+            ) : null}
+          </FieldSet>
+        ) : null}
+
+        {isCompact ? null : (
+          <FieldSet
+            data-invalid={Boolean(fieldErrors.surfaces)}
+            className="gap-3 border-0 p-0"
+          >
+            <FieldLegend className="mb-0 px-0">Affected surface</FieldLegend>
+            <div className="grid gap-3 sm:grid-cols-2">
+              {page.surfaceOptions.map((surface) => {
+                const surfaceId = `${idPrefix}-surface-${surface.replace(/\s+/g, "-").toLowerCase()}`;
+                return (
+                  <label
+                    key={surface}
+                    htmlFor={surfaceId}
+                    className="flex cursor-pointer items-center gap-2 rounded-lg border p-3 has-checked:border-primary has-checked:bg-primary/5"
+                  >
+                    <Checkbox
+                      id={surfaceId}
+                      checked={selectedSurfaces.includes(surface)}
+                      onCheckedChange={(checked) =>
+                        toggleSurface(surface, checked === true)
+                      }
+                    />
+                    <span className="text-sm">{surface}</span>
+                  </label>
+                );
+              })}
+            </div>
+            {fieldErrors.surfaces ? (
+              <FieldError>{fieldErrors.surfaces}</FieldError>
+            ) : null}
+          </FieldSet>
+        )}
+
         <Field
           data-invalid={Boolean(fieldErrors.name)}
           className={
@@ -292,38 +385,6 @@ export function LeadForm({
           ) : null}
         </Field>
 
-        {isCompact ? null : (
-          <FieldSet
-            data-invalid={Boolean(fieldErrors.surfaces)}
-            className="gap-3 border-0 p-0"
-          >
-            <FieldLegend className="mb-0 px-0">Affected surface</FieldLegend>
-            <div className="grid gap-3 sm:grid-cols-2">
-              {page.surfaceOptions.map((surface) => {
-                const surfaceId = `${idPrefix}-surface-${surface.replace(/\s+/g, "-").toLowerCase()}`;
-                return (
-                  <label
-                    key={surface}
-                    htmlFor={surfaceId}
-                    className="flex cursor-pointer items-center gap-2 rounded-lg border p-3 has-checked:border-primary has-checked:bg-primary/5"
-                  >
-                    <Checkbox
-                      id={surfaceId}
-                      checked={selectedSurfaces.includes(surface)}
-                      onCheckedChange={(checked) =>
-                        toggleSurface(surface, checked === true)
-                      }
-                    />
-                    <span className="text-sm">{surface}</span>
-                  </label>
-                );
-              })}
-            </div>
-            {fieldErrors.surfaces ? (
-              <FieldError>{fieldErrors.surfaces}</FieldError>
-            ) : null}
-          </FieldSet>
-        )}
         {isRowLayout ? (
           <Button
             type="submit"

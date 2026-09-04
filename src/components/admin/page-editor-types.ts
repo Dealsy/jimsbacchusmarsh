@@ -55,6 +55,8 @@ export type EditorState = {
   googleReviewCount: string;
   leadServiceType: string;
   surfaceOptions: string[];
+  reasonQuestion: string;
+  reasonOptions: string[];
   heroImageStorageId?: Id<"_storage">;
   heroLogoStorageId?: Id<"_storage">;
   theme: LandingTheme;

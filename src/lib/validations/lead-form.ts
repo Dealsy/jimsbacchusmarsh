@@ -16,6 +16,7 @@ export type LeadFormRawInput = {
   readonly name: string;
   readonly phone: string;
   readonly suburb: string;
+  readonly mainReason?: string;
   readonly surfaces: readonly string[];
   readonly description: string;
   readonly website: string;
@@ -29,6 +30,7 @@ export type LeadFormRawInput = {
 
 type LeadFormSchemaOptions = {
   readonly requireSurfaces?: boolean;
+  readonly reasonOptions?: readonly string[];
 };
 
 export function createLeadFormSchema(
@@ -37,6 +39,9 @@ export function createLeadFormSchema(
 ) {
   const surfaceSet = new Set(surfaceOptions);
   const requireSurfaces = options.requireSurfaces ?? true;
+  const reasonOptions = options.reasonOptions ?? [];
+  const reasonSet = new Set(reasonOptions);
+  const requireMainReason = reasonOptions.length > 0;
 
   const surfacesSchema = requireSurfaces
     ? z
@@ -52,6 +57,14 @@ export function createLeadFormSchema(
           (values) => values.every((value) => surfaceSet.has(value)),
           "Invalid surface selection",
         );
+
+  const mainReasonSchema = requireMainReason
+    ? z
+        .string()
+        .trim()
+        .min(1, "Please select a reason")
+        .refine((value) => reasonSet.has(value), "Invalid reason selection")
+    : z.string().trim().optional();
 
   return z.object({
     name: z
@@ -70,6 +83,7 @@ export function createLeadFormSchema(
       .trim()
       .min(1, "Please enter your suburb")
       .max(80, "Suburb is too long"),
+    mainReason: mainReasonSchema,
     surfaces: surfacesSchema,
     description: z
       .string()
@@ -101,11 +115,13 @@ export function extractLeadFormValues(
   const discountRaw = String(formData.get("webBookingDiscountPercent") ?? "");
   const parsedDiscount = Number.parseInt(discountRaw, 10);
   const serviceTitle = String(formData.get("serviceTitle") ?? "").trim();
+  const mainReason = String(formData.get("mainReason") ?? "").trim();
 
   return {
     name: String(formData.get("name") ?? ""),
     phone: String(formData.get("phone") ?? ""),
     suburb: String(formData.get("suburb") ?? ""),
+    mainReason: mainReason || undefined,
     surfaces,
     description: String(formData.get("description") ?? ""),
     website: String(formData.get("website") ?? ""),
@@ -141,11 +157,13 @@ export function getLeadFieldErrors(
 export function validateLeadForm(
   rawValues: LeadFormRawInput,
   surfaceOptions: readonly string[],
+  reasonOptions: readonly string[] = [],
 ):
   | { success: true; data: LeadFormValues }
   | { success: false; fieldErrors: LeadFormFieldErrors } {
   const schema = createLeadFormSchema(surfaceOptions, {
     requireSurfaces: rawValues.formVariant !== "compact",
+    reasonOptions,
   });
   const parsed = schema.safeParse(rawValues);
 
