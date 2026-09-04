@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import { Raleway, Roboto } from "next/font/google";
 import { Suspense } from "react";
 import { GoogleTag } from "@/components/analytics/google-tag";
+import { GoogleTagManager } from "@/components/analytics/google-tag-manager";
 import { PostHogPageView } from "@/components/analytics/posthog-pageview";
 import { ConvexClientProvider } from "@/components/providers/convex-client-provider";
 import { Toaster } from "@/components/ui/toast";
@@ -46,6 +47,7 @@ export default function RootLayout({
       )}
     >
       <body className="min-h-full flex flex-col">
+        <GoogleTagManager />
         <GoogleTag measurementId={gaMeasurementId} />
         <Suspense fallback={null}>
           <PostHogPageView />

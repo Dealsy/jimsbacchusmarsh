@@ -39,7 +39,18 @@ export function GoogleTag({ measurementId }: GoogleTagProps) {
 
 /** Fired on thank-you page — use as GA4/Google Ads lead conversion. */
 export function trackGoogleLead(pageSlug?: string): void {
-  if (typeof window === "undefined" || !window.gtag) {
+  if (typeof window === "undefined") {
+    return;
+  }
+
+  window.dataLayer = window.dataLayer ?? [];
+  window.dataLayer.push({
+    event: "generate_lead",
+    event_category: "lead_form",
+    page_slug: pageSlug,
+  });
+
+  if (!window.gtag) {
     return;
   }
 
