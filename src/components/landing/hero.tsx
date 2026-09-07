@@ -1,11 +1,13 @@
-import { MapPinIcon, ShieldCheckIcon } from "lucide-react";
+import { MapPinIcon, PhoneIcon } from "lucide-react";
 import Image from "next/image";
 import { LeadForm } from "@/components/landing/lead-form";
 import { Badge } from "@/components/ui/badge";
+import { LinkButton } from "@/components/ui/link-button";
 import {
   HERO_REVIEW_LOOM_ASPECT_PADDING,
   HERO_REVIEW_LOOM_EMBED_SRC,
 } from "@/lib/hero-review-video";
+import { formatPhoneHref, isPlaceholderPhone } from "@/lib/phone";
 import type { PublishedLandingPage } from "@/lib/types/landing-page";
 
 type HeroProps = {
@@ -45,7 +47,18 @@ export function Hero({ page }: HeroProps) {
             />
           </div>
         ) : null}
-        <div className="relative z-10 mx-auto grid min-h-0 max-w-7xl gap-8 px-4 py-8 md:min-h-[38rem] md:grid-cols-12 md:items-start md:gap-8 md:pt-14 md:pb-24 lg:gap-10">
+        {!isPlaceholderPhone(page.phone) ? (
+          <LinkButton
+            href={formatPhoneHref(page.phone)}
+            landingCtaLocation="hero_call_now"
+            size="lg"
+            className="absolute top-4 right-4 z-30 hidden bg-white text-foreground shadow-md hover:bg-white/90 md:inline-flex"
+          >
+            <PhoneIcon />
+            Call now
+          </LinkButton>
+        ) : null}
+        <div className="relative z-10 mx-auto grid min-h-0 max-w-7xl gap-8 px-4 py-8 md:min-h-[38rem] md:grid-cols-12 md:items-start md:gap-8 md:pt-20 md:pb-24 lg:gap-10">
           <div className="relative flex flex-col justify-center space-y-5 drop-shadow-[0_2px_10px_rgba(0,0,0,0.85)] md:col-span-6 md:space-y-6">
             {hero.audienceCallout ? (
               <p className="text-sm font-semibold uppercase tracking-wide text-white/90">
@@ -62,28 +75,9 @@ export function Hero({ page }: HeroProps) {
             <h1 className="font-heading text-4xl font-bold leading-tight tracking-tight md:text-6xl">
               {hero.headline}
             </h1>
-            <p className="text-lg text-white md:text-2xl">{hero.subheadline}</p>
-            {hero.intrigueBullets && hero.intrigueBullets.length > 0 ? (
-              <ul className="space-y-2 text-left text-sm text-white/95 md:text-base">
-                {hero.intrigueBullets.map((bullet) => (
-                  <li key={bullet} className="flex items-start gap-2">
-                    <span className="mt-1.5 size-1.5 shrink-0 rounded-full bg-white/70" />
-                    {bullet}
-                  </li>
-                ))}
-              </ul>
-            ) : null}
-            <ul className="hidden flex-wrap gap-3 pt-2 md:flex">
-              {hero.trustStrip.map((item) => (
-                <li
-                  key={item}
-                  className="flex items-center gap-1.5 text-sm text-white/80"
-                >
-                  <ShieldCheckIcon className="size-4 shrink-0" />
-                  {item}
-                </li>
-              ))}
-            </ul>
+            <p className="pt-6 text-lg text-white md:pt-10 md:text-2xl">
+              {hero.subheadline}
+            </p>
           </div>
           <div className="rounded-2xl bg-card p-5 text-card-foreground shadow-lg md:col-span-6 md:p-6">
             <LeadForm page={page} idPrefix="hero" formLocation="hero" />

@@ -1167,7 +1167,7 @@ export function PageEditor({ slug }: PageEditorProps) {
             <TabsContent value="reviews" className="space-y-6">
               <SectionCard
                 title="Google reviews badge"
-                description="Shown under the hero, above the Fully Insured bar. Hidden until a review URL is set."
+                description="Used for the View more link under the Google reviews section below Sound familiar. Hidden until a review URL is set."
               >
                 <FieldGroup>
                   <Field>

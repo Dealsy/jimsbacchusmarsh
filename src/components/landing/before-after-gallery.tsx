@@ -19,7 +19,7 @@ import type {
 } from "@/lib/types/landing-page";
 
 const GALLERY_SECTION_ID = "before-after";
-const GALLERY_THUMB_SIZES = "30vw";
+const GALLERY_THUMB_SIZES = "(min-width: 768px) 25vw, 50vw";
 const GALLERY_LIGHTBOX_SIZES = "90vw";
 
 type GalleryLightboxSide = "before" | "after";
@@ -267,7 +267,7 @@ export function BeforeAfterGallery({
               </p>
             </div>
           ) : (
-            <div className="grid min-w-0 flex-1 grid-cols-2 gap-3 sm:gap-4 md:grid-cols-3">
+            <div className="grid min-w-0 flex-1 grid-cols-2 gap-3 sm:gap-4 md:grid-cols-4">
               {visiblePhotos.map((photo) => (
                 <figure
                   key={`${photo.itemId}-${photo.side}`}

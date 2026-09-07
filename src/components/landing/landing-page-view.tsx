@@ -9,7 +9,6 @@ import { BeforeAfterGallery } from "@/components/landing/before-after-gallery";
 import { CloseSection } from "@/components/landing/close-section";
 import { FaqSection } from "@/components/landing/faq-section";
 import { FinalCta } from "@/components/landing/final-cta";
-import { GoogleReviewsBadge } from "@/components/landing/google-reviews-badge";
 import { GuaranteeSection } from "@/components/landing/guarantee-section";
 import { Hero, TrustStrip } from "@/components/landing/hero";
 import { HowItWorks } from "@/components/landing/how-it-works";
@@ -44,9 +43,9 @@ export function LandingPageView({ page, gallery }: LandingPageViewProps) {
       <LandingPageTheme theme={page.theme}>
         <main className="pb-32 md:pb-14">
           <Hero page={page} />
-          <GoogleReviewsBadge page={page} />
           <TrustStrip page={page} />
           <ProblemSection page={page} />
+          <TestimonialsSection page={page} />
           <WedgeSection page={page} />
           <BeforeAfterGallery
             page={page}
@@ -56,7 +55,6 @@ export function LandingPageView({ page, gallery }: LandingPageViewProps) {
           />
           <OfferStackSection page={page} />
           <ServicesGrid page={page} />
-          <TestimonialsSection page={page} />
           <GuaranteeSection page={page} />
           <HowItWorks page={page} />
           <FaqSection page={page} />
