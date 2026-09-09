@@ -1,4 +1,4 @@
-import { PageEditor } from "@/components/admin/page-editor";
+import { PageEditor } from "@/components/admin/page-editor/page-editor";
 
 type AdminSlugPageProps = {
   readonly params: Promise<{ slug: string }>;

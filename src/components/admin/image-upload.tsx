@@ -6,6 +6,7 @@ import { useMutation, useQuery } from "convex/react";
 import { ImageIcon, UploadIcon } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
+import { uploadToConvex } from "@/lib/upload-to-convex";
 import { cn } from "@/lib/utils";
 
 type ImageUploadProps = {
@@ -15,24 +16,6 @@ type ImageUploadProps = {
   readonly onUploaded: (storageId: Id<"_storage">) => void;
   readonly onUploadingChange?: (uploading: boolean) => void;
 };
-
-export async function uploadToConvex(
-  file: File,
-  uploadUrl: string,
-): Promise<Id<"_storage">> {
-  const response = await fetch(uploadUrl, {
-    method: "POST",
-    headers: { "Content-Type": file.type },
-    body: file,
-  });
-
-  if (!response.ok) {
-    throw new Error("Upload failed");
-  }
-
-  const json = (await response.json()) as { storageId: Id<"_storage"> };
-  return json.storageId;
-}
 
 export function ImageUpload({
   label,
@@ -107,6 +90,18 @@ export function ImageUpload({
       }
 
       const uploadedStorageId = await uploadToConvex(file, result.uploadUrl);
+      if (!uploadedStorageId) {
+        setError("Upload failed. Try again.");
+        setAwaitingStorageId(null);
+        setLocalPreviewUrl((previous) => {
+          if (previous) {
+            URL.revokeObjectURL(previous);
+          }
+          return null;
+        });
+        return;
+      }
+
       setAwaitingStorageId(uploadedStorageId);
       onUploaded(uploadedStorageId);
     } catch {
@@ -137,7 +132,7 @@ export function ImageUpload({
   async function handleDrop(event: React.DragEvent) {
     event.preventDefault();
     setDragOver(false);
-    const file = event.dataTransfer.files[0];
+    const file = event.dataTransfer.files.item(0);
     if (file?.type.startsWith("image/")) {
       await uploadFile(file);
     }
@@ -148,7 +143,7 @@ export function ImageUpload({
       <p className="text-sm font-medium">{label}</p>
 
       {displayUrl ? (
-        // eslint-disable-next-line @next/next/no-img-element
+        // biome-ignore lint/performance/noImgElement: blob and Convex storage URLs
         <img
           key={displayUrl}
           src={displayUrl}
@@ -171,6 +166,7 @@ export function ImageUpload({
         id={`upload-${label.replace(/\s+/g, "-").toLowerCase()}`}
       />
 
+      {/* biome-ignore lint/a11y/noStaticElementInteractions: drag-and-drop target */}
       <div
         role="presentation"
         onDragOver={(event) => {

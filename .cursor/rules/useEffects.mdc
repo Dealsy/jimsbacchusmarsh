@@ -1,0 +1,19 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+When using a useEffect double check that we need if, it the useEffect is using lots of useState calls in it like this:
+
+  useEffect(() => {
+    if (document) {
+      setDocumentName(document.name || '')
+      setDescription(document.description || '')
+      setMustBeRead(document.mustBeRead || false)
+      setExpiry(document.expiry || '')
+    }
+  }, [document])
+
+  We should probably just use a dirved state pattern and remove the useEffect altogether. 
+
+  Always double check that the UseEffect is indeed actaully required. 

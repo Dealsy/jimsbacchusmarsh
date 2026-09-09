@@ -1,0 +1,13 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+Unless we are building an NPM package, do not create barrl files, These make it hard to debug and know what's going on
+
+Exaplme on a file that you should not do
+
+// Re-export the refactored quote form
+export { default } from "./quotes/quote-form-refactored";
+export { default as QuoteForm } from "./quotes/quote-form-refactored";
+

@@ -2,33 +2,14 @@ import type {
   EditorState,
   LoadedPage,
 } from "@/components/admin/page-editor-types";
+import {
+  optionalTrim,
+  parseGoogleRating,
+  parseGoogleReviewCount,
+  trimStringList,
+} from "@/lib/editor-string";
 import { parseWebBookingDiscountPercent } from "@/lib/landing-page-content";
 import type { PublishedLandingPage } from "@/lib/types/landing-page";
-
-function trimStringList(values: readonly string[]): string[] {
-  return values.map((value) => value.trim()).filter(Boolean);
-}
-
-function optionalTrim(value: string): string | undefined {
-  const trimmed = value.trim();
-  return trimmed || undefined;
-}
-
-function parseGoogleRating(value: string): number | undefined {
-  const parsed = Number.parseFloat(value.trim());
-  if (!Number.isFinite(parsed) || parsed < 0 || parsed > 5) {
-    return undefined;
-  }
-  return parsed;
-}
-
-function parseGoogleReviewCount(value: string): number | undefined {
-  const parsed = Number.parseInt(value.trim(), 10);
-  if (!Number.isFinite(parsed) || parsed < 0) {
-    return undefined;
-  }
-  return parsed;
-}
 
 export function mergeEditorPreviewPage(
   page: LoadedPage,

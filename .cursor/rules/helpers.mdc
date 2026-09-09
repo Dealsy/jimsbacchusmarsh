@@ -1,0 +1,9 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+When creating helping functions, these should always be stored in a utils folder or a helpers.ts file 
+
+
+and then be expoerted out to the files that require them. 

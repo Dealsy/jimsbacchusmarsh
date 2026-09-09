@@ -2,7 +2,6 @@
 
 import { api } from "convex/_generated/api";
 import { useQuery } from "convex/react";
-import { useMemo } from "react";
 import type {
   EditorState,
   LoadedPage,
@@ -31,14 +30,10 @@ export function EditorLivePreview({
     state.heroLogoStorageId ? { storageId: state.heroLogoStorageId } : "skip",
   );
 
-  const previewPage = useMemo(
-    () =>
-      mergeEditorPreviewPage(page, state, {
-        heroImageUrl,
-        heroLogoUrl,
-      }),
-    [page, state, heroImageUrl, heroLogoUrl],
-  );
+  const previewPage = mergeEditorPreviewPage(page, state, {
+    heroImageUrl,
+    heroLogoUrl,
+  });
 
   const previewKey = [
     page.updatedAt,

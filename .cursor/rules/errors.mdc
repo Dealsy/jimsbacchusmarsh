@@ -1,0 +1,12 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+Whereever possible never throw new errors. 
+
+An exmaplle of what not to do
+
+throw new Error('No authentication token found')
+
+The reason here is that if in this case there is no token, the webpage will completely break which is a terrible UX, we always need to handle errors gracefully

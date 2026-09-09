@@ -1,0 +1,6 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+This project use the React 19 compiler, this means that we do not need to use useMemo or useCallback as the complier will handle memorization for us. 

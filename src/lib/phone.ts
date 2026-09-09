@@ -1,15 +1,20 @@
-export function formatPhoneHref(phone: string): string {
+export function formatE164Phone(phone: string): string {
   const digits = phone.replace(/\D/g, "");
   if (digits.startsWith("61")) {
-    return `tel:+${digits}`;
+    return `+${digits}`;
   }
   if (digits.startsWith("0")) {
-    return `tel:+61${digits.slice(1)}`;
+    return `+61${digits.slice(1)}`;
   }
   if (digits.length > 0) {
-    return `tel:+${digits}`;
+    return `+${digits}`;
   }
-  return "tel:";
+  return "";
+}
+
+export function formatPhoneHref(phone: string): string {
+  const e164 = formatE164Phone(phone);
+  return e164 ? `tel:${e164}` : "tel:";
 }
 
 export function isPlaceholderPhone(phone: string): boolean {

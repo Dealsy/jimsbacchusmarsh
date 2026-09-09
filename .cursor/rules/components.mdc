@@ -1,0 +1,10 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+When creating files in React or Next JS you should always think about breaking the files down into componets as much as possible. 
+
+The best practice would be if you have something like a large form for example, and you want to break it down into many components, you would first 
+
+create a folder that is relavant to that form, so if its a form for a qoute, would create a folder called qoutes in the components folder and place all relvant components into that folder

@@ -62,6 +62,11 @@ export type EditorState = {
   theme: LandingTheme;
 };
 
+export type UpdateEditorField = <K extends keyof EditorState>(
+  key: K,
+  value: EditorState[K],
+) => void;
+
 export type LoadedPage = NonNullable<
   FunctionReturnType<typeof api.landingPages.getBySlug>
 >;

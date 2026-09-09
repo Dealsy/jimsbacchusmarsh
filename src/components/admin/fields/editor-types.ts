@@ -44,10 +44,9 @@ export type GuaranteeFields = {
   body: string;
 };
 
-export type UrgencyFields = {
-  enabled: boolean;
-  message: string;
-};
+export type UrgencyFields =
+  | { enabled: true; message: string }
+  | { enabled: false; message: string };
 
 export type CloseFields = {
   warning?: string;

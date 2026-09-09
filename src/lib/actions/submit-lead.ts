@@ -1,8 +1,10 @@
 "use server";
 
 import { Resend } from "resend";
+import twilio from "twilio";
 
 import { buildLeadNotificationEmail } from "@/lib/emails/lead-notification-email";
+import { formatE164Phone } from "@/lib/phone";
 import {
   extractLeadFormValues,
   type LeadFormFieldErrors,
@@ -147,6 +149,60 @@ async function submitToResend(
   }
 }
 
+function buildLeadSmsBody(values: LeadFormValues): string {
+  const service =
+    values.serviceTitle?.trim() ||
+    values.pageName?.trim() ||
+    values.pageSlug.replace(/-/g, " ");
+
+  return [
+    `New lead: ${values.name.trim()}`,
+    values.phone.trim(),
+    values.suburb.trim(),
+    service,
+  ].join("\n");
+}
+
+async function submitToTwilioSms(values: LeadFormValues): Promise<boolean> {
+  const accountSid = process.env.TWILIO_ACCOUNT_SID;
+  const authToken = process.env.TWILIO_AUTH_TOKEN;
+  const fromRaw = process.env.TWILIO_FROM_NUMBER;
+  const toRaw = process.env.SMS_TO_NUMBER;
+
+  if (!accountSid || !authToken || !fromRaw || !toRaw) {
+    console.error(
+      "Twilio SMS skipped: missing TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN, TWILIO_FROM_NUMBER, or SMS_TO_NUMBER",
+    );
+    return false;
+  }
+
+  const fromNumber = formatE164Phone(fromRaw);
+  const toNumber = formatE164Phone(toRaw);
+
+  if (!fromNumber || !toNumber) {
+    console.error(
+      "Twilio SMS skipped: invalid TWILIO_FROM_NUMBER or SMS_TO_NUMBER",
+    );
+    return false;
+  }
+
+  try {
+    const client = twilio(accountSid, authToken);
+    await client.messages.create({
+      body: buildLeadSmsBody(values),
+      from: fromNumber,
+      to: toNumber,
+    });
+    return true;
+  } catch (error) {
+    console.error(
+      "Twilio SMS error:",
+      error instanceof Error ? error.message : error,
+    );
+    return false;
+  }
+}
+
 export async function submitLead(
   formData: FormData,
   surfaceOptions: readonly string[],
@@ -205,6 +261,7 @@ export async function submitLead(
     const [leadOsOk, resendOk] = await Promise.all([
       submitToLeadOs(values, photoBase64, photoMimeType),
       submitToResend(values, photoBuffer, photoMimeType, photoFileName),
+      submitToTwilioSms(values),
     ]);
 
     if (!leadOsOk && !resendOk) {

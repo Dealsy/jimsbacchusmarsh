@@ -1,0 +1,13 @@
+---
+alwaysApply: true
+---
+
+This project uses Shadcn UI for the UI components.
+
+When creating a new component, you should use the Shadcn UI component library.
+
+For example, if you want to create a new button, you should use the Button component from Shadcn UI.
+
+```tsx
+<Button>Click me</Button>
+```
