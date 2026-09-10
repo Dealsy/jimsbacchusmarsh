@@ -44,15 +44,17 @@ async function serializeHero(
   },
   hero: LandingPageDoc["hero"],
 ) {
-  const [imageUrl, logoUrl] = await Promise.all([
+  const [imageUrl, logoUrl, videoUrl] = await Promise.all([
     resolveStorageUrl(ctx, hero.imageStorageId),
     resolveStorageUrl(ctx, hero.logoStorageId),
+    resolveStorageUrl(ctx, hero.videoStorageId),
   ]);
 
   return {
     ...hero,
     imageUrl,
     logoUrl,
+    videoUrl,
   };
 }
 

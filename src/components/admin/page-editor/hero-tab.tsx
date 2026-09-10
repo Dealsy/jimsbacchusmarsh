@@ -10,6 +10,7 @@ import type {
 import { SectionCard, TabIntro } from "@/components/admin/section-card";
 import { Field, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
 
 type HeroTabProps = {
@@ -29,7 +30,7 @@ export function HeroTab({
     <div className="space-y-6 pt-6">
       <TabIntro
         title="Top of page"
-        description="The first thing visitors see — headline, trust badges, and a full-bleed background photo behind the quote form."
+        description="The first thing visitors see — headline, trust badges, and a full-bleed background photo or muted looping video behind the quote form."
       />
 
       <SectionCard title="Headline & intro">
@@ -105,17 +106,46 @@ export function HeroTab({
 
       <SectionCard
         title="Hero background"
-        description="Full-bleed photo behind the headline and quote form. A dark overlay is applied so the text stays readable."
+        description="Full-bleed photo or muted looping video behind the headline and quote form. Desktop only — a dark overlay keeps the text readable."
       >
-        <ImageUpload
-          label="Upload hero background"
-          currentUrl={page.hero.imageUrl}
-          storageId={state.heroImageStorageId}
-          onUploadingChange={onUploadingChange}
-          onUploaded={(storageId: Id<"_storage">) =>
-            updateField("heroImageStorageId", storageId)
-          }
-        />
+        <Tabs
+          value={state.heroBackgroundKind}
+          onValueChange={(kind) => {
+            if (kind === "image" || kind === "video") {
+              updateField("heroBackgroundKind", kind);
+            }
+          }}
+        >
+          <TabsList className="mb-4">
+            <TabsTrigger value="image">Image</TabsTrigger>
+            <TabsTrigger value="video">Video</TabsTrigger>
+          </TabsList>
+          <TabsContent value="image">
+            <ImageUpload
+              label="Upload hero background"
+              currentUrl={page.hero.imageUrl}
+              storageId={state.heroImageStorageId}
+              onUploadingChange={onUploadingChange}
+              onUploaded={(storageId: Id<"_storage">) => {
+                updateField("heroImageStorageId", storageId);
+                updateField("heroBackgroundKind", "image");
+              }}
+            />
+          </TabsContent>
+          <TabsContent value="video">
+            <ImageUpload
+              kind="video"
+              label="Upload hero background video"
+              currentUrl={page.hero.videoUrl}
+              storageId={state.heroVideoStorageId}
+              onUploadingChange={onUploadingChange}
+              onUploaded={(storageId: Id<"_storage">) => {
+                updateField("heroVideoStorageId", storageId);
+                updateField("heroBackgroundKind", "video");
+              }}
+            />
+          </TabsContent>
+        </Tabs>
       </SectionCard>
     </div>
   );

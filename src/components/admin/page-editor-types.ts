@@ -59,6 +59,8 @@ export type EditorState = {
   reasonOptions: string[];
   heroImageStorageId?: Id<"_storage">;
   heroLogoStorageId?: Id<"_storage">;
+  heroVideoStorageId?: Id<"_storage">;
+  heroBackgroundKind: "image" | "video";
   theme: LandingTheme;
 };
 

@@ -30,9 +30,15 @@ export function EditorLivePreview({
     state.heroLogoStorageId ? { storageId: state.heroLogoStorageId } : "skip",
   );
 
+  const heroVideoUrl = useQuery(
+    api.landingPages.getStorageUrl,
+    state.heroVideoStorageId ? { storageId: state.heroVideoStorageId } : "skip",
+  );
+
   const previewPage = mergeEditorPreviewPage(page, state, {
     heroImageUrl,
     heroLogoUrl,
+    heroVideoUrl,
   });
 
   const previewKey = [
@@ -41,6 +47,8 @@ export function EditorLivePreview({
     state.heroSubheadline,
     state.heroImageStorageId,
     state.heroLogoStorageId,
+    state.heroVideoStorageId,
+    state.heroBackgroundKind,
     state.theme.primary,
     state.theme.heroFrom,
     state.theme.heroTo,

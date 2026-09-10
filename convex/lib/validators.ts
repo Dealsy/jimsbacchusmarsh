@@ -7,12 +7,19 @@ export const pageStatusValidator = v.union(
 
 export const pageTemplateValidator = v.literal("service-landing");
 
+export const heroBackgroundKindValidator = v.union(
+  v.literal("image"),
+  v.literal("video"),
+);
+
 export const heroValidator = v.object({
   headline: v.string(),
   subheadline: v.string(),
   trustStrip: v.array(v.string()),
   imageStorageId: v.optional(v.id("_storage")),
   logoStorageId: v.optional(v.id("_storage")),
+  videoStorageId: v.optional(v.id("_storage")),
+  backgroundKind: v.optional(heroBackgroundKindValidator),
   audienceCallout: v.optional(v.string()),
   intrigueBullets: v.optional(v.array(v.string())),
 });

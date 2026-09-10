@@ -17,6 +17,7 @@ export function mergeEditorPreviewPage(
   imageUrls: {
     readonly heroImageUrl: string | null | undefined;
     readonly heroLogoUrl: string | null | undefined;
+    readonly heroVideoUrl: string | null | undefined;
   },
 ): PublishedLandingPage {
   const offerHeadline = state.offer.headline.trim();
@@ -40,8 +41,11 @@ export function mergeEditorPreviewPage(
       trustStrip: trimStringList(state.trustStrip),
       imageStorageId: state.heroImageStorageId,
       logoStorageId: state.heroLogoStorageId,
+      videoStorageId: state.heroVideoStorageId,
+      backgroundKind: state.heroBackgroundKind,
       imageUrl: imageUrls.heroImageUrl ?? page.hero.imageUrl,
       logoUrl: imageUrls.heroLogoUrl ?? page.hero.logoUrl,
+      videoUrl: imageUrls.heroVideoUrl ?? page.hero.videoUrl,
     },
     problem: { body: state.problemBody.trim() },
     wedge: {

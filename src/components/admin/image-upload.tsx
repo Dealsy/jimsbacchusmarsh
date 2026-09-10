@@ -3,14 +3,21 @@
 import { api } from "convex/_generated/api";
 import type { Id } from "convex/_generated/dataModel";
 import { useMutation, useQuery } from "convex/react";
-import { ImageIcon, UploadIcon } from "lucide-react";
+import { ImageIcon, UploadIcon, VideoIcon } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
+import {
+  isAcceptedMediaFile,
+  isWithinConvexUploadLimit,
+  type MediaUploadKind,
+  mediaAcceptAttribute,
+} from "@/lib/media-file";
 import { uploadToConvex } from "@/lib/upload-to-convex";
 import { cn } from "@/lib/utils";
 
 type ImageUploadProps = {
   readonly label: string;
+  readonly kind?: MediaUploadKind;
   readonly currentUrl?: string | null;
   readonly storageId?: Id<"_storage">;
   readonly onUploaded: (storageId: Id<"_storage">) => void;
@@ -19,6 +26,7 @@ type ImageUploadProps = {
 
 export function ImageUpload({
   label,
+  kind = "image",
   currentUrl,
   storageId,
   onUploaded,
@@ -38,6 +46,8 @@ export function ImageUpload({
     useState<Id<"_storage"> | null>(null);
 
   const displayUrl = localPreviewUrl ?? storageUrl ?? currentUrl ?? null;
+  const isVideo = kind === "video";
+  const EmptyIcon = isVideo ? VideoIcon : ImageIcon;
 
   useEffect(() => {
     onUploadingChange?.(uploading);
@@ -66,6 +76,15 @@ export function ImageUpload({
     setAwaitingStorageId(null);
   }, [awaitingStorageId, localPreviewUrl, storageId, storageUrl]);
 
+  function clearLocalPreview() {
+    setLocalPreviewUrl((previous) => {
+      if (previous) {
+        URL.revokeObjectURL(previous);
+      }
+      return null;
+    });
+  }
+
   function setInstantPreview(file: File) {
     const blobUrl = URL.createObjectURL(file);
     setLocalPreviewUrl((previous) => {
@@ -77,6 +96,20 @@ export function ImageUpload({
   }
 
   async function uploadFile(file: File) {
+    if (!isAcceptedMediaFile(file, kind)) {
+      setError(
+        isVideo
+          ? "Please upload an MP4 or WebM video."
+          : "Please upload an image file.",
+      );
+      return;
+    }
+
+    if (!isWithinConvexUploadLimit(file)) {
+      setError("File must be 20 MB or smaller.");
+      return;
+    }
+
     setInstantPreview(file);
     setUploading(true);
     setError(null);
@@ -93,12 +126,7 @@ export function ImageUpload({
       if (!uploadedStorageId) {
         setError("Upload failed. Try again.");
         setAwaitingStorageId(null);
-        setLocalPreviewUrl((previous) => {
-          if (previous) {
-            URL.revokeObjectURL(previous);
-          }
-          return null;
-        });
+        clearLocalPreview();
         return;
       }
 
@@ -107,12 +135,7 @@ export function ImageUpload({
     } catch {
       setError("Upload failed. Try again.");
       setAwaitingStorageId(null);
-      setLocalPreviewUrl((previous) => {
-        if (previous) {
-          URL.revokeObjectURL(previous);
-        }
-        return null;
-      });
+      clearLocalPreview();
     } finally {
       setUploading(false);
       if (inputRef.current) {
@@ -133,7 +156,7 @@ export function ImageUpload({
     event.preventDefault();
     setDragOver(false);
     const file = event.dataTransfer.files.item(0);
-    if (file?.type.startsWith("image/")) {
+    if (file && isAcceptedMediaFile(file, kind)) {
       await uploadFile(file);
     }
   }
@@ -143,23 +166,35 @@ export function ImageUpload({
       <p className="text-sm font-medium">{label}</p>
 
       {displayUrl ? (
-        // biome-ignore lint/performance/noImgElement: blob and Convex storage URLs
-        <img
-          key={displayUrl}
-          src={displayUrl}
-          alt=""
-          className="aspect-video w-full max-w-md rounded-xl border object-cover"
-        />
+        isVideo ? (
+          <video
+            key={displayUrl}
+            src={displayUrl}
+            className="aspect-video w-full max-w-md rounded-xl border object-cover"
+            muted
+            loop
+            autoPlay
+            playsInline
+          />
+        ) : (
+          // biome-ignore lint/performance/noImgElement: blob and Convex storage URLs
+          <img
+            key={displayUrl}
+            src={displayUrl}
+            alt=""
+            className="aspect-video w-full max-w-md rounded-xl border object-cover"
+          />
+        )
       ) : (
         <div className="flex aspect-video w-full max-w-md items-center justify-center rounded-xl border border-dashed bg-muted/20">
-          <ImageIcon className="size-10 text-muted-foreground/50" />
+          <EmptyIcon className="size-10 text-muted-foreground/50" />
         </div>
       )}
 
       <input
         ref={inputRef}
         type="file"
-        accept="image/*"
+        accept={mediaAcceptAttribute(kind)}
         onChange={handleChange}
         disabled={uploading}
         className="sr-only"
@@ -182,7 +217,9 @@ export function ImageUpload({
       >
         <UploadIcon className="size-5 text-muted-foreground" />
         <p className="text-center text-sm text-muted-foreground">
-          Drag an image here, or choose a file
+          {isVideo
+            ? "Drag an MP4 or WebM here, or choose a file (max 20 MB)"
+            : "Drag an image here, or choose a file"}
         </p>
         <Button
           type="button"
@@ -191,7 +228,7 @@ export function ImageUpload({
           disabled={uploading}
           onClick={() => inputRef.current?.click()}
         >
-          {uploading ? "Uploading…" : "Choose image"}
+          {uploading ? "Uploading…" : isVideo ? "Choose video" : "Choose image"}
         </Button>
       </div>
 

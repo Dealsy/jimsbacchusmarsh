@@ -119,6 +119,8 @@ export function PageEditorLoaded({
             trustStrip: trimStringList(currentState.trustStrip),
             imageStorageId: currentState.heroImageStorageId,
             logoStorageId: currentState.heroLogoStorageId,
+            videoStorageId: currentState.heroVideoStorageId,
+            backgroundKind: currentState.heroBackgroundKind,
             audienceCallout:
               currentState.heroAudienceCallout.trim() || undefined,
             intrigueBullets: trimStringList(currentState.heroIntrigueBullets),

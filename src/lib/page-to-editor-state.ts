@@ -99,6 +99,9 @@ export function pageToEditorState(page: LoadedPage): EditorState {
         : [...DEFAULT_REASON_OPTIONS],
     heroImageStorageId: page.hero.imageStorageId,
     heroLogoStorageId: page.hero.logoStorageId,
+    heroVideoStorageId: page.hero.videoStorageId,
+    heroBackgroundKind:
+      page.hero.backgroundKind === "video" ? "video" : "image",
     theme: sanitizeTheme({
       primary: page.theme?.primary ?? DEFAULT_LANDING_THEME.primary,
       heroFrom: page.theme?.heroFrom ?? DEFAULT_LANDING_THEME.heroFrom,

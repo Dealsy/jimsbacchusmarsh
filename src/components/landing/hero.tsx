@@ -9,10 +9,60 @@ import {
 } from "@/lib/hero-review-video";
 import { formatPhoneHref, isPlaceholderPhone } from "@/lib/phone";
 import type { PublishedLandingPage } from "@/lib/types/landing-page";
+import { cn } from "@/lib/utils";
 
 type HeroProps = {
   readonly page: PublishedLandingPage;
 };
+
+const HERO_MEDIA_CLASS =
+  "object-contain object-[10%_50%] scale-[1.45] origin-[22%_80%]";
+
+const HERO_OVERLAY_STYLE = {
+  background:
+    "linear-gradient(to right, color-mix(in srgb, var(--landing-hero-from) 82%, transparent) 0%, color-mix(in srgb, var(--landing-hero-from) 58%, transparent) 38%, color-mix(in srgb, var(--landing-hero-from) 22%, transparent) 58%, color-mix(in srgb, var(--landing-hero-to) 10%, transparent) 100%)",
+} as const;
+
+function HeroBackgroundMedia({
+  hero,
+}: {
+  readonly hero: PublishedLandingPage["hero"];
+}) {
+  const showVideo = hero.backgroundKind === "video" && Boolean(hero.videoUrl);
+  const mediaUrl = showVideo ? hero.videoUrl : hero.imageUrl;
+  if (!mediaUrl) {
+    return null;
+  }
+
+  return (
+    <div className="pointer-events-none absolute inset-0 hidden md:block">
+      {showVideo ? (
+        <video
+          key={mediaUrl}
+          src={mediaUrl}
+          className={cn("absolute inset-0 h-full w-full", HERO_MEDIA_CLASS)}
+          autoPlay
+          muted
+          loop
+          playsInline
+          aria-hidden
+        />
+      ) : (
+        <Image
+          key={mediaUrl}
+          src={mediaUrl}
+          alt=""
+          fill
+          unoptimized
+          className={HERO_MEDIA_CLASS}
+          priority
+          sizes="100vw"
+        />
+      )}
+      <div className="absolute inset-0" style={HERO_OVERLAY_STYLE} />
+    </div>
+  );
+}
 
 export function Hero({ page }: HeroProps) {
   const { hero } = page;
@@ -26,27 +76,7 @@ export function Hero({ page }: HeroProps) {
           background: `linear-gradient(to bottom, var(--landing-hero-from), var(--landing-hero-to))`,
         }}
       >
-        {hero.imageUrl ? (
-          <div className="pointer-events-none absolute inset-0 hidden md:block">
-            <Image
-              key={hero.imageUrl}
-              src={hero.imageUrl}
-              alt=""
-              fill
-              unoptimized
-              className="object-contain object-[10%_50%] scale-[1.45] origin-[22%_80%]"
-              priority
-              sizes="100vw"
-            />
-            <div
-              className="absolute inset-0"
-              style={{
-                background:
-                  "linear-gradient(to right, color-mix(in srgb, var(--landing-hero-from) 82%, transparent) 0%, color-mix(in srgb, var(--landing-hero-from) 58%, transparent) 38%, color-mix(in srgb, var(--landing-hero-from) 22%, transparent) 58%, color-mix(in srgb, var(--landing-hero-to) 10%, transparent) 100%)",
-              }}
-            />
-          </div>
-        ) : null}
+        <HeroBackgroundMedia hero={hero} />
         {!isPlaceholderPhone(page.phone) ? (
           <LinkButton
             href={formatPhoneHref(page.phone)}
