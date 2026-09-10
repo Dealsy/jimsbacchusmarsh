@@ -192,7 +192,10 @@ export function TestimonialsSection({ page }: TestimonialsSectionProps) {
   const visibleReviews = page.testimonials.filter(
     (item) => !item.quote.includes("PLACEHOLDER"),
   );
-  const hasRealQuotes = visibleReviews.length > 0;
+
+  if (visibleReviews.length === 0) {
+    return null;
+  }
 
   return (
     <section className="bg-muted/30 py-16 md:py-20">
@@ -201,80 +204,70 @@ export function TestimonialsSection({ page }: TestimonialsSectionProps) {
           <h2 className="font-heading text-3xl font-bold tracking-tight md:text-4xl">
             What locals say
           </h2>
-          {hasRealQuotes ? (
-            <p className="text-lg text-muted-foreground">
-              Real feedback from homeowners across{" "}
-              {page.serviceAreas.slice(0, 3).join(", ")}
-              {page.serviceAreas.length > 3 ? " and surrounds" : ""}.
-            </p>
-          ) : null}
+          <p className="text-lg text-muted-foreground">
+            Real feedback from homeowners across{" "}
+            {page.serviceAreas.slice(0, 3).join(", ")}
+            {page.serviceAreas.length > 3 ? " and surrounds" : ""}.
+          </p>
         </div>
-        {!hasRealQuotes ? (
-          <div className="rounded-2xl border border-dashed bg-background p-12 text-center text-muted-foreground">
-            [PLACEHOLDER — Matt to supply 2–3 real customer quotes via admin]
-          </div>
-        ) : (
-          <>
-            <ReviewsCarousel slideCount={visibleReviews.length}>
-              <CarouselContent className="ml-0 px-4 py-3">
-                {visibleReviews.map((testimonial) => (
-                  <CarouselItem
-                    key={`${testimonial.author}-${testimonial.quote.slice(0, 20)}`}
-                    className="md:basis-1/2 lg:basis-1/3"
-                  >
-                    <div className="py-2">
-                      <Card className="rounded-2xl border-border/80 bg-background shadow-sm">
-                        <CardContent className="flex flex-col gap-4 p-6">
-                          <FiveStarRating />
-                          <blockquote className="flex-1 text-base leading-relaxed text-foreground">
-                            {testimonial.quote}
-                          </blockquote>
-                          <footer className="mt-auto flex items-center justify-between gap-3">
-                            <div className="flex min-w-0 items-center gap-3">
-                              <span
-                                className={cn(
-                                  "flex size-10 shrink-0 items-center justify-center rounded-full text-sm font-semibold text-white",
-                                  avatarColorClass(testimonial.author),
-                                )}
-                                aria-hidden
-                              >
-                                {authorInitials(testimonial.author)}
-                              </span>
-                              <p className="truncate font-semibold">
-                                {testimonial.author}
-                              </p>
-                            </div>
-                            <div className="flex shrink-0 items-center gap-2">
-                              {testimonial.location ? (
-                                <p className="max-w-28 truncate text-sm text-muted-foreground">
-                                  {testimonial.location}
-                                </p>
-                              ) : null}
-                              <GoogleMark />
-                              <span className="sr-only">Google review</span>
-                            </div>
-                          </footer>
-                        </CardContent>
-                      </Card>
-                    </div>
-                  </CarouselItem>
-                ))}
-              </CarouselContent>
-            </ReviewsCarousel>
-            {googleReviewUrl ? (
-              <p className="text-center">
-                <a
-                  href={googleReviewUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-sm font-medium text-primary underline-offset-4 hover:underline"
-                >
-                  View more
-                </a>
-              </p>
-            ) : null}
-          </>
-        )}
+        <ReviewsCarousel slideCount={visibleReviews.length}>
+          <CarouselContent className="ml-0 px-4 py-3">
+            {visibleReviews.map((testimonial) => (
+              <CarouselItem
+                key={`${testimonial.author}-${testimonial.quote.slice(0, 20)}`}
+                className="md:basis-1/2 lg:basis-1/3"
+              >
+                <div className="py-2">
+                  <Card className="rounded-2xl border-border/80 bg-background shadow-sm">
+                    <CardContent className="flex flex-col gap-4 p-6">
+                      <FiveStarRating />
+                      <blockquote className="flex-1 text-base leading-relaxed text-foreground">
+                        {testimonial.quote}
+                      </blockquote>
+                      <footer className="mt-auto flex items-center justify-between gap-3">
+                        <div className="flex min-w-0 items-center gap-3">
+                          <span
+                            className={cn(
+                              "flex size-10 shrink-0 items-center justify-center rounded-full text-sm font-semibold text-white",
+                              avatarColorClass(testimonial.author),
+                            )}
+                            aria-hidden
+                          >
+                            {authorInitials(testimonial.author)}
+                          </span>
+                          <p className="truncate font-semibold">
+                            {testimonial.author}
+                          </p>
+                        </div>
+                        <div className="flex shrink-0 items-center gap-2">
+                          {testimonial.location ? (
+                            <p className="max-w-28 truncate text-sm text-muted-foreground">
+                              {testimonial.location}
+                            </p>
+                          ) : null}
+                          <GoogleMark />
+                          <span className="sr-only">Google review</span>
+                        </div>
+                      </footer>
+                    </CardContent>
+                  </Card>
+                </div>
+              </CarouselItem>
+            ))}
+          </CarouselContent>
+        </ReviewsCarousel>
+        {googleReviewUrl ? (
+          <p className="text-center">
+            <a
+              href={googleReviewUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-sm font-medium text-primary underline-offset-4 hover:underline"
+            >
+              View more
+            </a>
+          </p>
+        ) : null}
       </div>
     </section>
   );
