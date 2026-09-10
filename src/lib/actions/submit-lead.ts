@@ -154,13 +154,20 @@ function buildLeadSmsBody(values: LeadFormValues): string {
     values.serviceTitle?.trim() ||
     values.pageName?.trim() ||
     values.pageSlug.replace(/-/g, " ");
+  const surfaces =
+    values.surfaces.length > 0
+      ? `Surfaces: ${values.surfaces.join(", ")}`
+      : undefined;
 
   return [
     `New lead: ${values.name.trim()}`,
     values.phone.trim(),
     values.suburb.trim(),
     service,
-  ].join("\n");
+    surfaces,
+  ]
+    .filter(Boolean)
+    .join("\n");
 }
 
 async function submitToTwilioSms(values: LeadFormValues): Promise<boolean> {
