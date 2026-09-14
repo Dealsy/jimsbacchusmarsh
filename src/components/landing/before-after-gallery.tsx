@@ -4,6 +4,7 @@ import { ChevronLeftIcon, ChevronRightIcon } from "lucide-react";
 import Image from "next/image";
 import { useState } from "react";
 
+import { BeforeAfterSlider } from "@/components/landing/before-after-slider";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -12,14 +13,15 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { LinkButton } from "@/components/ui/link-button";
 import { resolveGallerySection } from "@/lib/landing-page-content";
+import { landingSectionSurfaceClass } from "@/lib/landing-section-surface";
 import type {
   GalleryItem,
   PublishedLandingPage,
 } from "@/lib/types/landing-page";
 
 const GALLERY_SECTION_ID = "before-after";
-const GALLERY_THUMB_SIZES = "(min-width: 768px) 25vw, 50vw";
 const GALLERY_LIGHTBOX_SIZES = "90vw";
 
 type GalleryLightboxSide = "before" | "after";
@@ -30,13 +32,6 @@ type BeforeAfterGalleryProps = {
   readonly selectedCategory: string | null;
   readonly onSelectCategory: (category: string | null) => void;
   readonly hideCategoryFilters?: boolean;
-};
-
-type GalleryPhotoProps = {
-  readonly url: string | null;
-  readonly alt: string;
-  readonly side: GalleryLightboxSide;
-  readonly onOpen: () => void;
 };
 
 type GalleryPhotoEntry = {
@@ -105,70 +100,6 @@ function galleryCategories(
   return [...fromServices, ...extras];
 }
 
-function GalleryPhoto({ url, alt, side, onOpen }: GalleryPhotoProps) {
-  const label = side === "after" ? "After" : "Before";
-  const badgeClassName =
-    side === "after"
-      ? "absolute bottom-3 left-3 rounded-md px-2.5 py-1 text-sm font-medium text-white"
-      : "absolute bottom-3 left-3 rounded-md bg-black/60 px-2.5 py-1 text-sm font-medium text-white";
-
-  if (!url) {
-    return (
-      <div className="relative aspect-4/3 w-full overflow-hidden rounded-xl bg-muted shadow-sm">
-        <div className="flex h-full items-center justify-center text-sm text-muted-foreground">
-          {label}
-        </div>
-        <span
-          className={badgeClassName}
-          style={
-            side === "after"
-              ? {
-                  backgroundColor:
-                    "color-mix(in srgb, var(--landing-accent) 90%, black)",
-                }
-              : undefined
-          }
-        >
-          {label}
-        </span>
-      </div>
-    );
-  }
-
-  return (
-    <button
-      type="button"
-      className="relative block aspect-4/3 w-full cursor-zoom-in overflow-hidden rounded-xl bg-muted shadow-sm ring-offset-background transition hover:ring-2 hover:ring-foreground/20 focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
-      onClick={onOpen}
-      aria-label={`View full ${label.toLowerCase()} photo`}
-    >
-      <Image
-        key={url}
-        src={url}
-        alt={alt}
-        fill
-        unoptimized
-        className="object-cover"
-        sizes={GALLERY_THUMB_SIZES}
-        loading="lazy"
-      />
-      <span
-        className={`${badgeClassName} pointer-events-none`}
-        style={
-          side === "after"
-            ? {
-                backgroundColor:
-                  "color-mix(in srgb, var(--landing-accent) 90%, black)",
-              }
-            : undefined
-        }
-      >
-        {label}
-      </span>
-    </button>
-  );
-}
-
 export function BeforeAfterGallery({
   page,
   items,
@@ -192,6 +123,10 @@ export function BeforeAfterGallery({
     : "Photo";
   const canBrowseLightbox = lightboxPhotos.length > 1;
 
+  if (items.length === 0) {
+    return null;
+  }
+
   function openLightbox(photo: GalleryPhotoEntry) {
     if (!photo.url) {
       return;
@@ -206,6 +141,19 @@ export function BeforeAfterGallery({
     setLightboxIndex(index);
   }
 
+  function openPairLightbox(item: GalleryItem) {
+    const preferred = item.afterUrl
+      ? visiblePhotos.find(
+          (photo) => photo.itemId === item._id && photo.side === "after",
+        )
+      : visiblePhotos.find(
+          (photo) => photo.itemId === item._id && photo.side === "before",
+        );
+    if (preferred) {
+      openLightbox(preferred);
+    }
+  }
+
   function stepLightbox(delta: number) {
     setLightboxIndex((current) => {
       if (current === null || lightboxPhotos.length === 0) {
@@ -216,7 +164,10 @@ export function BeforeAfterGallery({
   }
 
   return (
-    <section id={GALLERY_SECTION_ID} className="py-16 md:py-20">
+    <section
+      id={GALLERY_SECTION_ID}
+      className={`${landingSectionSurfaceClass("band")} py-16 md:py-20`}
+    >
       <div className="mx-auto max-w-7xl space-y-10 px-4">
         <div className="mx-auto max-w-2xl space-y-4 text-center">
           <h2 className="font-heading text-3xl font-bold tracking-tight md:text-4xl">
@@ -224,70 +175,60 @@ export function BeforeAfterGallery({
           </h2>
           <p className="text-muted-foreground">{section.description}</p>
         </div>
-        <div className="flex flex-col gap-8 md:flex-row md:items-start md:gap-10">
-          {categories.length > 0 && !hideCategoryFilters ? (
-            <div className="flex flex-wrap justify-center gap-2 md:w-52 md:shrink-0 md:flex-col md:justify-start">
+        {categories.length > 0 && !hideCategoryFilters ? (
+          <div className="flex flex-wrap justify-center gap-2">
+            <Button
+              type="button"
+              size="sm"
+              variant={selectedCategory === null ? "default" : "outline"}
+              onClick={() => onSelectCategory(null)}
+            >
+              All
+            </Button>
+            {categories.map((category) => (
               <Button
+                key={category}
                 type="button"
                 size="sm"
-                className="md:w-full md:justify-start"
-                variant={selectedCategory === null ? "default" : "outline"}
-                onClick={() => onSelectCategory(null)}
+                variant={selectedCategory === category ? "default" : "outline"}
+                onClick={() => onSelectCategory(category)}
               >
-                All
+                {category}
               </Button>
-              {categories.map((category) => (
-                <Button
-                  key={category}
-                  type="button"
-                  size="sm"
-                  className="md:w-full md:justify-start"
-                  variant={
-                    selectedCategory === category ? "default" : "outline"
-                  }
-                  onClick={() => onSelectCategory(category)}
-                >
-                  {category}
-                </Button>
-              ))}
-            </div>
-          ) : null}
-          {items.length === 0 ? (
-            <div className="min-w-0 flex-1 rounded-2xl border border-dashed bg-muted/20 p-12 text-center text-muted-foreground">
-              <p className="font-medium">
-                [PLACEHOLDER — Matt to supply 3+ before/after photo pairs via
-                admin]
-              </p>
-            </div>
-          ) : visibleItems.length === 0 ? (
-            <div className="min-w-0 flex-1 rounded-2xl border border-dashed bg-muted/20 p-12 text-center text-muted-foreground">
-              <p className="font-medium">
-                No photos for {selectedCategory} yet. Choose All to see every
-                before and after.
-              </p>
-            </div>
-          ) : (
-            <div className="grid min-w-0 flex-1 grid-cols-2 gap-3 sm:gap-4 md:grid-cols-4">
-              {visiblePhotos.map((photo) => (
-                <figure
-                  key={`${photo.itemId}-${photo.side}`}
-                  className="space-y-2"
-                >
-                  <GalleryPhoto
-                    url={photo.url}
-                    alt={`${photo.side === "after" ? "After" : "Before"} — ${page.name}`}
-                    side={photo.side}
-                    onOpen={() => openLightbox(photo)}
-                  />
-                  {photo.caption ? (
-                    <figcaption className="text-sm font-medium">
-                      {photo.caption}
-                    </figcaption>
-                  ) : null}
-                </figure>
-              ))}
-            </div>
-          )}
+            ))}
+          </div>
+        ) : null}
+        {visibleItems.length === 0 ? (
+          <div className="rounded-2xl border border-dashed bg-background/60 p-12 text-center text-muted-foreground">
+            <p className="font-medium">
+              No photos for {selectedCategory} yet. Choose All to see every
+              before and after.
+            </p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3">
+            {visibleItems.map((item) => (
+              <figure key={item._id} className="space-y-2">
+                <BeforeAfterSlider
+                  beforeUrl={item.beforeUrl}
+                  afterUrl={item.afterUrl}
+                  beforeAlt={`Before — ${item.label ?? page.name}`}
+                  afterAlt={`After — ${item.label ?? page.name}`}
+                  onOpenLightbox={() => openPairLightbox(item)}
+                />
+                {item.label ? (
+                  <figcaption className="text-sm font-medium">
+                    {item.label}
+                  </figcaption>
+                ) : null}
+              </figure>
+            ))}
+          </div>
+        )}
+        <div className="flex justify-center">
+          <LinkButton href="#quote-form" landingCtaLocation="gallery" size="lg">
+            {page.ctaLabel}
+          </LinkButton>
         </div>
       </div>
 

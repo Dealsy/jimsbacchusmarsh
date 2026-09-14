@@ -5,6 +5,7 @@ export type LandingTheme = {
   readonly heroFrom: string;
   readonly heroTo: string;
   readonly accent: string;
+  readonly sectionBand?: string;
 };
 
 export const DEFAULT_LANDING_THEME: LandingTheme = {
@@ -66,7 +67,16 @@ export function resolveLandingTheme(
     heroFrom: theme?.heroFrom ?? DEFAULT_LANDING_THEME.heroFrom,
     heroTo: theme?.heroTo ?? DEFAULT_LANDING_THEME.heroTo,
     accent: theme?.accent ?? DEFAULT_LANDING_THEME.accent,
+    sectionBand: theme?.sectionBand,
   };
+}
+
+function sectionBandCssValue(theme: LandingTheme): string {
+  if (theme.sectionBand) {
+    return theme.sectionBand;
+  }
+
+  return `color-mix(in srgb, ${theme.primary} 8%, white)`;
 }
 
 export function landingThemeToStyle(theme: LandingTheme): CSSProperties {
@@ -75,6 +85,7 @@ export function landingThemeToStyle(theme: LandingTheme): CSSProperties {
     "--landing-hero-from": theme.heroFrom,
     "--landing-hero-to": theme.heroTo,
     "--landing-accent": theme.accent,
+    "--landing-section-band": sectionBandCssValue(theme),
     "--primary": theme.primary,
     "--ring": theme.primary,
   } as CSSProperties;

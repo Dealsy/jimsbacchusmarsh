@@ -1,12 +1,17 @@
 import { CheckIcon, GiftIcon } from "lucide-react";
 
+import { Suspense } from "react";
+
 import { LeadForm } from "@/components/landing/lead-form";
+import { LeadFormHeading } from "@/components/landing/lead-form-heading";
+import { OfferQuoteForm } from "@/components/landing/offer-quote-form";
 import {
   hasOfferStackContent,
   resolveOffer,
   resolveUrgency,
   sumOfferValue,
 } from "@/lib/landing-page-content";
+import { landingSectionSurfaceClass } from "@/lib/landing-section-surface";
 import type { PublishedLandingPage } from "@/lib/types/landing-page";
 
 import { UrgencyBanner } from "./urgency-banner";
@@ -25,7 +30,7 @@ export function OfferStackSection({ page }: OfferStackSectionProps) {
     <section
       id="quote-form"
       data-landing-section="offer"
-      className="bg-muted/30 py-16 md:py-20"
+      className={`${landingSectionSurfaceClass("plain")} py-16 md:py-20`}
     >
       <div className="mx-auto max-w-3xl space-y-8 px-4">
         {urgency ? <UrgencyBanner message={urgency.message} /> : null}
@@ -124,7 +129,14 @@ export function OfferStackSection({ page }: OfferStackSectionProps) {
         ) : null}
 
         <div className="rounded-2xl border bg-card p-6 shadow-sm md:p-8">
-          <LeadForm page={page} idPrefix="offer" formLocation="offer" />
+          <LeadFormHeading page={page} />
+          <Suspense
+            fallback={
+              <LeadForm page={page} idPrefix="offer" formLocation="offer" />
+            }
+          >
+            <OfferQuoteForm page={page} />
+          </Suspense>
         </div>
       </div>
     </section>

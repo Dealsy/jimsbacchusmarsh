@@ -107,8 +107,18 @@ export const themeValidator = v.object({
   heroFrom: v.string(),
   heroTo: v.string(),
   accent: v.string(),
+  sectionBand: v.optional(v.string()),
   navBackground: v.optional(v.string()),
   navText: v.optional(v.string()),
+});
+
+export const aboutValidator = v.object({
+  headline: v.string(),
+  body: v.string(),
+  photoStorageId: v.optional(v.union(v.id("_storage"), v.null())),
+  founderName: v.optional(v.string()),
+  yearsLocal: v.optional(v.string()),
+  jobsCompleted: v.optional(v.string()),
 });
 
 export const landingPageFields = {
@@ -147,9 +157,14 @@ export const landingPageFields = {
   servicesSectionDescription: v.optional(v.string()),
   gallerySectionTitle: v.optional(v.string()),
   gallerySectionDescription: v.optional(v.string()),
+  howItWorksSectionTitle: v.optional(v.string()),
+  howItWorksSectionDescription: v.optional(v.string()),
+  faqSectionTitle: v.optional(v.string()),
   googleReviewUrl: v.optional(v.string()),
   googleRating: v.optional(v.number()),
   googleReviewCount: v.optional(v.number()),
+  equipmentPhotoStorageId: v.optional(v.union(v.id("_storage"), v.null())),
+  about: v.optional(aboutValidator),
   updatedAt: v.number(),
 };
 
@@ -187,7 +202,12 @@ export const landingPageUpdateValidator = v.object({
   servicesSectionDescription: v.optional(v.string()),
   gallerySectionTitle: v.optional(v.string()),
   gallerySectionDescription: v.optional(v.string()),
+  howItWorksSectionTitle: v.optional(v.string()),
+  howItWorksSectionDescription: v.optional(v.string()),
+  faqSectionTitle: v.optional(v.string()),
   googleReviewUrl: v.optional(v.string()),
   googleRating: v.optional(v.number()),
   googleReviewCount: v.optional(v.number()),
+  equipmentPhotoStorageId: v.optional(v.union(v.id("_storage"), v.null())),
+  about: v.optional(aboutValidator),
 });

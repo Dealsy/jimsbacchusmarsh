@@ -235,6 +235,15 @@ export type ResolvedGallerySection = {
   readonly description: string;
 };
 
+export type ResolvedHowItWorksSection = {
+  readonly title: string;
+  readonly description: string;
+};
+
+export type ResolvedFaqSection = {
+  readonly title: string;
+};
+
 const DEFAULT_WEDGE: ResolvedWedgeSection = {
   headline: "Why pressure washing alone doesn't fix it",
   description:
@@ -253,6 +262,16 @@ const DEFAULT_GALLERY: ResolvedGallerySection = {
   title: "Before & after",
   description:
     "Real results from professional treatments — surfaces restored and protected.",
+};
+
+const DEFAULT_HOW_IT_WORKS: ResolvedHowItWorksSection = {
+  title: "How it works",
+  description:
+    "No guesswork — here's exactly what happens after you get in touch.",
+};
+
+const DEFAULT_FAQ: ResolvedFaqSection = {
+  title: "Common questions",
 };
 
 export function resolveWedgeSection(page: PublishedPage): ResolvedWedgeSection {
@@ -284,6 +303,39 @@ export function resolveGallerySection(
     description:
       page.gallerySectionDescription?.trim() || DEFAULT_GALLERY.description,
   };
+}
+
+export function resolveHowItWorksSection(
+  page: PublishedPage,
+): ResolvedHowItWorksSection {
+  return {
+    title: page.howItWorksSectionTitle?.trim() || DEFAULT_HOW_IT_WORKS.title,
+    description:
+      page.howItWorksSectionDescription?.trim() ||
+      DEFAULT_HOW_IT_WORKS.description,
+  };
+}
+
+export function resolveFaqSection(page: PublishedPage): ResolvedFaqSection {
+  return {
+    title: page.faqSectionTitle?.trim() || DEFAULT_FAQ.title,
+  };
+}
+
+export function hasAboutUsContent(page: PublishedPage): boolean {
+  const about = page.about;
+  if (!about) {
+    return false;
+  }
+
+  return Boolean(
+    about.headline.trim() ||
+      about.body.trim() ||
+      about.photoUrl ||
+      about.founderName?.trim() ||
+      about.yearsLocal?.trim() ||
+      about.jobsCompleted?.trim(),
+  );
 }
 
 export type LandingPageService = PublishedPage["services"][number];

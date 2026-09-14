@@ -49,6 +49,12 @@ const THEME_FIELDS: readonly {
     label: "Accent colour",
     description: "Positive callouts, success states, and badges.",
   },
+  {
+    key: "sectionBand",
+    label: "Section band",
+    description:
+      "Tint behind reviews, gallery, services, how-it-works, and FAQ. Leave blank to use a light mix of the brand colour.",
+  },
 ];
 
 function ColorField({
@@ -90,6 +96,14 @@ function ColorField({
 
 export function ThemeEditor({ value, onChange }: ThemeEditorProps) {
   function updateField(key: ThemeFieldKey, raw: string) {
+    if (key === "sectionBand" && raw.trim() === "") {
+      onChange({
+        ...value,
+        sectionBand: undefined,
+      });
+      return;
+    }
+
     const normalized = normalizeHexColor(raw);
     onChange({
       ...value,
@@ -132,6 +146,17 @@ export function ThemeEditor({ value, onChange }: ThemeEditorProps) {
           />
           <span className="text-sm text-white/80">Accent highlights</span>
         </div>
+        <div
+          className="flex items-center gap-3 border-t border-black/5 px-6 py-3"
+          style={{
+            backgroundColor:
+              value.sectionBand ??
+              `color-mix(in srgb, ${value.primary} 8%, white)`,
+          }}
+        >
+          <span className="size-4 rounded-md border bg-background" />
+          <span className="text-sm text-foreground/80">Section band</span>
+        </div>
       </div>
 
       <FieldGroup>
@@ -157,6 +182,12 @@ export function ThemeEditor({ value, onChange }: ThemeEditorProps) {
                   className="block h-4 w-10"
                   style={{ backgroundColor: preset.theme.primary }}
                 />
+                <span
+                  className="block h-4 w-10"
+                  style={{
+                    backgroundColor: `color-mix(in srgb, ${preset.theme.primary} 8%, white)`,
+                  }}
+                />
               </div>
               <span>
                 <span className="block font-medium">{preset.name}</span>
@@ -175,7 +206,7 @@ export function ThemeEditor({ value, onChange }: ThemeEditorProps) {
             key={field.key}
             label={field.label}
             description={field.description}
-            value={value[field.key]}
+            value={value[field.key] ?? ""}
             onChange={(next) => updateField(field.key, next)}
           />
         ))}

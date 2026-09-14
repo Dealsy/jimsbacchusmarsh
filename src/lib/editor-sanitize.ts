@@ -1,3 +1,5 @@
+import type { Id } from "convex/_generated/dataModel";
+
 import type {
   CloseFields,
   FaqItem,
@@ -10,7 +12,7 @@ import type {
   ThankYouFields,
   UrgencyFields,
 } from "@/components/admin/fields/editor-types";
-import { trimStringList } from "@/lib/editor-string";
+import { optionalTrim, trimStringList } from "@/lib/editor-string";
 import { parseWebBookingDiscountPercent } from "@/lib/landing-page-content";
 import type { LandingTheme } from "@/lib/landing-theme";
 import { DEFAULT_LANDING_THEME, normalizeHexColor } from "@/lib/landing-theme";
@@ -163,11 +165,45 @@ export function sanitizeThankYou(thankYou: ThankYouFields): ThankYouFields {
 }
 
 export function sanitizeTheme(theme: LandingTheme): LandingTheme {
+  const sectionBand = theme.sectionBand
+    ? normalizeHexColor(theme.sectionBand)
+    : undefined;
+
   return {
     primary: normalizeHexColor(theme.primary) ?? DEFAULT_LANDING_THEME.primary,
     heroFrom:
       normalizeHexColor(theme.heroFrom) ?? DEFAULT_LANDING_THEME.heroFrom,
     heroTo: normalizeHexColor(theme.heroTo) ?? DEFAULT_LANDING_THEME.heroTo,
     accent: normalizeHexColor(theme.accent) ?? DEFAULT_LANDING_THEME.accent,
+    sectionBand: sectionBand ?? undefined,
+  };
+}
+
+export function sanitizeAbout(about: {
+  readonly headline: string;
+  readonly body: string;
+  readonly photoStorageId?: Id<"_storage">;
+  readonly founderName?: string;
+  readonly yearsLocal?: string;
+  readonly jobsCompleted?: string;
+}): {
+  headline: string;
+  body: string;
+  photoStorageId?: Id<"_storage">;
+  founderName?: string;
+  yearsLocal?: string;
+  jobsCompleted?: string;
+} {
+  const founderName = optionalTrim(about.founderName ?? "");
+  const yearsLocal = optionalTrim(about.yearsLocal ?? "");
+  const jobsCompleted = optionalTrim(about.jobsCompleted ?? "");
+
+  return {
+    headline: about.headline.trim(),
+    body: about.body.trim(),
+    photoStorageId: about.photoStorageId,
+    ...(founderName ? { founderName } : {}),
+    ...(yearsLocal ? { yearsLocal } : {}),
+    ...(jobsCompleted ? { jobsCompleted } : {}),
   };
 }

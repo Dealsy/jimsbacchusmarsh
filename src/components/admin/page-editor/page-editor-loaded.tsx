@@ -25,6 +25,7 @@ import { capturePostHogEvent } from "@/components/analytics/posthog";
 import { LinkButton } from "@/components/ui/link-button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
+  sanitizeAbout,
   sanitizeClose,
   sanitizeFaq,
   sanitizeGuarantee,
@@ -176,6 +177,23 @@ export function PageEditorLoaded({
           gallerySectionDescription: optionalTrim(
             currentState.gallerySectionDescription,
           ),
+          howItWorksSectionTitle: optionalTrim(
+            currentState.howItWorksSectionTitle,
+          ),
+          howItWorksSectionDescription: optionalTrim(
+            currentState.howItWorksSectionDescription,
+          ),
+          faqSectionTitle: optionalTrim(currentState.faqSectionTitle),
+          equipmentPhotoStorageId:
+            currentState.equipmentPhotoStorageId ?? null,
+          about: sanitizeAbout({
+            headline: currentState.aboutHeadline,
+            body: currentState.aboutBody,
+            photoStorageId: currentState.aboutPhotoStorageId,
+            founderName: currentState.aboutFounderName,
+            yearsLocal: currentState.aboutYearsLocal,
+            jobsCompleted: currentState.aboutJobsCompleted,
+          }),
           theme: sanitizeTheme(currentState.theme),
         },
       });
@@ -308,7 +326,12 @@ export function PageEditorLoaded({
         </TabsContent>
 
         <TabsContent value="content">
-          <ContentTab state={state} updateField={updateField} />
+          <ContentTab
+            page={page}
+            state={state}
+            updateField={updateField}
+            onUploadingChange={handleUploadingChange}
+          />
         </TabsContent>
 
         <TabsContent value="thank-you">

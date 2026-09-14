@@ -37,6 +37,9 @@ export function pageToEditorState(page: LoadedPage): EditorState {
     servicesSectionDescription: page.servicesSectionDescription ?? "",
     gallerySectionTitle: page.gallerySectionTitle ?? "",
     gallerySectionDescription: page.gallerySectionDescription ?? "",
+    howItWorksSectionTitle: page.howItWorksSectionTitle ?? "",
+    howItWorksSectionDescription: page.howItWorksSectionDescription ?? "",
+    faqSectionTitle: page.faqSectionTitle ?? "",
     offer: {
       headline: page.offer?.headline ?? page.offerText,
       reasonWhy: page.offer?.reasonWhy ?? "",
@@ -102,11 +105,19 @@ export function pageToEditorState(page: LoadedPage): EditorState {
     heroVideoStorageId: page.hero.videoStorageId,
     heroBackgroundKind:
       page.hero.backgroundKind === "video" ? "video" : "image",
+    equipmentPhotoStorageId: page.equipmentPhotoStorageId ?? undefined,
+    aboutHeadline: page.about?.headline ?? "",
+    aboutBody: page.about?.body ?? "",
+    aboutFounderName: page.about?.founderName ?? "",
+    aboutYearsLocal: page.about?.yearsLocal ?? "",
+    aboutJobsCompleted: page.about?.jobsCompleted ?? "",
+    aboutPhotoStorageId: page.about?.photoStorageId ?? undefined,
     theme: sanitizeTheme({
       primary: page.theme?.primary ?? DEFAULT_LANDING_THEME.primary,
       heroFrom: page.theme?.heroFrom ?? DEFAULT_LANDING_THEME.heroFrom,
       heroTo: page.theme?.heroTo ?? DEFAULT_LANDING_THEME.heroTo,
       accent: page.theme?.accent ?? DEFAULT_LANDING_THEME.accent,
+      sectionBand: page.theme?.sectionBand,
     }),
   };
 }

@@ -17,9 +17,8 @@ export function CloseSection({ page }: CloseSectionProps) {
     <section className="border-t bg-muted/20 py-12 md:py-16">
       <div className="mx-auto max-w-3xl space-y-6 px-4">
         {close.warning ? (
-          <div className="rounded-xl border border-destructive/20 bg-destructive/5 p-6">
-            <p className="text-sm font-medium text-destructive">Warning</p>
-            <p className="mt-2 leading-relaxed text-muted-foreground">
+          <div className="rounded-xl border bg-muted/40 p-6">
+            <p className="leading-relaxed text-muted-foreground">
               {close.warning}
             </p>
           </div>

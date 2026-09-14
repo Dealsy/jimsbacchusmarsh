@@ -18,6 +18,8 @@ export function mergeEditorPreviewPage(
     readonly heroImageUrl: string | null | undefined;
     readonly heroLogoUrl: string | null | undefined;
     readonly heroVideoUrl: string | null | undefined;
+    readonly equipmentPhotoUrl: string | null | undefined;
+    readonly aboutPhotoUrl: string | null | undefined;
   },
 ): PublishedLandingPage {
   const offerHeadline = state.offer.headline.trim();
@@ -137,7 +139,51 @@ export function mergeEditorPreviewPage(
     servicesSectionDescription: optionalTrim(state.servicesSectionDescription),
     gallerySectionTitle: optionalTrim(state.gallerySectionTitle),
     gallerySectionDescription: optionalTrim(state.gallerySectionDescription),
+    howItWorksSectionTitle: optionalTrim(state.howItWorksSectionTitle),
+    howItWorksSectionDescription: optionalTrim(
+      state.howItWorksSectionDescription,
+    ),
+    faqSectionTitle: optionalTrim(state.faqSectionTitle),
+    equipmentPhotoStorageId: state.equipmentPhotoStorageId,
+    equipmentPhotoUrl:
+      imageUrls.equipmentPhotoUrl ?? page.equipmentPhotoUrl ?? null,
+    about: previewAbout(state, imageUrls.aboutPhotoUrl, page.about?.photoUrl),
     theme: state.theme,
     updatedAt: page.updatedAt,
+  };
+}
+
+function previewAbout(
+  state: EditorState,
+  previewPhotoUrl: string | null | undefined,
+  savedPhotoUrl: string | null | undefined,
+) {
+  const headline = state.aboutHeadline.trim();
+  const body = state.aboutBody.trim();
+  const founderName = optionalTrim(state.aboutFounderName);
+  const yearsLocal = optionalTrim(state.aboutYearsLocal);
+  const jobsCompleted = optionalTrim(state.aboutJobsCompleted);
+  const photoUrl = previewPhotoUrl ?? savedPhotoUrl ?? null;
+
+  if (
+    !headline &&
+    !body &&
+    !photoUrl &&
+    !state.aboutPhotoStorageId &&
+    !founderName &&
+    !yearsLocal &&
+    !jobsCompleted
+  ) {
+    return undefined;
+  }
+
+  return {
+    headline,
+    body,
+    photoStorageId: state.aboutPhotoStorageId,
+    photoUrl,
+    founderName,
+    yearsLocal,
+    jobsCompleted,
   };
 }

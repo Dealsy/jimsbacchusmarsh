@@ -1,7 +1,7 @@
 import { LeadForm } from "@/components/landing/lead-form";
-import { UrgencyBanner } from "@/components/landing/urgency-banner";
+import { LeadFormHeading } from "@/components/landing/lead-form-heading";
 import { LinkButton } from "@/components/ui/link-button";
-import { resolveOffer, resolveUrgency } from "@/lib/landing-page-content";
+import { resolveOffer } from "@/lib/landing-page-content";
 import { formatPhoneHref, isPlaceholderPhone } from "@/lib/phone";
 import type { PublishedLandingPage } from "@/lib/types/landing-page";
 
@@ -13,7 +13,6 @@ export function FinalCta({ page }: FinalCtaProps) {
   const phoneHref = formatPhoneHref(page.phone);
   const showPhone = !isPlaceholderPhone(page.phone);
   const offer = resolveOffer(page);
-  const urgency = resolveUrgency(page);
 
   return (
     <section
@@ -41,11 +40,9 @@ export function FinalCta({ page }: FinalCtaProps) {
             {page.businessName} · {page.serviceAreas.join(", ")}
           </p>
         </div>
-        <div className="space-y-4">
-          {urgency ? <UrgencyBanner message={urgency.message} /> : null}
-          <div className="rounded-2xl border bg-card p-6 shadow-sm md:p-8">
-            <LeadForm page={page} idPrefix="footer" formLocation="footer" />
-          </div>
+        <div className="rounded-2xl border bg-card p-6 shadow-sm md:p-8">
+          <LeadFormHeading page={page} />
+          <LeadForm page={page} idPrefix="footer" formLocation="footer" />
         </div>
       </div>
     </section>

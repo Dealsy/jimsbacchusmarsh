@@ -34,11 +34,25 @@ export function EditorLivePreview({
     api.landingPages.getStorageUrl,
     state.heroVideoStorageId ? { storageId: state.heroVideoStorageId } : "skip",
   );
+  const equipmentPhotoUrl = useQuery(
+    api.landingPages.getStorageUrl,
+    state.equipmentPhotoStorageId
+      ? { storageId: state.equipmentPhotoStorageId }
+      : "skip",
+  );
+  const aboutPhotoUrl = useQuery(
+    api.landingPages.getStorageUrl,
+    state.aboutPhotoStorageId
+      ? { storageId: state.aboutPhotoStorageId }
+      : "skip",
+  );
 
   const previewPage = mergeEditorPreviewPage(page, state, {
     heroImageUrl,
     heroLogoUrl,
     heroVideoUrl,
+    equipmentPhotoUrl,
+    aboutPhotoUrl,
   });
 
   const previewKey = [
@@ -49,10 +63,18 @@ export function EditorLivePreview({
     state.heroLogoStorageId,
     state.heroVideoStorageId,
     state.heroBackgroundKind,
+    state.equipmentPhotoStorageId,
+    state.aboutHeadline,
+    state.aboutBody,
+    state.aboutFounderName,
+    state.aboutYearsLocal,
+    state.aboutJobsCompleted,
+    state.aboutPhotoStorageId,
     state.theme.primary,
     state.theme.heroFrom,
     state.theme.heroTo,
     state.theme.accent,
+    state.theme.sectionBand,
   ].join("|");
 
   return (

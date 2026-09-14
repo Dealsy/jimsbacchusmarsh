@@ -46,7 +46,7 @@ export function ServicePageView({
       <MetaPixel pixelId={metaPixelId} />
       <GoogleAds adsId={googleAdsId} />
       <LandingPageTheme theme={page.theme}>
-        <main className="pb-32 md:pb-14">
+        <main className="pb-28 md:pb-14">
           <section
             data-landing-section="hero"
             className="border-b py-10 md:py-14"
@@ -137,8 +137,16 @@ export function ServicePageView({
             </div>
           </section>
         </main>
-        <SiteFooter businessName={page.businessName} phone={page.phone} />
-        <StickyMobileBar phone={page.phone} ctaLabel={page.ctaLabel} />
+        <SiteFooter
+          businessName={page.businessName}
+          phone={page.phone}
+          hideOnMobile
+        />
+        <StickyMobileBar
+          phone={page.phone}
+          ctaLabel={page.ctaLabel}
+          businessName={page.businessName}
+        />
       </LandingPageTheme>
     </>
   );

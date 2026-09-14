@@ -44,14 +44,31 @@ export function ImageUpload({
   const [localPreviewUrl, setLocalPreviewUrl] = useState<string | null>(null);
   const [awaitingStorageId, setAwaitingStorageId] =
     useState<Id<"_storage"> | null>(null);
+  const onUploadingChangeRef = useRef(onUploadingChange);
+  const parentNotifiedRef = useRef(false);
+
+  onUploadingChangeRef.current = onUploadingChange;
 
   const displayUrl = localPreviewUrl ?? storageUrl ?? currentUrl ?? null;
   const isVideo = kind === "video";
   const EmptyIcon = isVideo ? VideoIcon : ImageIcon;
 
+  function notifyUploading(next: boolean): void {
+    if (parentNotifiedRef.current === next) {
+      return;
+    }
+    parentNotifiedRef.current = next;
+    onUploadingChangeRef.current?.(next);
+  }
+
   useEffect(() => {
-    onUploadingChange?.(uploading);
-  }, [onUploadingChange, uploading]);
+    return () => {
+      if (parentNotifiedRef.current) {
+        parentNotifiedRef.current = false;
+        onUploadingChangeRef.current?.(false);
+      }
+    };
+  }, []);
 
   useEffect(() => {
     return () => {
@@ -112,6 +129,7 @@ export function ImageUpload({
 
     setInstantPreview(file);
     setUploading(true);
+    notifyUploading(true);
     setError(null);
 
     try {
@@ -138,6 +156,7 @@ export function ImageUpload({
       clearLocalPreview();
     } finally {
       setUploading(false);
+      notifyUploading(false);
       if (inputRef.current) {
         inputRef.current.value = "";
       }

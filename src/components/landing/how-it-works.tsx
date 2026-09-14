@@ -1,3 +1,5 @@
+import { resolveHowItWorksSection } from "@/lib/landing-page-content";
+import { landingSectionSurfaceClass } from "@/lib/landing-section-surface";
 import type { PublishedLandingPage } from "@/lib/types/landing-page";
 
 type HowItWorksProps = {
@@ -5,24 +7,28 @@ type HowItWorksProps = {
 };
 
 export function HowItWorks({ page }: HowItWorksProps) {
+  const section = resolveHowItWorksSection(page);
   const sorted = [...page.howItWorks].sort((a, b) => a.step - b.step);
 
   return (
-    <section className="py-16 md:py-20">
+    <section className={`${landingSectionSurfaceClass("band")} py-16 md:py-20`}>
       <div className="mx-auto max-w-6xl space-y-10 px-4">
         <div className="mx-auto max-w-2xl space-y-4 text-center">
           <h2 className="font-heading text-3xl font-bold tracking-tight md:text-4xl">
-            How it works
+            {section.title}
           </h2>
-          <p className="text-muted-foreground">
-            No guesswork — here&apos;s exactly what happens after you get in
-            touch.
-          </p>
+          <p className="text-muted-foreground">{section.description}</p>
         </div>
-        <ol className="grid gap-8 md:grid-cols-3">
+        <ol className="relative grid gap-8 md:grid-cols-3">
+          {sorted.length > 1 ? (
+            <div
+              aria-hidden
+              className="pointer-events-none absolute top-6 right-[16.666%] left-[16.666%] hidden h-0.5 bg-primary/25 md:block"
+            />
+          ) : null}
           {sorted.map((step) => (
             <li key={step.step} className="relative space-y-4 text-center">
-              <div className="mx-auto flex size-12 items-center justify-center rounded-full bg-primary text-lg font-bold text-primary-foreground">
+              <div className="relative z-10 mx-auto flex size-12 items-center justify-center rounded-full bg-primary text-lg font-bold text-primary-foreground">
                 {step.step}
               </div>
               <h3 className="font-heading text-xl font-semibold">

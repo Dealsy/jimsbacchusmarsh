@@ -33,6 +33,7 @@ type LeadFormProps = {
   readonly variant?: LeadFormVariant;
   readonly layout?: "stack" | "row";
   readonly serviceTitle?: string;
+  readonly initialSurfaces?: readonly string[];
 };
 
 /** Keep error copy from collapsing the row when messages appear or clear. */
@@ -54,12 +55,19 @@ export function LeadForm({
   variant = "full",
   layout = "stack",
   serviceTitle,
+  initialSurfaces,
 }: LeadFormProps) {
   const formRef = useRef<HTMLFormElement>(null);
   const hasTrackedFormStart = useRef(false);
   const [fieldErrors, setFieldErrors] = useState<LeadFormFieldErrors>({});
   const [formError, setFormError] = useState<string | null>(null);
-  const [selectedSurfaces, setSelectedSurfaces] = useState<string[]>([]);
+  const [selectedSurfaces, setSelectedSurfaces] = useState<string[]>(() => {
+    if (!initialSurfaces?.length) {
+      return [];
+    }
+    const allowed = new Set(page.surfaceOptions);
+    return initialSurfaces.filter((surface) => allowed.has(surface));
+  });
   const [selectedReason, setSelectedReason] = useState("");
   const [isPending, startTransition] = useTransition();
   const offer = resolveOffer(page);

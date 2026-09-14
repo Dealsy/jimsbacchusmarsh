@@ -2,6 +2,7 @@ import { defineSchema, defineTable } from "convex/server";
 import { v } from "convex/values";
 
 import {
+  aboutValidator,
   closeValidator,
   faqItemValidator,
   guaranteeValidator,
@@ -56,9 +57,14 @@ export default defineSchema({
     servicesSectionDescription: v.optional(v.string()),
     gallerySectionTitle: v.optional(v.string()),
     gallerySectionDescription: v.optional(v.string()),
+    howItWorksSectionTitle: v.optional(v.string()),
+    howItWorksSectionDescription: v.optional(v.string()),
+    faqSectionTitle: v.optional(v.string()),
     googleReviewUrl: v.optional(v.string()),
     googleRating: v.optional(v.number()),
     googleReviewCount: v.optional(v.number()),
+    equipmentPhotoStorageId: v.optional(v.union(v.id("_storage"), v.null())),
+    about: v.optional(aboutValidator),
     updatedAt: v.number(),
   }).index("by_slug", ["slug"]),
 

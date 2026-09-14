@@ -1,6 +1,7 @@
-import { MapPinIcon, PhoneIcon } from "lucide-react";
+import { PhoneIcon } from "lucide-react";
 import Image from "next/image";
 import { LeadForm } from "@/components/landing/lead-form";
+import { LeadFormHeading } from "@/components/landing/lead-form-heading";
 import { Badge } from "@/components/ui/badge";
 import { LinkButton } from "@/components/ui/link-button";
 import {
@@ -8,6 +9,7 @@ import {
   HERO_REVIEW_LOOM_EMBED_SRC,
 } from "@/lib/hero-review-video";
 import { formatPhoneHref, isPlaceholderPhone } from "@/lib/phone";
+import { trustStripIcon } from "@/lib/trust-strip-icon";
 import type { PublishedLandingPage } from "@/lib/types/landing-page";
 import { cn } from "@/lib/utils";
 
@@ -29,38 +31,58 @@ function HeroBackgroundMedia({
   readonly hero: PublishedLandingPage["hero"];
 }) {
   const showVideo = hero.backgroundKind === "video" && Boolean(hero.videoUrl);
-  const mediaUrl = showVideo ? hero.videoUrl : hero.imageUrl;
-  if (!mediaUrl) {
+  const desktopMediaUrl = showVideo ? hero.videoUrl : hero.imageUrl;
+  const mobileImageUrl = hero.imageUrl;
+
+  if (!desktopMediaUrl && !mobileImageUrl) {
     return null;
   }
 
   return (
-    <div className="pointer-events-none absolute inset-0 hidden md:block">
-      {showVideo ? (
-        <video
-          key={mediaUrl}
-          src={mediaUrl}
-          className={cn("absolute inset-0 h-full w-full", HERO_MEDIA_CLASS)}
-          autoPlay
-          muted
-          loop
-          playsInline
-          aria-hidden
-        />
-      ) : (
-        <Image
-          key={mediaUrl}
-          src={mediaUrl}
-          alt=""
-          fill
-          unoptimized
-          className={HERO_MEDIA_CLASS}
-          priority
-          sizes="100vw"
-        />
-      )}
-      <div className="absolute inset-0" style={HERO_OVERLAY_STYLE} />
-    </div>
+    <>
+      {mobileImageUrl ? (
+        <div className="pointer-events-none absolute inset-0 md:hidden">
+          <Image
+            src={mobileImageUrl}
+            alt=""
+            fill
+            unoptimized
+            className={HERO_MEDIA_CLASS}
+            priority
+            sizes="100vw"
+          />
+          <div className="absolute inset-0" style={HERO_OVERLAY_STYLE} />
+        </div>
+      ) : null}
+      {desktopMediaUrl ? (
+        <div className="pointer-events-none absolute inset-0 hidden md:block">
+          {showVideo ? (
+            <video
+              key={desktopMediaUrl}
+              src={desktopMediaUrl}
+              className={cn("absolute inset-0 h-full w-full", HERO_MEDIA_CLASS)}
+              autoPlay
+              muted
+              loop
+              playsInline
+              aria-hidden
+            />
+          ) : (
+            <Image
+              key={desktopMediaUrl}
+              src={desktopMediaUrl}
+              alt=""
+              fill
+              unoptimized
+              className={HERO_MEDIA_CLASS}
+              priority
+              sizes="100vw"
+            />
+          )}
+          <div className="absolute inset-0" style={HERO_OVERLAY_STYLE} />
+        </div>
+      ) : null}
+    </>
   );
 }
 
@@ -110,6 +132,7 @@ export function Hero({ page }: HeroProps) {
             </p>
           </div>
           <div className="rounded-2xl bg-card p-5 text-card-foreground shadow-lg md:col-span-6 md:p-6">
+            <LeadFormHeading page={page} />
             <LeadForm page={page} idPrefix="hero" formLocation="hero" />
           </div>
         </div>
@@ -146,12 +169,15 @@ export function TrustStrip({ page }: HeroProps) {
   return (
     <section className="border-b bg-muted/40 py-4">
       <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-center gap-6 px-4 text-sm text-muted-foreground">
-        {page.hero.trustStrip.map((item) => (
-          <span key={item} className="flex items-center gap-2">
-            <MapPinIcon className="size-4 text-primary" />
-            {item}
-          </span>
-        ))}
+        {page.hero.trustStrip.map((item) => {
+          const Icon = trustStripIcon(item);
+          return (
+            <span key={item} className="flex items-center gap-2">
+              <Icon className="size-4 text-primary" />
+              {item}
+            </span>
+          );
+        })}
       </div>
     </section>
   );

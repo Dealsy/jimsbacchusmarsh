@@ -4,11 +4,14 @@ import { OfferValueItemsEditor } from "@/components/admin/fields/offer-value-ite
 import { ServicesEditor } from "@/components/admin/fields/services-editor";
 import { StringListEditor } from "@/components/admin/fields/string-list-editor";
 import { TestimonialsEditor } from "@/components/admin/fields/testimonials-editor";
+import { ImageUpload } from "@/components/admin/image-upload";
 import type {
   EditorState,
+  LoadedPage,
   UpdateEditorField,
 } from "@/components/admin/page-editor-types";
 import { SectionCard, TabIntro } from "@/components/admin/section-card";
+import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
   Field,
@@ -21,11 +24,18 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
 
 type ContentTabProps = {
+  readonly page: LoadedPage;
   readonly state: EditorState;
   readonly updateField: UpdateEditorField;
+  readonly onUploadingChange: (uploading: boolean) => void;
 };
 
-export function ContentTab({ state, updateField }: ContentTabProps) {
+export function ContentTab({
+  page,
+  state,
+  updateField,
+  onUploadingChange,
+}: ContentTabProps) {
   return (
     <div className="space-y-6 pt-6">
       <TabIntro
@@ -156,10 +166,120 @@ export function ContentTab({ state, updateField }: ContentTabProps) {
             values={state.services}
             onChange={(values) => updateField("services", values)}
           />
+          <SectionCard title="How it works headings">
+            <FieldGroup>
+              <Field>
+                <FieldLabel>Section title</FieldLabel>
+                <Input
+                  value={state.howItWorksSectionTitle}
+                  onChange={(event) =>
+                    updateField("howItWorksSectionTitle", event.target.value)
+                  }
+                  placeholder="e.g. How it works"
+                />
+              </Field>
+              <Field>
+                <FieldLabel>Section description</FieldLabel>
+                <Textarea
+                  value={state.howItWorksSectionDescription}
+                  onChange={(event) =>
+                    updateField(
+                      "howItWorksSectionDescription",
+                      event.target.value,
+                    )
+                  }
+                  rows={2}
+                  placeholder="e.g. No guesswork — here's exactly what happens after you get in touch."
+                />
+              </Field>
+            </FieldGroup>
+          </SectionCard>
           <HowItWorksEditor
             values={state.howItWorks}
             onChange={(values) => updateField("howItWorks", values)}
           />
+          <SectionCard
+            title="About us"
+            description="Shown after How it works. Hidden on the live page until you add a headline, body, or team photo."
+          >
+            <FieldGroup>
+              <Field>
+                <FieldLabel>Headline</FieldLabel>
+                <Input
+                  value={state.aboutHeadline}
+                  onChange={(event) =>
+                    updateField("aboutHeadline", event.target.value)
+                  }
+                  placeholder="e.g. A local team who treats your home like their own"
+                />
+              </Field>
+              <Field>
+                <FieldLabel>Body</FieldLabel>
+                <Textarea
+                  value={state.aboutBody}
+                  onChange={(event) =>
+                    updateField("aboutBody", event.target.value)
+                  }
+                  rows={4}
+                  placeholder="Short story about the team, insurance, and how you work…"
+                />
+              </Field>
+              <Field>
+                <FieldLabel>Founder name (optional)</FieldLabel>
+                <Input
+                  value={state.aboutFounderName}
+                  onChange={(event) =>
+                    updateField("aboutFounderName", event.target.value)
+                  }
+                  placeholder="e.g. Jim"
+                />
+              </Field>
+              <Field>
+                <FieldLabel>Years local (optional)</FieldLabel>
+                <Input
+                  value={state.aboutYearsLocal}
+                  onChange={(event) =>
+                    updateField("aboutYearsLocal", event.target.value)
+                  }
+                  placeholder="e.g. 12 years"
+                />
+              </Field>
+              <Field>
+                <FieldLabel>Jobs completed (optional)</FieldLabel>
+                <Input
+                  value={state.aboutJobsCompleted}
+                  onChange={(event) =>
+                    updateField("aboutJobsCompleted", event.target.value)
+                  }
+                  placeholder="e.g. 2,000+"
+                />
+              </Field>
+              <ImageUpload
+                label="Team photo"
+                currentUrl={
+                  state.aboutPhotoStorageId === page.about?.photoStorageId
+                    ? page.about?.photoUrl
+                    : null
+                }
+                storageId={state.aboutPhotoStorageId}
+                onUploaded={(storageId) =>
+                  updateField("aboutPhotoStorageId", storageId)
+                }
+                onUploadingChange={onUploadingChange}
+              />
+              {state.aboutPhotoStorageId ? (
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  className="self-start"
+                  onClick={() => updateField("aboutPhotoStorageId", undefined)}
+                >
+                  Remove team photo
+                </Button>
+              ) : null}
+            </FieldGroup>
+          </SectionCard>
         </TabsContent>
 
         <TabsContent value="offer" className="space-y-6">
@@ -354,6 +474,20 @@ export function ContentTab({ state, updateField }: ContentTabProps) {
         </TabsContent>
 
         <TabsContent value="faq" className="space-y-6">
+          <SectionCard title="FAQ heading">
+            <FieldGroup>
+              <Field>
+                <FieldLabel>Section title</FieldLabel>
+                <Input
+                  value={state.faqSectionTitle}
+                  onChange={(event) =>
+                    updateField("faqSectionTitle", event.target.value)
+                  }
+                  placeholder="e.g. Common questions"
+                />
+              </Field>
+            </FieldGroup>
+          </SectionCard>
           <FaqEditor
             values={state.faq}
             onChange={(values) => updateField("faq", values)}
@@ -361,6 +495,39 @@ export function ContentTab({ state, updateField }: ContentTabProps) {
         </TabsContent>
 
         <TabsContent value="reviews" className="space-y-6">
+          <SectionCard
+            title="Trust photos"
+            description="Optional equipment photo sits to the right of reviews on large screens, and stacks under reviews on phones."
+          >
+            <FieldGroup>
+              <ImageUpload
+                label="Equipment photo"
+                currentUrl={
+                  state.equipmentPhotoStorageId === page.equipmentPhotoStorageId
+                    ? page.equipmentPhotoUrl
+                    : null
+                }
+                storageId={state.equipmentPhotoStorageId}
+                onUploaded={(storageId) =>
+                  updateField("equipmentPhotoStorageId", storageId)
+                }
+                onUploadingChange={onUploadingChange}
+              />
+              {state.equipmentPhotoStorageId ? (
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  className="self-start"
+                  onClick={() =>
+                    updateField("equipmentPhotoStorageId", undefined)
+                  }
+                >
+                  Remove equipment photo
+                </Button>
+              ) : null}
+            </FieldGroup>
+          </SectionCard>
           <SectionCard
             title="Google reviews badge"
             description="Used for the View more link under the Google reviews section below Sound familiar. Hidden until a review URL is set."

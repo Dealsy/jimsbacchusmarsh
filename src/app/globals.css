@@ -128,3 +128,38 @@
     @apply font-sans;
   }
 }
+
+::view-transition-group(.review-expand) {
+  animation-duration: 350ms;
+  animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+  overflow: clip;
+}
+
+::view-transition-old(.review-expand) {
+  animation: review-expand-fade-out 280ms ease both;
+}
+
+::view-transition-new(.review-expand) {
+  animation: review-expand-fade-in 280ms ease both;
+}
+
+@keyframes review-expand-fade-out {
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes review-expand-fade-in {
+  from {
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-group(.review-expand),
+  ::view-transition-old(.review-expand),
+  ::view-transition-new(.review-expand) {
+    animation: none;
+    animation-duration: 0s;
+  }
+}

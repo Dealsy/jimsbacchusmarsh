@@ -38,6 +38,9 @@ export type EditorState = {
   servicesSectionDescription: string;
   gallerySectionTitle: string;
   gallerySectionDescription: string;
+  howItWorksSectionTitle: string;
+  howItWorksSectionDescription: string;
+  faqSectionTitle: string;
   offer: OfferFields;
   guarantee: GuaranteeFields;
   urgency: UrgencyFields;
@@ -61,6 +64,13 @@ export type EditorState = {
   heroLogoStorageId?: Id<"_storage">;
   heroVideoStorageId?: Id<"_storage">;
   heroBackgroundKind: "image" | "video";
+  equipmentPhotoStorageId?: Id<"_storage">;
+  aboutHeadline: string;
+  aboutBody: string;
+  aboutFounderName: string;
+  aboutYearsLocal: string;
+  aboutJobsCompleted: string;
+  aboutPhotoStorageId?: Id<"_storage">;
   theme: LandingTheme;
 };
 

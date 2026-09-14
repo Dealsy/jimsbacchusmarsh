@@ -58,13 +58,30 @@ async function serializeHero(
   };
 }
 
-function serializePage(
+async function serializePage(
+  ctx: {
+    storage: {
+      getUrl: (id: Id<"_storage">) => Promise<string | null>;
+    };
+  },
   page: LandingPageDoc,
-  hero: Awaited<ReturnType<typeof serializeHero>>,
 ) {
+  const [hero, equipmentPhotoUrl, aboutPhotoUrl] = await Promise.all([
+    serializeHero(ctx, page.hero),
+    resolveStorageUrl(ctx, page.equipmentPhotoStorageId ?? undefined),
+    resolveStorageUrl(ctx, page.about?.photoStorageId ?? undefined),
+  ]);
+
   return {
     ...page,
     hero,
+    equipmentPhotoUrl,
+    about: page.about
+      ? {
+          ...page.about,
+          photoUrl: aboutPhotoUrl,
+        }
+      : undefined,
   };
 }
 
@@ -80,8 +97,7 @@ export const getPublishedBySlug = query({
       return null;
     }
 
-    const hero = await serializeHero(ctx, page.hero);
-    return serializePage(page, hero);
+    return await serializePage(ctx, page);
   },
 });
 
@@ -102,8 +118,7 @@ export const getBySlugForPreview = query({
       return null;
     }
 
-    const hero = await serializeHero(ctx, page.hero);
-    return serializePage(page, hero);
+    return await serializePage(ctx, page);
   },
 });
 
@@ -173,8 +188,7 @@ export const getBySlug = query({
       return null;
     }
 
-    const hero = await serializeHero(ctx, page.hero);
-    return serializePage(page, hero);
+    return await serializePage(ctx, page);
   },
 });
 
