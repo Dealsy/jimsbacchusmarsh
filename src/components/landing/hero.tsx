@@ -99,17 +99,6 @@ export function Hero({ page }: HeroProps) {
         }}
       >
         <HeroBackgroundMedia hero={hero} />
-        {!isPlaceholderPhone(page.phone) ? (
-          <LinkButton
-            href={formatPhoneHref(page.phone)}
-            landingCtaLocation="hero_call_now"
-            size="lg"
-            className="absolute top-4 right-4 z-30 hidden bg-white text-foreground shadow-md hover:bg-white/90 md:inline-flex"
-          >
-            <PhoneIcon />
-            Call now
-          </LinkButton>
-        ) : null}
         <div className="relative z-10 mx-auto grid min-h-0 max-w-7xl gap-8 px-4 py-8 md:min-h-[38rem] md:grid-cols-12 md:items-start md:gap-8 md:pt-20 md:pb-24 lg:gap-10">
           <div className="relative flex flex-col justify-center space-y-5 drop-shadow-[0_2px_10px_rgba(0,0,0,0.85)] md:col-span-6 md:space-y-6">
             {hero.audienceCallout ? (
@@ -130,6 +119,17 @@ export function Hero({ page }: HeroProps) {
             <p className="pt-6 text-lg text-white md:pt-10 md:text-2xl">
               {hero.subheadline}
             </p>
+            {!isPlaceholderPhone(page.phone) ? (
+              <LinkButton
+                href={formatPhoneHref(page.phone)}
+                landingCtaLocation="hero_call_now"
+                size="lg"
+                className="hidden h-14 self-center px-8 mt-10 text-xl shadow-lg md:inline-flex [&_svg:not([class*='size-'])]:size-6"
+              >
+                <PhoneIcon />
+                Call now
+              </LinkButton>
+            ) : null}
           </div>
           <div className="rounded-2xl bg-card p-5 text-card-foreground shadow-lg md:col-span-6 md:p-6">
             <LeadFormHeading page={page} />

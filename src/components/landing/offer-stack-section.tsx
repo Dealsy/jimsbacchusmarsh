@@ -30,7 +30,7 @@ export function OfferStackSection({ page }: OfferStackSectionProps) {
     <section
       id="quote-form"
       data-landing-section="offer"
-      className={`${landingSectionSurfaceClass("plain")} py-16 md:py-20`}
+      className={`${landingSectionSurfaceClass("plain")} scroll-mt-4 py-16 md:py-20`}
     >
       <div className="mx-auto max-w-3xl space-y-8 px-4">
         {urgency ? <UrgencyBanner message={urgency.message} /> : null}

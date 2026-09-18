@@ -24,9 +24,10 @@ export function TestimonialsSection({ page }: TestimonialsSectionProps) {
 
   return (
     <section
+      id="reviews"
       className={cn(
         landingSectionSurfaceClass("band"),
-        "pt-16 pb-16 md:pt-20 md:pb-20",
+        "scroll-mt-4 pt-24 pb-16 md:pt-32 md:pb-20 min-[2237px]:pt-72!",
       )}
     >
       <div className="mx-auto max-w-[100rem] space-y-10 px-4">

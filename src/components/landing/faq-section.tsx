@@ -21,8 +21,9 @@ export function FaqSection({ page }: FaqSectionProps) {
 
   return (
     <section
+      id="faq"
       data-landing-section="faq"
-      className={`${landingSectionSurfaceClass("band")} py-16 md:py-20`}
+      className={`${landingSectionSurfaceClass("band")} scroll-mt-4 py-16 md:py-20`}
     >
       <div className="mx-auto max-w-3xl space-y-10 px-4">
         <h2 className="text-center font-heading text-3xl font-bold tracking-tight md:text-4xl">

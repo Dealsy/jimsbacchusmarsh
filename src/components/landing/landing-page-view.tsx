@@ -17,10 +17,11 @@ import { HowItWorks } from "@/components/landing/how-it-works";
 import { LandingPageTheme } from "@/components/landing/landing-page-theme";
 import { OfferStackSection } from "@/components/landing/offer-stack-section";
 import { ProblemSection } from "@/components/landing/problem-section";
-import { ReviewsWedgeBlock } from "@/components/landing/reviews-wedge-block";
+import { ReviewsBlock } from "@/components/landing/reviews-wedge-block";
 import { ServicesGrid } from "@/components/landing/services-grid";
 import { SiteFooter } from "@/components/landing/site-footer";
 import { StickyMobileBar } from "@/components/landing/sticky-mobile-bar";
+import { WedgeSection } from "@/components/landing/wedge-section";
 import type {
   GalleryItem,
   PublishedLandingPage,
@@ -46,8 +47,9 @@ export function LandingPageView({ page, gallery }: LandingPageViewProps) {
           <Hero page={page} />
           <TrustStrip page={page} />
           <GoogleReviewsBadge page={page} />
+          <ReviewsBlock page={page} />
           <ProblemSection page={page} />
-          <ReviewsWedgeBlock page={page} />
+          <WedgeSection page={page} />
           <HowItWorks page={page} />
           <BeforeAfterGallery
             page={page}
@@ -55,11 +57,11 @@ export function LandingPageView({ page, gallery }: LandingPageViewProps) {
             selectedCategory={galleryCategory}
             onSelectCategory={setGalleryCategory}
           />
+          <FaqSection page={page} />
           <OfferStackSection page={page} />
           <ServicesGrid page={page} />
           <GuaranteeSection page={page} />
           <AboutUsSection page={page} />
-          <FaqSection page={page} />
           <FinalCta page={page} />
           <CloseSection page={page} />
         </main>

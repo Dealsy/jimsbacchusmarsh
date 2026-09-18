@@ -21,7 +21,8 @@ import type {
   PublishedLandingPage,
 } from "@/lib/types/landing-page";
 
-const GALLERY_SECTION_ID = "before-after";
+const GALLERY_SECTION_ID = "gallery";
+const GALLERY_LEGACY_ID = "before-after";
 const GALLERY_LIGHTBOX_SIZES = "90vw";
 
 type GalleryLightboxSide = "before" | "after";
@@ -166,8 +167,9 @@ export function BeforeAfterGallery({
   return (
     <section
       id={GALLERY_SECTION_ID}
-      className={`${landingSectionSurfaceClass("band")} py-16 md:py-20`}
+      className={`${landingSectionSurfaceClass("band")} scroll-mt-4 py-16 md:py-20`}
     >
+      <div id={GALLERY_LEGACY_ID} className="scroll-mt-4" aria-hidden />
       <div className="mx-auto max-w-7xl space-y-10 px-4">
         <div className="mx-auto max-w-2xl space-y-4 text-center">
           <h2 className="font-heading text-3xl font-bold tracking-tight md:text-4xl">
