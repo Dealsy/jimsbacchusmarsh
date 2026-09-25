@@ -8,7 +8,7 @@ import {
   HERO_REVIEW_LOOM_ASPECT_PADDING,
   HERO_REVIEW_LOOM_EMBED_SRC,
 } from "@/lib/hero-review-video";
-import { formatPhoneHref, isPlaceholderPhone } from "@/lib/phone";
+import { formatPhoneHref, HERO_CALL_MOBILE } from "@/lib/phone";
 import { trustStripIcon } from "@/lib/trust-strip-icon";
 import type { PublishedLandingPage } from "@/lib/types/landing-page";
 import { cn } from "@/lib/utils";
@@ -119,17 +119,15 @@ export function Hero({ page }: HeroProps) {
             <p className="pt-6 text-lg text-white md:pt-10 md:text-2xl">
               {hero.subheadline}
             </p>
-            {!isPlaceholderPhone(page.phone) ? (
-              <LinkButton
-                href={formatPhoneHref(page.phone)}
-                landingCtaLocation="hero_call_now"
-                size="lg"
-                className="hidden h-14 self-center px-8 mt-10 text-xl shadow-lg md:inline-flex [&_svg:not([class*='size-'])]:size-6"
-              >
-                <PhoneIcon />
-                Call now
-              </LinkButton>
-            ) : null}
+            <LinkButton
+              href={formatPhoneHref(HERO_CALL_MOBILE)}
+              landingCtaLocation="hero_call_now"
+              size="lg"
+              className="mt-10 hidden h-14 self-center px-8 text-xl shadow-lg md:inline-flex [&_svg:not([class*='size-'])]:size-6"
+            >
+              <PhoneIcon />
+              {HERO_CALL_MOBILE}
+            </LinkButton>
           </div>
           <div className="rounded-2xl bg-card p-5 text-card-foreground shadow-lg md:col-span-6 md:p-6">
             <LeadFormHeading page={page} />

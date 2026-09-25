@@ -1,3 +1,5 @@
+export const HERO_CALL_MOBILE = "0480 638 728";
+
 export function formatE164Phone(phone: string): string {
   const digits = phone.replace(/\D/g, "");
   if (digits.startsWith("61")) {
