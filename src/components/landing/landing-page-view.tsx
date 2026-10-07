@@ -14,6 +14,7 @@ import { GoogleReviewsBadge } from "@/components/landing/google-reviews-badge";
 import { GuaranteeSection } from "@/components/landing/guarantee-section";
 import { Hero, TrustStrip } from "@/components/landing/hero";
 import { HowItWorks } from "@/components/landing/how-it-works";
+import { InterviewVideoSection } from "@/components/landing/interview-video-section";
 import { LandingPageTheme } from "@/components/landing/landing-page-theme";
 import { OfferStackSection } from "@/components/landing/offer-stack-section";
 import { ProblemSection } from "@/components/landing/problem-section";
@@ -59,6 +60,7 @@ export function LandingPageView({ page, gallery }: LandingPageViewProps) {
             selectedCategory={galleryCategory}
             onSelectCategory={setGalleryCategory}
           />
+          <InterviewVideoSection page={page} />
           <FaqSection page={page} />
           <OfferStackSection page={page} />
           <ServicesGrid page={page} />

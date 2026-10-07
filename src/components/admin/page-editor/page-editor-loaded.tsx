@@ -178,6 +178,7 @@ export function PageEditorLoaded({
             currentState.gallerySectionDescription,
           ),
           socialVideos: trimStringList(currentState.socialVideoUrls),
+          interviewVideoUrl: currentState.interviewVideoUrl.trim(),
           howItWorksSectionTitle: optionalTrim(
             currentState.howItWorksSectionTitle,
           ),

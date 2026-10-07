@@ -2,12 +2,12 @@ import {
   DEFAULT_REASON_OPTIONS,
   DEFAULT_REASON_QUESTION,
 } from "convex/lib/reasonQuestionDefaults";
-
 import type {
   EditorState,
   LoadedPage,
 } from "@/components/admin/page-editor-types";
 import { sanitizeTheme } from "@/lib/editor-sanitize";
+import { DEFAULT_INTERVIEW_VIDEO_URL } from "@/lib/interview-video";
 import { DEFAULT_LANDING_THEME } from "@/lib/landing-theme";
 
 export function pageToEditorState(page: LoadedPage): EditorState {
@@ -38,6 +38,10 @@ export function pageToEditorState(page: LoadedPage): EditorState {
     gallerySectionTitle: page.gallerySectionTitle ?? "",
     gallerySectionDescription: page.gallerySectionDescription ?? "",
     socialVideoUrls: [...(page.socialVideos ?? [])],
+    interviewVideoUrl:
+      page.interviewVideoUrl === undefined
+        ? DEFAULT_INTERVIEW_VIDEO_URL
+        : page.interviewVideoUrl,
     howItWorksSectionTitle: page.howItWorksSectionTitle ?? "",
     howItWorksSectionDescription: page.howItWorksSectionDescription ?? "",
     faqSectionTitle: page.faqSectionTitle ?? "",

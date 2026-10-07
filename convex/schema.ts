@@ -66,6 +66,7 @@ export default defineSchema({
     equipmentPhotoStorageId: v.optional(v.union(v.id("_storage"), v.null())),
     about: v.optional(aboutValidator),
     socialVideos: v.optional(v.array(v.string())),
+    interviewVideoUrl: v.optional(v.string()),
     updatedAt: v.number(),
   }).index("by_slug", ["slug"]),
 

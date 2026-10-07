@@ -140,6 +140,7 @@ export function mergeEditorPreviewPage(
     gallerySectionTitle: optionalTrim(state.gallerySectionTitle),
     gallerySectionDescription: optionalTrim(state.gallerySectionDescription),
     socialVideos: trimStringList(state.socialVideoUrls),
+    interviewVideoUrl: state.interviewVideoUrl.trim(),
     howItWorksSectionTitle: optionalTrim(state.howItWorksSectionTitle),
     howItWorksSectionDescription: optionalTrim(
       state.howItWorksSectionDescription,

@@ -69,13 +69,14 @@ export function GalleryTab({
     <div className="space-y-6 pt-6">
       <TabIntro
         title="Photos and videos"
-        description="Before-and-after photos, plus Instagram or YouTube clips for this page."
+        description="Before-and-after photos, Instagram or YouTube clips, and the large interview under the gallery."
       />
 
       <Tabs defaultValue="photos">
         <TabsList className="mb-4 flex h-auto flex-wrap gap-1 bg-muted/30 p-1">
           <TabsTrigger value="photos">Photos</TabsTrigger>
           <TabsTrigger value="videos">Videos</TabsTrigger>
+          <TabsTrigger value="interview">Interview</TabsTrigger>
         </TabsList>
 
         <TabsContent value="photos" className="space-y-6">
@@ -245,7 +246,61 @@ export function GalleryTab({
             </p>
           ) : null}
         </TabsContent>
+
+        <TabsContent value="interview" className="space-y-4">
+          <InterviewVideoField
+            value={state.interviewVideoUrl}
+            onChange={(value) => updateField("interviewVideoUrl", value)}
+          />
+        </TabsContent>
       </Tabs>
     </div>
+  );
+}
+
+function InterviewVideoField({
+  value,
+  onChange,
+}: {
+  readonly value: string;
+  readonly onChange: (value: string) => void;
+}) {
+  const trimmed = value.trim();
+  const parsed = trimmed ? parseSocialVideoUrl(trimmed) : null;
+  const invalid = trimmed.length > 0 && parsed?.provider !== "youtube";
+
+  return (
+    <SectionCard
+      title="Interview"
+      description="Shown large under the before-and-after gallery. Every page starts with the Jim's franchise interview. Remove it to hide the video on this page."
+      action={
+        trimmed ? (
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={() => onChange("")}
+          >
+            Remove
+          </Button>
+        ) : null
+      }
+    >
+      <Field>
+        <FieldLabel>YouTube link</FieldLabel>
+        <Input
+          value={value}
+          placeholder="Paste a YouTube link"
+          onChange={(event) =>
+            onChange(normalizeSocialVideoInput(event.target.value))
+          }
+        />
+      </Field>
+      {invalid ? (
+        <p className="text-sm text-destructive">
+          This link will not appear on the page. Paste a YouTube link.
+        </p>
+      ) : null}
+    </SectionCard>
   );
 }

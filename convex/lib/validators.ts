@@ -166,6 +166,7 @@ export const landingPageFields = {
   equipmentPhotoStorageId: v.optional(v.union(v.id("_storage"), v.null())),
   about: v.optional(aboutValidator),
   socialVideos: v.optional(v.array(v.string())),
+  interviewVideoUrl: v.optional(v.string()),
   updatedAt: v.number(),
 };
 
@@ -212,4 +213,5 @@ export const landingPageUpdateValidator = v.object({
   equipmentPhotoStorageId: v.optional(v.union(v.id("_storage"), v.null())),
   about: v.optional(aboutValidator),
   socialVideos: v.optional(v.array(v.string())),
+  interviewVideoUrl: v.optional(v.string()),
 });
