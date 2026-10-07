@@ -1,12 +1,14 @@
 "use client";
 
-import { Trash2Icon } from "lucide-react";
+import { PencilIcon, Trash2Icon } from "lucide-react";
+import { useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import { Field, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 
 import type { OfferValueItem } from "./editor-types";
+import { ItemEditorDialog } from "./item-editor-dialog";
 import { ListSection } from "./list-section";
 import {
   reorderList,
@@ -29,12 +31,42 @@ export function OfferValueItemsEditor({
   values,
   onChange,
 }: OfferValueItemsEditorProps) {
-  function updateItem(index: number, patch: Partial<OfferValueItem>) {
-    onChange(
-      values.map((item, itemIndex) =>
-        itemIndex === index ? { ...item, ...patch } : item,
-      ),
-    );
+  const [draft, setDraft] = useState<OfferValueItem | null>(null);
+  const [editIndex, setEditIndex] = useState<number | null>(null);
+
+  function openAdd() {
+    setEditIndex(null);
+    setDraft(emptyValueItem());
+  }
+
+  function openEdit(index: number) {
+    const item = values[index];
+    if (!item) {
+      return;
+    }
+    setEditIndex(index);
+    setDraft({ ...item });
+  }
+
+  function closeDialog() {
+    setDraft(null);
+    setEditIndex(null);
+  }
+
+  function saveDraft() {
+    if (!draft || !draft.label.trim()) {
+      return;
+    }
+    if (editIndex === null) {
+      onChange([...values, draft]);
+    } else {
+      onChange(
+        values.map((item, itemIndex) =>
+          itemIndex === editIndex ? draft : item,
+        ),
+      );
+    }
+    closeDialog();
   }
 
   function removeItem(index: number) {
@@ -46,7 +78,7 @@ export function OfferValueItemsEditor({
       title="What's included"
       description="Itemize what they get in the assessment — optional dollar value for stacking (e.g. $150)."
       addLabel="Add item"
-      onAdd={() => onChange([...values, emptyValueItem()])}
+      onAdd={openAdd}
       isEmpty={values.length === 0}
       emptyMessage="No value items yet. Add what's included in your offer."
     >
@@ -57,48 +89,81 @@ export function OfferValueItemsEditor({
       >
         {values.map((item, index) => (
           <SortableItemRow
-            key={`offer-value-${index}`}
+            key={`${item.label}-${item.value ?? ""}-${index}`}
             index={index}
-            className="space-y-3 rounded-xl border bg-background/80 p-4"
+            className="flex items-center gap-2 rounded-xl border bg-background/80 p-3"
           >
-            <div className="flex items-center gap-2">
-              <SortableDragHandle index={index} />
-              <p className="flex-1 text-sm font-medium text-muted-foreground">
-                Item {index + 1}
+            <SortableDragHandle index={index} />
+            <div className="min-w-0 flex-1">
+              <p className="truncate text-sm font-medium">
+                {item.label.trim() || "Untitled"}
               </p>
-              <Button
-                type="button"
-                variant="ghost"
-                size="icon-sm"
-                className="text-muted-foreground hover:text-destructive"
-                onClick={() => removeItem(index)}
-              >
-                <Trash2Icon className="size-4" />
-              </Button>
+              {item.value?.trim() ? (
+                <p className="truncate text-xs text-muted-foreground">
+                  {item.value}
+                </p>
+              ) : null}
             </div>
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              onClick={() => openEdit(index)}
+            >
+              <PencilIcon className="size-4" />
+              Edit
+            </Button>
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              className="text-muted-foreground hover:text-destructive"
+              onClick={() => removeItem(index)}
+            >
+              <Trash2Icon className="size-4" />
+              Remove
+            </Button>
+          </SortableItemRow>
+        ))}
+      </SortableList>
+
+      <ItemEditorDialog
+        open={draft !== null}
+        title={editIndex === null ? "Add item" : "Edit item"}
+        canSave={Boolean(draft?.label.trim())}
+        onOpenChange={(open) => {
+          if (!open) {
+            closeDialog();
+          }
+        }}
+        onSave={saveDraft}
+      >
+        {draft ? (
+          <>
             <Field>
               <FieldLabel>Label</FieldLabel>
               <Input
-                value={item.label}
-                onChange={(event) =>
-                  updateItem(index, { label: event.target.value })
-                }
+                value={draft.label}
+                autoFocus
                 placeholder="e.g. On-site roof inspection"
+                onChange={(event) =>
+                  setDraft({ ...draft, label: event.target.value })
+                }
               />
             </Field>
             <Field>
               <FieldLabel>Value (optional)</FieldLabel>
               <Input
-                value={item.value ?? ""}
-                onChange={(event) =>
-                  updateItem(index, { value: event.target.value })
-                }
+                value={draft.value ?? ""}
                 placeholder="e.g. $150"
+                onChange={(event) =>
+                  setDraft({ ...draft, value: event.target.value })
+                }
               />
             </Field>
-          </SortableItemRow>
-        ))}
-      </SortableList>
+          </>
+        ) : null}
+      </ItemEditorDialog>
     </ListSection>
   );
 }

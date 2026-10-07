@@ -139,6 +139,7 @@ export function mergeEditorPreviewPage(
     servicesSectionDescription: optionalTrim(state.servicesSectionDescription),
     gallerySectionTitle: optionalTrim(state.gallerySectionTitle),
     gallerySectionDescription: optionalTrim(state.gallerySectionDescription),
+    socialVideos: trimStringList(state.socialVideoUrls),
     howItWorksSectionTitle: optionalTrim(state.howItWorksSectionTitle),
     howItWorksSectionDescription: optionalTrim(
       state.howItWorksSectionDescription,

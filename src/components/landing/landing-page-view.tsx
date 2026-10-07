@@ -20,6 +20,7 @@ import { ProblemSection } from "@/components/landing/problem-section";
 import { ReviewsBlock } from "@/components/landing/reviews-wedge-block";
 import { ServicesGrid } from "@/components/landing/services-grid";
 import { SiteFooter } from "@/components/landing/site-footer";
+import { SocialVideosSection } from "@/components/landing/social-videos-section";
 import { StickyMobileBar } from "@/components/landing/sticky-mobile-bar";
 import { WedgeSection } from "@/components/landing/wedge-section";
 import type {
@@ -49,6 +50,7 @@ export function LandingPageView({ page, gallery }: LandingPageViewProps) {
           <GoogleReviewsBadge page={page} />
           <ReviewsBlock page={page} />
           <ProblemSection page={page} />
+          <SocialVideosSection page={page} />
           <WedgeSection page={page} />
           <HowItWorks page={page} />
           <BeforeAfterGallery

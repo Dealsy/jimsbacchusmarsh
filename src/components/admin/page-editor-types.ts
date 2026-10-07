@@ -38,6 +38,7 @@ export type EditorState = {
   servicesSectionDescription: string;
   gallerySectionTitle: string;
   gallerySectionDescription: string;
+  socialVideoUrls: string[];
   howItWorksSectionTitle: string;
   howItWorksSectionDescription: string;
   faqSectionTitle: string;

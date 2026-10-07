@@ -177,6 +177,7 @@ export function PageEditorLoaded({
           gallerySectionDescription: optionalTrim(
             currentState.gallerySectionDescription,
           ),
+          socialVideos: trimStringList(currentState.socialVideoUrls),
           howItWorksSectionTitle: optionalTrim(
             currentState.howItWorksSectionTitle,
           ),
@@ -184,8 +185,7 @@ export function PageEditorLoaded({
             currentState.howItWorksSectionDescription,
           ),
           faqSectionTitle: optionalTrim(currentState.faqSectionTitle),
-          equipmentPhotoStorageId:
-            currentState.equipmentPhotoStorageId ?? null,
+          equipmentPhotoStorageId: currentState.equipmentPhotoStorageId ?? null,
           about: sanitizeAbout({
             headline: currentState.aboutHeadline,
             body: currentState.aboutBody,
@@ -303,7 +303,7 @@ export function PageEditorLoaded({
           <TabsTrigger value="content">Content</TabsTrigger>
           <TabsTrigger value="thank-you">Thank you</TabsTrigger>
           <TabsTrigger value="theme">Theme</TabsTrigger>
-          <TabsTrigger value="gallery">Gallery</TabsTrigger>
+          <TabsTrigger value="gallery">Media</TabsTrigger>
           <TabsTrigger value="preview">Live preview</TabsTrigger>
           <TabsTrigger value="analytics">Analytics</TabsTrigger>
         </TabsList>

@@ -37,6 +37,7 @@ export function pageToEditorState(page: LoadedPage): EditorState {
     servicesSectionDescription: page.servicesSectionDescription ?? "",
     gallerySectionTitle: page.gallerySectionTitle ?? "",
     gallerySectionDescription: page.gallerySectionDescription ?? "",
+    socialVideoUrls: [...(page.socialVideos ?? [])],
     howItWorksSectionTitle: page.howItWorksSectionTitle ?? "",
     howItWorksSectionDescription: page.howItWorksSectionDescription ?? "",
     faqSectionTitle: page.faqSectionTitle ?? "",

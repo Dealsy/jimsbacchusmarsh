@@ -165,6 +165,7 @@ export const landingPageFields = {
   googleReviewCount: v.optional(v.number()),
   equipmentPhotoStorageId: v.optional(v.union(v.id("_storage"), v.null())),
   about: v.optional(aboutValidator),
+  socialVideos: v.optional(v.array(v.string())),
   updatedAt: v.number(),
 };
 
@@ -210,4 +211,5 @@ export const landingPageUpdateValidator = v.object({
   googleReviewCount: v.optional(v.number()),
   equipmentPhotoStorageId: v.optional(v.union(v.id("_storage"), v.null())),
   about: v.optional(aboutValidator),
+  socialVideos: v.optional(v.array(v.string())),
 });

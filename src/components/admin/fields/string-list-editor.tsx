@@ -21,6 +21,7 @@ type StringListEditorProps = {
   readonly onChange: (values: string[]) => void;
   readonly placeholder?: string;
   readonly addLabel?: string;
+  readonly normalize?: (value: string) => string;
 };
 
 export function StringListEditor({
@@ -30,11 +31,16 @@ export function StringListEditor({
   onChange,
   placeholder = "Type and press Add…",
   addLabel = "Add",
+  normalize,
 }: StringListEditorProps) {
   const [draft, setDraft] = useState("");
 
+  function prepare(value: string): string {
+    return (normalize?.(value) ?? value).trim();
+  }
+
   function addItem() {
-    const trimmed = draft.trim();
+    const trimmed = prepare(draft);
     if (!trimmed) {
       return;
     }
@@ -43,8 +49,9 @@ export function StringListEditor({
   }
 
   function updateItem(index: number, value: string) {
+    const next = normalize ? normalize(value) : value;
     onChange(
-      values.map((item, itemIndex) => (itemIndex === index ? value : item)),
+      values.map((item, itemIndex) => (itemIndex === index ? next : item)),
     );
   }
 
@@ -81,6 +88,14 @@ export function StringListEditor({
                 value={value}
                 aria-label={`${label} ${index + 1}`}
                 onChange={(event) => updateItem(index, event.target.value)}
+                onPaste={(event) => {
+                  const text = event.clipboardData.getData("text");
+                  const normalized = normalize?.(text);
+                  if (normalized && normalized !== text) {
+                    event.preventDefault();
+                    updateItem(index, normalized);
+                  }
+                }}
                 className="border-0 bg-transparent shadow-none focus-visible:ring-0"
               />
               <Button
@@ -102,7 +117,18 @@ export function StringListEditor({
         <Input
           value={draft}
           placeholder={placeholder}
-          onChange={(event) => setDraft(event.target.value)}
+          onChange={(event) => {
+            const next = event.target.value;
+            setDraft(normalize?.(next) ?? next);
+          }}
+          onPaste={(event) => {
+            const text = event.clipboardData.getData("text");
+            const normalized = normalize?.(text);
+            if (normalized && normalized !== text) {
+              event.preventDefault();
+              setDraft(normalized);
+            }
+          }}
           onKeyDown={(event) => {
             if (event.key === "Enter") {
               event.preventDefault();

@@ -1,6 +1,7 @@
 "use client";
 
-import { Trash2Icon } from "lucide-react";
+import { PencilIcon, Trash2Icon } from "lucide-react";
+import { useState } from "react";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -9,6 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 
 import type { HowItWorksStep } from "./editor-types";
+import { ItemEditorDialog } from "./item-editor-dialog";
 import { ListSection } from "./list-section";
 import {
   reorderList,
@@ -33,14 +35,44 @@ const emptyStep = (stepNumber: number): HowItWorksStep => ({
 });
 
 export function HowItWorksEditor({ values, onChange }: HowItWorksEditorProps) {
-  function updateItem(index: number, patch: Partial<HowItWorksStep>) {
-    onChange(
-      renumberSteps(
-        values.map((item, itemIndex) =>
-          itemIndex === index ? { ...item, ...patch } : item,
+  const [draft, setDraft] = useState<HowItWorksStep | null>(null);
+  const [editIndex, setEditIndex] = useState<number | null>(null);
+
+  function openAdd() {
+    setEditIndex(null);
+    setDraft(emptyStep(values.length + 1));
+  }
+
+  function openEdit(index: number) {
+    const item = values[index];
+    if (!item) {
+      return;
+    }
+    setEditIndex(index);
+    setDraft({ ...item });
+  }
+
+  function closeDialog() {
+    setDraft(null);
+    setEditIndex(null);
+  }
+
+  function saveDraft() {
+    if (!draft || !draft.title.trim()) {
+      return;
+    }
+    if (editIndex === null) {
+      onChange(renumberSteps([...values, draft]));
+    } else {
+      onChange(
+        renumberSteps(
+          values.map((item, itemIndex) =>
+            itemIndex === editIndex ? draft : item,
+          ),
         ),
-      ),
-    );
+      );
+    }
+    closeDialog();
   }
 
   function removeItem(index: number) {
@@ -49,67 +81,99 @@ export function HowItWorksEditor({ values, onChange }: HowItWorksEditorProps) {
     );
   }
 
-  function handleReorder(fromIndex: number, toIndex: number) {
-    onChange(renumberSteps(reorderList(values, fromIndex, toIndex)));
-  }
-
   return (
     <ListSection
       title="How it works"
       description="Step-by-step process shown on the page. Drag to reorder."
       addLabel="Add step"
-      onAdd={() => onChange([...values, emptyStep(values.length + 1)])}
+      onAdd={openAdd}
       isEmpty={values.length === 0}
       emptyMessage="No steps yet. Add how your service works."
     >
-      <SortableList onReorder={handleReorder}>
+      <SortableList
+        onReorder={(fromIndex, toIndex) =>
+          onChange(renumberSteps(reorderList(values, fromIndex, toIndex)))
+        }
+      >
         {values.map((step, index) => (
           <SortableItemRow
-            key={`step-${index}`}
+            key={`${step.title}-${step.description}-${index}`}
             index={index}
-            className="space-y-4 rounded-xl border bg-background/80 p-4"
+            className="flex items-center gap-2 rounded-xl border bg-background/80 p-3"
           >
-            <div className="flex items-center gap-2">
-              <SortableDragHandle index={index} />
-              <Badge variant="secondary">Step {step.step}</Badge>
-              <div className="flex-1" />
-              <Button
-                type="button"
-                variant="ghost"
-                size="icon-sm"
-                className="text-muted-foreground hover:text-destructive"
-                onClick={() => removeItem(index)}
-                aria-label="Remove step"
-              >
-                <Trash2Icon className="size-4" />
-              </Button>
+            <SortableDragHandle index={index} />
+            <Badge variant="secondary">Step {step.step}</Badge>
+            <div className="min-w-0 flex-1">
+              <p className="truncate text-sm font-medium">
+                {step.title.trim() || "Untitled"}
+              </p>
+              {step.description.trim() ? (
+                <p className="truncate text-xs text-muted-foreground">
+                  {step.description}
+                </p>
+              ) : null}
             </div>
-
-            <Field>
-              <FieldLabel>Step title</FieldLabel>
-              <Input
-                value={step.title}
-                placeholder="e.g. Free on-site assessment"
-                onChange={(event) =>
-                  updateItem(index, { title: event.target.value })
-                }
-              />
-            </Field>
-
-            <Field>
-              <FieldLabel>Step description</FieldLabel>
-              <Textarea
-                value={step.description}
-                rows={3}
-                placeholder="Explain what happens in this step…"
-                onChange={(event) =>
-                  updateItem(index, { description: event.target.value })
-                }
-              />
-            </Field>
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              onClick={() => openEdit(index)}
+            >
+              <PencilIcon className="size-4" />
+              Edit
+            </Button>
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              className="text-muted-foreground hover:text-destructive"
+              onClick={() => removeItem(index)}
+            >
+              <Trash2Icon className="size-4" />
+              Remove
+            </Button>
           </SortableItemRow>
         ))}
       </SortableList>
+
+      <ItemEditorDialog
+        open={draft !== null}
+        title={editIndex === null ? "Add step" : "Edit step"}
+        canSave={Boolean(draft?.title.trim())}
+        onOpenChange={(open) => {
+          if (!open) {
+            closeDialog();
+          }
+        }}
+        onSave={saveDraft}
+      >
+        {draft ? (
+          <>
+            <Field>
+              <FieldLabel>Step title</FieldLabel>
+              <Input
+                value={draft.title}
+                autoFocus
+                placeholder="e.g. Free on-site assessment"
+                onChange={(event) =>
+                  setDraft({ ...draft, title: event.target.value })
+                }
+              />
+            </Field>
+            <Field>
+              <FieldLabel>Step description</FieldLabel>
+              <Textarea
+                value={draft.description}
+                rows={3}
+                placeholder="Explain what happens in this step…"
+                onChange={(event) =>
+                  setDraft({ ...draft, description: event.target.value })
+                }
+              />
+            </Field>
+          </>
+        ) : null}
+      </ItemEditorDialog>
     </ListSection>
   );
 }
