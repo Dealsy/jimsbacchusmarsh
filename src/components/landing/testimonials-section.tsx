@@ -13,7 +13,6 @@ type TestimonialsSectionProps = {
 };
 
 export function TestimonialsSection({ page }: TestimonialsSectionProps) {
-  const googleReviewUrl = page.googleReviewUrl?.trim();
   const visibleReviews = page.testimonials.filter(
     (item) => !item.quote.includes("PLACEHOLDER"),
   );
@@ -55,18 +54,6 @@ export function TestimonialsSection({ page }: TestimonialsSectionProps) {
             ))}
           </CarouselContent>
         </ReviewsCarousel>
-        {googleReviewUrl ? (
-          <p className="text-center">
-            <a
-              href={googleReviewUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-sm font-medium text-primary underline-offset-4 hover:underline"
-            >
-              View more
-            </a>
-          </p>
-        ) : null}
         <div
           className="h-24 md:h-32 min-[2000px]:h-56 min-[2237px]:h-72"
           aria-hidden

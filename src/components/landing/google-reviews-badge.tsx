@@ -49,37 +49,24 @@ export function GoogleReviewsBadge({ page }: GoogleReviewsBadgeProps) {
   const hasRating = typeof rating === "number" && Number.isFinite(rating);
   const hasCount = typeof count === "number" && Number.isFinite(count);
 
-  const label = [
-    hasRating ? `${rating.toFixed(1)} out of 5` : null,
-    hasCount ? `${formatReviewCount(count)} Google reviews` : "Google reviews",
-  ]
-    .filter(Boolean)
-    .join(" · ");
-
   return (
     <section
       data-landing-section="google-reviews"
       className="border-b bg-background py-3"
     >
-      <a
-        href={url}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="mx-auto flex max-w-6xl flex-wrap items-center justify-center gap-2 px-4 text-sm text-foreground"
-        aria-label={`${label} — opens Google in a new tab`}
-      >
+      <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-center gap-2 px-4 text-sm text-foreground">
         <GoogleRatingStars rating={hasRating ? rating : undefined} />
         {hasRating ? (
           <span className="font-semibold tabular-nums">
             {rating.toFixed(1)}
           </span>
         ) : null}
-        <span className="font-medium text-primary underline-offset-2 hover:underline">
+        <span className="font-medium text-primary">
           {hasCount
             ? `${formatReviewCount(count)} Google reviews`
             : "Google reviews"}
         </span>
-      </a>
+      </div>
     </section>
   );
 }

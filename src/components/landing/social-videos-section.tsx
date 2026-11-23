@@ -1,19 +1,19 @@
-"use client";
-
-import { useEffect } from "react";
-
 import { landingSectionSurfaceClass } from "@/lib/landing-section-surface";
 import { parseSocialVideoUrl, type SocialVideoEmbed } from "@/lib/social-video";
 import type { PublishedLandingPage } from "@/lib/types/landing-page";
 import { cn } from "@/lib/utils";
 
-const INSTAGRAM_EMBED_SCRIPT = "https://www.instagram.com/embed.js";
+/**
+ * Instagram's embed header (username and View profile). Measured on a live reel.
+ * The media box under it is 4:5 of the embed width.
+ */
+const INSTAGRAM_EMBED_HEADER_PX = 54;
 
-type InstagramEmbedApi = {
-  Embeds: {
-    process: () => void;
-  };
-};
+/**
+ * Room below the video for the embed footer. The iframe is this much taller than
+ * the clip so the footer never creates a scrollbar that would shift the video.
+ */
+const INSTAGRAM_EMBED_FOOTER_PX = 420;
 
 type SocialVideosSectionProps = {
   readonly page: PublishedLandingPage;
@@ -24,46 +24,6 @@ export function SocialVideosSection({ page }: SocialVideosSectionProps) {
     const video = parseSocialVideoUrl(url);
     return video ? [{ video, index }] : [];
   });
-  const instagramKey = videos
-    .flatMap(({ video }) =>
-      video.provider === "instagram" ? [video.pageUrl] : [],
-    )
-    .join("|");
-
-  useEffect(() => {
-    if (!instagramKey) {
-      return;
-    }
-
-    let cancelled = false;
-    const processEmbeds = () => {
-      if (cancelled) {
-        return;
-      }
-      readInstagramApi()?.Embeds.process();
-    };
-
-    const existing = document.querySelector<HTMLScriptElement>(
-      `script[src="${INSTAGRAM_EMBED_SCRIPT}"]`,
-    );
-    const frame = requestAnimationFrame(processEmbeds);
-
-    if (!existing) {
-      const script = document.createElement("script");
-      script.async = true;
-      script.src = INSTAGRAM_EMBED_SCRIPT;
-      script.onload = processEmbeds;
-      document.body.appendChild(script);
-    } else if (!readInstagramApi()) {
-      existing.addEventListener("load", processEmbeds);
-    }
-
-    return () => {
-      cancelled = true;
-      cancelAnimationFrame(frame);
-      existing?.removeEventListener("load", processEmbeds);
-    };
-  }, [instagramKey]);
 
   if (videos.length === 0) {
     return null;
@@ -84,26 +44,7 @@ export function SocialVideosSection({ page }: SocialVideosSectionProps) {
 
 function SocialVideoCard({ video }: { readonly video: SocialVideoEmbed }) {
   if (video.provider === "instagram") {
-    return (
-      <li className="w-full max-w-[540px]">
-        <blockquote
-          className="instagram-media"
-          data-instgrm-permalink={video.pageUrl}
-          data-instgrm-version="14"
-          style={{
-            margin: 0,
-            maxWidth: 540,
-            minWidth: 0,
-            padding: 0,
-            width: "100%",
-          }}
-        >
-          <a href={video.pageUrl} target="_blank" rel="noreferrer">
-            View this post on Instagram
-          </a>
-        </blockquote>
-      </li>
-    );
+    return <InstagramVideoCard video={video} />;
   }
 
   return (
@@ -135,6 +76,24 @@ function SocialVideoCard({ video }: { readonly video: SocialVideoEmbed }) {
   );
 }
 
-function readInstagramApi(): InstagramEmbedApi | undefined {
-  return (window as Window & { instgrm?: InstagramEmbedApi }).instgrm;
+function InstagramVideoCard({ video }: { readonly video: SocialVideoEmbed }) {
+  return (
+    <li className="w-full max-w-[540px]">
+      <div className="relative aspect-[4/5] overflow-hidden bg-black">
+        <iframe
+          src={video.embedUrl}
+          title="Instagram video"
+          loading="lazy"
+          scrolling="no"
+          referrerPolicy="strict-origin-when-cross-origin"
+          allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share"
+          className="absolute left-0 w-full border-0"
+          style={{
+            top: -INSTAGRAM_EMBED_HEADER_PX,
+            height: `calc(100% + ${INSTAGRAM_EMBED_HEADER_PX + INSTAGRAM_EMBED_FOOTER_PX}px)`,
+          }}
+        />
+      </div>
+    </li>
+  );
 }

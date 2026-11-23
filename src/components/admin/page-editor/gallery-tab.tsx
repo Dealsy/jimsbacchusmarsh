@@ -272,7 +272,7 @@ function InterviewVideoField({
   return (
     <SectionCard
       title="Interview"
-      description="Shown large under the before-and-after gallery. Every page starts with the Jim's franchise interview. Remove it to hide the video on this page."
+      description="Shown large under Common questions. Every page starts with the Jim's franchise interview. Remove it to hide the video on this page."
       action={
         trimmed ? (
           <Button

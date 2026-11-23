@@ -60,8 +60,8 @@ export function LandingPageView({ page, gallery }: LandingPageViewProps) {
             selectedCategory={galleryCategory}
             onSelectCategory={setGalleryCategory}
           />
-          <InterviewVideoSection page={page} />
           <FaqSection page={page} />
+          <InterviewVideoSection page={page} />
           <OfferStackSection page={page} />
           <ServicesGrid page={page} />
           <GuaranteeSection page={page} />

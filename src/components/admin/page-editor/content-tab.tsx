@@ -530,7 +530,7 @@ export function ContentTab({
           </SectionCard>
           <SectionCard
             title="Google reviews badge"
-            description="Used for the View more link under the Google reviews section below Sound familiar. Hidden until a review URL is set."
+            description="Shows the rating strip when a review URL is saved. The strip is not a link. Hidden until a review URL is set."
           >
             <FieldGroup>
               <Field>
@@ -554,7 +554,7 @@ export function ContentTab({
                   inputMode="decimal"
                 />
                 <p className="text-xs text-muted-foreground">
-                  Number from 0 to 5. Leave blank to show the link without a
+                  Number from 0 to 5. Leave blank to show the badge without a
                   score.
                 </p>
               </Field>
