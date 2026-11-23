@@ -22,6 +22,7 @@ type StringListEditorProps = {
   readonly placeholder?: string;
   readonly addLabel?: string;
   readonly normalize?: (value: string) => string;
+  readonly onCommit?: (values: string[]) => void;
 };
 
 export function StringListEditor({
@@ -32,6 +33,7 @@ export function StringListEditor({
   placeholder = "Type and press Add…",
   addLabel = "Add",
   normalize,
+  onCommit,
 }: StringListEditorProps) {
   const [draft, setDraft] = useState("");
 
@@ -39,12 +41,17 @@ export function StringListEditor({
     return (normalize?.(value) ?? value).trim();
   }
 
+  function emit(next: string[]) {
+    onChange(next);
+    onCommit?.(next);
+  }
+
   function addItem() {
     const trimmed = prepare(draft);
     if (!trimmed) {
       return;
     }
-    onChange([...values, trimmed]);
+    emit([...values, trimmed]);
     setDraft("");
   }
 
@@ -55,8 +62,14 @@ export function StringListEditor({
     );
   }
 
+  function commitItem(index: number, value: string) {
+    emit(
+      values.map((item, itemIndex) => (itemIndex === index ? value : item)),
+    );
+  }
+
   function removeItem(index: number) {
-    onChange(values.filter((_, itemIndex) => itemIndex !== index));
+    emit(values.filter((_, itemIndex) => itemIndex !== index));
   }
 
   return (
@@ -74,7 +87,7 @@ export function StringListEditor({
         <SortableList
           className="space-y-2"
           onReorder={(fromIndex, toIndex) =>
-            onChange(reorderList(values, fromIndex, toIndex))
+            emit(reorderList(values, fromIndex, toIndex))
           }
         >
           {values.map((value, index) => (
@@ -88,6 +101,17 @@ export function StringListEditor({
                 value={value}
                 aria-label={`${label} ${index + 1}`}
                 onChange={(event) => updateItem(index, event.target.value)}
+                onBlur={(event) => {
+                  if (!onCommit) {
+                    return;
+                  }
+                  commitItem(
+                    index,
+                    normalize
+                      ? normalize(event.currentTarget.value)
+                      : event.currentTarget.value,
+                  );
+                }}
                 onPaste={(event) => {
                   const text = event.clipboardData.getData("text");
                   const normalized = normalize?.(text);

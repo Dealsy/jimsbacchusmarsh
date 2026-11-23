@@ -75,6 +75,7 @@ export function EditorLivePreview({
     state.theme.heroTo,
     state.theme.accent,
     state.theme.sectionBand,
+    state.socialVideoUrls.join("\n"),
   ].join("|");
 
   return (

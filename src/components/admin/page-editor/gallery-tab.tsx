@@ -40,6 +40,7 @@ type GalleryTabProps = {
     itemId: Id<"landingPageGallery">,
     category: string,
   ) => void;
+  readonly onCommitSocialVideos: (values: readonly string[]) => void;
 };
 
 export function GalleryTab({
@@ -60,6 +61,7 @@ export function GalleryTab({
   onAddGalleryItem,
   onRemoveGalleryItem,
   onUpdateGalleryCategory,
+  onCommitSocialVideos,
 }: GalleryTabProps) {
   const hiddenVideoUrls = state.socialVideoUrls.filter(
     (url) => url.trim().length > 0 && parseSocialVideoUrl(url) === null,
@@ -220,13 +222,16 @@ export function GalleryTab({
         <TabsContent value="videos" className="space-y-4">
           <StringListEditor
             label="Instagram and YouTube"
-            description="Paste a public Instagram or YouTube link, or the embed code Instagram gives you. These appear between Sound familiar and the comparison section. Embed code is saved as the reel link. Anything else is kept here but not shown on the page."
+            description="Paste a public Instagram or YouTube link, or the embed code Instagram gives you. These appear between Sound familiar and the comparison section. Embed code is saved as the reel link. Anything else is kept here but not shown on the page. Removing a clip updates the live page immediately."
             values={state.socialVideoUrls}
             onChange={(values) =>
               updateField(
                 "socialVideoUrls",
                 values.map(normalizeSocialVideoInput),
               )
+            }
+            onCommit={(values) =>
+              onCommitSocialVideos(values.map(normalizeSocialVideoInput))
             }
             normalize={normalizeSocialVideoInput}
             placeholder="Paste a link or Instagram embed code"

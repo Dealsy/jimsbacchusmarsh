@@ -4,7 +4,7 @@ import { api } from "convex/_generated/api";
 import type { Id } from "convex/_generated/dataModel";
 import { useMutation, useQuery } from "convex/react";
 import { ArrowLeftIcon } from "lucide-react";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { EditorLivePreview } from "@/components/admin/editor-live-preview";
 import { EditorToolbar } from "@/components/admin/editor-toolbar";
 import { galleryCategoryOptions } from "@/components/admin/fields/gallery-category-field";
@@ -76,6 +76,7 @@ export function PageEditorLoaded({
   const [createdGalleryCategories, setCreatedGalleryCategories] = useState<
     string[]
   >([]);
+  const socialVideoSave = useRef(Promise.resolve());
 
   function handleUploadingChange(uploading: boolean): void {
     setActiveUploads((count) => {
@@ -96,6 +97,28 @@ export function PageEditorLoaded({
   const updateField: UpdateEditorField = (key, value) => {
     setState((current) => ({ ...current, [key]: value }));
   };
+
+  function handleCommitSocialVideos(values: readonly string[]): void {
+    const socialVideos = trimStringList(values);
+    setState((current) => ({ ...current, socialVideoUrls: socialVideos }));
+    socialVideoSave.current = socialVideoSave.current
+      .catch(() => undefined)
+      .then(async () => {
+        try {
+          const result = await updatePage({
+            slug,
+            updates: { socialVideos },
+          });
+          setMessage(
+            result.success
+              ? "Live page updated."
+              : (result.error ?? "Could not update the live page."),
+          );
+        } catch {
+          setMessage("Could not update the live page.");
+        }
+      });
+  }
 
   async function handleSave(): Promise<void> {
     const currentState = state;
@@ -368,6 +391,7 @@ export function PageEditorLoaded({
             onUpdateGalleryCategory={(itemId, category) => {
               void handleUpdateGalleryCategory(itemId, category);
             }}
+            onCommitSocialVideos={handleCommitSocialVideos}
           />
         </TabsContent>
 
