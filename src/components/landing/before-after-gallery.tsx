@@ -1,10 +1,17 @@
 "use client";
 
-import { ChevronLeftIcon, ChevronRightIcon } from "lucide-react";
+import {
+  ArrowRightIcon,
+  ChevronLeftIcon,
+  ChevronRightIcon,
+} from "lucide-react";
 import Image from "next/image";
-import { useState } from "react";
+import { type ReactNode, useState } from "react";
 
 import { BeforeAfterSlider } from "@/components/landing/before-after-slider";
+import { LandingSection } from "@/components/landing/shell/landing-section";
+import { Reveal } from "@/components/landing/shell/reveal";
+import { SectionHeading } from "@/components/landing/shell/section-heading";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -15,11 +22,11 @@ import {
 } from "@/components/ui/dialog";
 import { LinkButton } from "@/components/ui/link-button";
 import { resolveGallerySection } from "@/lib/landing-page-content";
-import { landingSectionSurfaceClass } from "@/lib/landing-section-surface";
 import type {
   GalleryItem,
   PublishedLandingPage,
 } from "@/lib/types/landing-page";
+import { cn } from "@/lib/utils";
 
 const GALLERY_SECTION_ID = "gallery";
 const GALLERY_LEGACY_ID = "before-after";
@@ -164,74 +171,102 @@ export function BeforeAfterGallery({
     });
   }
 
+  const featureFirst = visibleItems.length >= 3;
+
   return (
-    <section
+    <LandingSection
       id={GALLERY_SECTION_ID}
-      className={`${landingSectionSurfaceClass("band")} scroll-mt-4 py-16 md:py-20`}
+      tone="band"
+      width="wide"
+      className="scroll-mt-4"
+      containerClassName="space-y-10"
     >
       <div id={GALLERY_LEGACY_ID} className="scroll-mt-4" aria-hidden />
-      <div className="mx-auto max-w-7xl space-y-10 px-4">
-        <div className="mx-auto max-w-2xl space-y-4 text-center">
-          <h2 className="font-heading text-3xl font-bold tracking-tight md:text-4xl">
-            {section.title}
-          </h2>
-          <p className="text-muted-foreground">{section.description}</p>
-        </div>
-        {categories.length > 0 && !hideCategoryFilters ? (
-          <div className="flex flex-wrap justify-center gap-2">
-            <Button
-              type="button"
-              size="sm"
-              variant={selectedCategory === null ? "default" : "outline"}
+      <Reveal>
+        <SectionHeading
+          eyebrow="Real results"
+          title={section.title}
+          description={section.description}
+        />
+      </Reveal>
+      {categories.length > 0 && !hideCategoryFilters ? (
+        <div className="no-scrollbar -mx-5 flex overflow-x-auto px-5 md:mx-0 md:justify-center md:px-0">
+          <div className="mx-auto inline-flex shrink-0 gap-1 rounded-full bg-background p-1 shadow-elevated ring-1 ring-border">
+            <GalleryFilterButton
+              active={selectedCategory === null}
               onClick={() => onSelectCategory(null)}
             >
               All
-            </Button>
+            </GalleryFilterButton>
             {categories.map((category) => (
-              <Button
+              <GalleryFilterButton
                 key={category}
-                type="button"
-                size="sm"
-                variant={selectedCategory === category ? "default" : "outline"}
+                active={selectedCategory === category}
                 onClick={() => onSelectCategory(category)}
               >
                 {category}
-              </Button>
+              </GalleryFilterButton>
             ))}
           </div>
-        ) : null}
-        {visibleItems.length === 0 ? (
-          <div className="rounded-2xl border border-dashed bg-background/60 p-12 text-center text-muted-foreground">
-            <p className="font-medium">
-              No photos for {selectedCategory} yet. Choose All to see every
-              before and after.
-            </p>
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3">
-            {visibleItems.map((item) => (
-              <figure key={item._id} className="space-y-2">
-                <BeforeAfterSlider
-                  beforeUrl={item.beforeUrl}
-                  afterUrl={item.afterUrl}
-                  beforeAlt={`Before — ${item.label ?? page.name}`}
-                  afterAlt={`After — ${item.label ?? page.name}`}
-                  onOpenLightbox={() => openPairLightbox(item)}
-                />
-                {item.label ? (
-                  <figcaption className="text-sm font-medium">
-                    {item.label}
-                  </figcaption>
-                ) : null}
-              </figure>
-            ))}
-          </div>
-        )}
-        <div className="flex justify-center">
-          <LinkButton href="#quote-form" landingCtaLocation="gallery" size="lg">
-            {page.ctaLabel}
-          </LinkButton>
         </div>
+      ) : null}
+      {visibleItems.length === 0 ? (
+        <div className="rounded-3xl border border-dashed bg-background/60 p-12 text-center text-muted-foreground">
+          <p className="font-medium">
+            No photos for {selectedCategory} yet. Choose All to see every before
+            and after.
+          </p>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 gap-5 md:grid-cols-2 md:gap-6 lg:grid-cols-3">
+          {visibleItems.map((item, index) => {
+            const featured = featureFirst && index === 0;
+            return (
+              <Reveal
+                key={item._id}
+                delay={Math.min(index, 5) * 60}
+                className={cn(
+                  featured && "md:col-span-2 lg:row-span-2 lg:flex lg:flex-col",
+                )}
+              >
+                <figure
+                  className={cn(
+                    "space-y-3",
+                    featured && "lg:flex lg:flex-1 lg:flex-col",
+                  )}
+                >
+                  <BeforeAfterSlider
+                    beforeUrl={item.beforeUrl}
+                    afterUrl={item.afterUrl}
+                    beforeAlt={`Before — ${item.label ?? page.name}`}
+                    afterAlt={`After — ${item.label ?? page.name}`}
+                    onOpenLightbox={() => openPairLightbox(item)}
+                    className={cn(
+                      featured &&
+                        "md:aspect-16/10 lg:aspect-auto lg:min-h-0 lg:flex-1",
+                    )}
+                  />
+                  {item.label ? (
+                    <figcaption className="px-1 text-sm font-medium text-muted-foreground">
+                      {item.label}
+                    </figcaption>
+                  ) : null}
+                </figure>
+              </Reveal>
+            );
+          })}
+        </div>
+      )}
+      <div className="flex justify-center">
+        <LinkButton
+          href="#quote-form"
+          landingCtaLocation="gallery"
+          size="lg"
+          className="h-12 px-7 text-base shadow-lg shadow-primary/25"
+        >
+          {page.ctaLabel}
+          <ArrowRightIcon data-icon="inline-end" />
+        </LinkButton>
       </div>
 
       <Dialog
@@ -304,6 +339,32 @@ export function BeforeAfterGallery({
           ) : null}
         </DialogContent>
       </Dialog>
-    </section>
+    </LandingSection>
+  );
+}
+
+function GalleryFilterButton({
+  active,
+  onClick,
+  children,
+}: {
+  readonly active: boolean;
+  readonly onClick: () => void;
+  readonly children: ReactNode;
+}) {
+  return (
+    <Button
+      type="button"
+      size="sm"
+      variant={active ? "default" : "ghost"}
+      aria-pressed={active}
+      onClick={onClick}
+      className={cn(
+        "h-9 rounded-full px-4",
+        active ? "shadow-md" : "text-muted-foreground",
+      )}
+    >
+      {children}
+    </Button>
   );
 }

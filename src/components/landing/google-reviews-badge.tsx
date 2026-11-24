@@ -1,9 +1,6 @@
 import { StarIcon } from "lucide-react";
 
-import {
-  GOOGLE_STAR_KEYS,
-  googleStarFill,
-} from "@/lib/google-rating";
+import { GOOGLE_STAR_KEYS, googleStarFill } from "@/lib/google-rating";
 import type { PublishedLandingPage } from "@/lib/types/landing-page";
 import { cn } from "@/lib/utils";
 
@@ -15,7 +12,11 @@ function formatReviewCount(count: number): string {
   return new Intl.NumberFormat("en-AU").format(count);
 }
 
-function GoogleRatingStars({ rating }: { readonly rating: number | undefined }) {
+function GoogleRatingStars({
+  rating,
+}: {
+  readonly rating: number | undefined;
+}) {
   const hasRating = typeof rating === "number" && Number.isFinite(rating);
 
   return (
@@ -70,23 +71,5 @@ export function GoogleRatingSummary({
           : "Google reviews"}
       </span>
     </div>
-  );
-}
-
-export function GoogleReviewsBadge({ page }: GoogleReviewsBadgeProps) {
-  if (!page.googleReviewUrl?.trim()) {
-    return null;
-  }
-
-  return (
-    <section
-      data-landing-section="google-reviews"
-      className="hidden border-b bg-background py-3 md:block"
-    >
-      <GoogleRatingSummary
-        page={page}
-        className="mx-auto max-w-6xl justify-center px-4 text-foreground"
-      />
-    </section>
   );
 }

@@ -1,6 +1,7 @@
 "use client";
 
 import { DEFAULT_REASON_QUESTION } from "convex/lib/reasonQuestionDefaults";
+import { ArrowRightIcon } from "lucide-react";
 import { useRef, useState, useTransition } from "react";
 import { capturePostHogEvent } from "@/components/analytics/posthog";
 import { Button } from "@/components/ui/button";
@@ -19,6 +20,7 @@ import { submitLead } from "@/lib/actions/submit-lead";
 import { resolveOffer } from "@/lib/landing-page-content";
 import { formatPhoneHref, isPlaceholderPhone } from "@/lib/phone";
 import type { PublishedLandingPage } from "@/lib/types/landing-page";
+import { cn } from "@/lib/utils";
 import {
   extractLeadFormValues,
   type LeadFormFieldErrors,
@@ -35,6 +37,14 @@ type LeadFormProps = {
   readonly serviceTitle?: string;
   readonly initialSurfaces?: readonly string[];
 };
+
+const OPTION_TILE_CLASS =
+  "flex min-h-12 cursor-pointer items-center gap-2.5 rounded-xl border bg-background px-3.5 py-3 transition-[border-color,background-color,box-shadow] hover:border-primary/40 has-data-checked:border-primary has-data-checked:bg-primary/5 has-data-checked:ring-1 has-data-checked:ring-primary has-checked:border-primary has-checked:bg-primary/5 has-checked:ring-1 has-checked:ring-primary";
+
+const SUBMIT_CLASS =
+  "h-12 rounded-xl text-base font-semibold shadow-lg shadow-primary/25 [&_svg]:transition-transform hover:[&_svg]:translate-x-0.5";
+
+const INPUT_CLASS = "h-11 rounded-xl px-3.5 text-base md:text-sm";
 
 /** Keep error copy from collapsing the row when messages appear or clear. */
 function ReservedFieldError({ message }: { readonly message?: string }) {
@@ -76,8 +86,7 @@ export function LeadForm({
   const isRowLayout = isCompact && layout === "row";
   const reasonOptions =
     page.reasonOptions?.filter((option) => option.trim().length > 0) ?? [];
-  const reasonQuestion =
-    page.reasonQuestion?.trim() || DEFAULT_REASON_QUESTION;
+  const reasonQuestion = page.reasonQuestion?.trim() || DEFAULT_REASON_QUESTION;
 
   const nameId = `${idPrefix}-name`;
   const phoneId = `${idPrefix}-phone`;
@@ -241,7 +250,9 @@ export function LeadForm({
                 : "gap-3 border-0 p-0"
             }
           >
-            <FieldLegend className="mb-0 px-0">{reasonQuestion}</FieldLegend>
+            <FieldLegend className="mb-0 px-0 font-semibold">
+              {reasonQuestion}
+            </FieldLegend>
             <RadioGroup
               value={selectedReason}
               onValueChange={(value) => {
@@ -260,10 +271,10 @@ export function LeadForm({
                   <label
                     key={reason}
                     htmlFor={reasonId}
-                    className="flex cursor-pointer items-center gap-2 rounded-lg border p-3 has-data-checked:border-primary has-data-checked:bg-primary/5"
+                    className={OPTION_TILE_CLASS}
                   >
                     <RadioGroupItem id={reasonId} value={reason} />
-                    <span className="text-sm">{reason}</span>
+                    <span className="text-sm font-medium">{reason}</span>
                   </label>
                 );
               })}
@@ -279,7 +290,9 @@ export function LeadForm({
             data-invalid={Boolean(fieldErrors.surfaces)}
             className="gap-3 border-0 p-0"
           >
-            <FieldLegend className="mb-0 px-0">Affected surface</FieldLegend>
+            <FieldLegend className="mb-0 px-0 font-semibold">
+              Affected surface
+            </FieldLegend>
             <div className="grid grid-cols-2 gap-2 sm:gap-3">
               {page.surfaceOptions.map((surface) => {
                 const surfaceId = `${idPrefix}-surface-${surface.replace(/\s+/g, "-").toLowerCase()}`;
@@ -287,7 +300,7 @@ export function LeadForm({
                   <label
                     key={surface}
                     htmlFor={surfaceId}
-                    className="flex cursor-pointer items-center gap-2 rounded-lg border p-3 has-checked:border-primary has-checked:bg-primary/5"
+                    className={OPTION_TILE_CLASS}
                   >
                     <Checkbox
                       id={surfaceId}
@@ -296,7 +309,7 @@ export function LeadForm({
                         toggleSurface(surface, checked === true)
                       }
                     />
-                    <span className="text-sm">{surface}</span>
+                    <span className="text-sm font-medium">{surface}</span>
                   </label>
                 );
               })}
@@ -321,6 +334,7 @@ export function LeadForm({
               id={nameId}
               name="name"
               autoComplete="name"
+              className={INPUT_CLASS}
               data-lpignore="true"
               data-1p-ignore="true"
               data-bwignore="true"
@@ -350,6 +364,7 @@ export function LeadForm({
               name="phone"
               type="tel"
               autoComplete="tel"
+              className={INPUT_CLASS}
               data-lpignore="true"
               data-1p-ignore="true"
               data-bwignore="true"
@@ -378,6 +393,7 @@ export function LeadForm({
               id={suburbId}
               name="suburb"
               autoComplete="address-level2"
+              className={INPUT_CLASS}
               placeholder="Your suburb"
               data-lpignore="true"
               data-1p-ignore="true"
@@ -397,10 +413,14 @@ export function LeadForm({
           <Button
             type="submit"
             size="lg"
-            className="w-full md:col-start-4 md:row-start-2 md:h-9 md:w-auto md:min-w-48 md:self-start"
+            className={cn(
+              SUBMIT_CLASS,
+              "w-full md:col-start-4 md:row-start-2 md:h-11 md:w-auto md:min-w-48 md:self-start",
+            )}
             disabled={isPending}
           >
             {isPending ? "Sending…" : page.ctaLabel}
+            {isPending ? null : <ArrowRightIcon data-icon="inline-end" />}
           </Button>
         ) : null}
       </FieldGroup>
@@ -431,8 +451,14 @@ export function LeadForm({
       ) : null}
 
       {isRowLayout ? null : (
-        <Button type="submit" size="lg" className="w-full" disabled={isPending}>
+        <Button
+          type="submit"
+          size="lg"
+          className={cn(SUBMIT_CLASS, "w-full")}
+          disabled={isPending}
+        >
           {isPending ? "Sending…" : page.ctaLabel}
+          {isPending ? null : <ArrowRightIcon data-icon="inline-end" />}
         </Button>
       )}
     </form>

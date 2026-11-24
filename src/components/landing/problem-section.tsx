@@ -1,4 +1,8 @@
-import { landingSectionSurfaceClass } from "@/lib/landing-section-surface";
+import { ArrowRightIcon, QuoteIcon } from "lucide-react";
+
+import { LandingSection } from "@/components/landing/shell/landing-section";
+import { Reveal } from "@/components/landing/shell/reveal";
+import { Eyebrow } from "@/components/landing/shell/section-heading";
 import type { PublishedLandingPage } from "@/lib/types/landing-page";
 
 type ProblemSectionProps = {
@@ -10,20 +14,33 @@ export function ProblemSection({ page }: ProblemSectionProps) {
   const [quote, ...supporting] = paragraphs;
 
   return (
-    <section className={`${landingSectionSurfaceClass("plain")} py-16 md:py-20`}>
-      <div className="mx-auto max-w-3xl space-y-6 px-4 text-center">
-        <h2 className="font-heading text-3xl font-bold tracking-tight md:text-4xl">
-          Sound familiar?
-        </h2>
+    <LandingSection tone="light" width="narrow">
+      <Reveal className="space-y-8 text-center">
+        <div className="space-y-4">
+          <Eyebrow>The problem</Eyebrow>
+          <h2 className="font-heading text-3xl font-bold tracking-tight text-balance md:text-5xl">
+            Sound familiar?
+          </h2>
+        </div>
         {quote ? (
-          <blockquote className="border-primary/40 text-xl leading-relaxed font-medium text-foreground italic md:border-l-4 md:pl-6 md:text-2xl">
-            {quote}
-          </blockquote>
+          <figure className="relative mx-auto max-w-2xl">
+            <QuoteIcon
+              aria-hidden
+              className="mx-auto mb-4 size-10 fill-primary/15 text-primary/40"
+            />
+            <blockquote className="font-heading text-2xl leading-snug font-semibold tracking-tight text-balance text-foreground md:text-[2.125rem] md:leading-tight">
+              {quote}
+            </blockquote>
+            <div
+              aria-hidden
+              className="mx-auto mt-8 h-1 w-16 rounded-full bg-linear-to-r from-(--landing-primary) to-(--landing-accent)"
+            />
+          </figure>
         ) : null}
         {supporting.map((paragraph) => (
           <p
             key={paragraph}
-            className="text-lg leading-relaxed text-muted-foreground"
+            className="mx-auto max-w-2xl text-lg leading-relaxed text-pretty text-muted-foreground"
           >
             {paragraph}
           </p>
@@ -31,12 +48,13 @@ export function ProblemSection({ page }: ProblemSectionProps) {
         <p>
           <a
             href="#before-after"
-            className="font-medium text-primary underline-offset-4 hover:underline"
+            className="group inline-flex items-center gap-2 rounded-full bg-primary/10 px-5 py-2.5 text-sm font-semibold text-primary transition-colors hover:bg-primary/15"
           >
             See the difference
+            <ArrowRightIcon className="size-4 transition-transform group-hover:translate-x-0.5" />
           </a>
         </p>
-      </div>
-    </section>
+      </Reveal>
+    </LandingSection>
   );
 }

@@ -13,11 +13,11 @@ export function LeadFormHeading({ page }: LeadFormHeadingProps) {
       : "No obligation. We'll look at the surfaces and call you back with a clear price.";
 
   return (
-    <div className="mb-5 space-y-1">
-      <p className="font-heading text-lg font-semibold tracking-tight">
+    <div className="mb-6 space-y-1.5">
+      <p className="font-heading text-xl font-bold tracking-tight md:text-2xl">
         Get a free on-site quote
       </p>
-      <p className="text-sm text-muted-foreground">{payoff}</p>
+      <p className="text-sm leading-relaxed text-muted-foreground">{payoff}</p>
     </div>
   );
 }

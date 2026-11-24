@@ -1,10 +1,10 @@
 "use client";
 
-import { useEffect, useState, type ReactNode } from "react";
+import { type ReactNode, useEffect, useState } from "react";
 
 import {
-  type CarouselApi,
   Carousel,
+  type CarouselApi,
   CarouselNext,
   CarouselPrevious,
 } from "@/components/ui/carousel";
@@ -38,7 +38,10 @@ function scrollReviews(api: CarouselApi, direction: "next" | "prev") {
   }
 }
 
-export function ReviewsCarousel({ children, slideCount }: ReviewsCarouselProps) {
+export function ReviewsCarousel({
+  children,
+  slideCount,
+}: ReviewsCarouselProps) {
   const [api, setApi] = useState<CarouselApi>();
   const canLoop = slideCount > 1;
 
@@ -83,22 +86,22 @@ export function ReviewsCarousel({ children, slideCount }: ReviewsCarouselProps) 
     <Carousel
       setApi={setApi}
       opts={{ align: "start", loop: true }}
-      className="w-full px-12"
+      className="w-full px-5 md:px-16"
     >
       {children}
       {canLoop ? (
-        <>
+        <div className="mt-2 flex justify-center gap-3 md:contents">
           <CarouselPrevious
             disabled={false}
-            className="left-0 size-10 border bg-background shadow-md"
+            className="static size-11 rounded-full border-0 bg-background shadow-elevated ring-1 ring-border hover:bg-background hover:text-primary md:absolute md:left-3"
             onClick={() => scrollReviews(api, "prev")}
           />
           <CarouselNext
             disabled={false}
-            className="right-0 size-10 border bg-background shadow-md"
+            className="static size-11 rounded-full border-0 bg-background shadow-elevated ring-1 ring-border hover:bg-background hover:text-primary md:absolute md:right-3"
             onClick={() => scrollReviews(api, "next")}
           />
-        </>
+        </div>
       ) : null}
     </Carousel>
   );

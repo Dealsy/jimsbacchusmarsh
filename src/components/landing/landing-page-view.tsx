@@ -10,13 +10,8 @@ import { BeforeAfterGallery } from "@/components/landing/before-after-gallery";
 import { CloseSection } from "@/components/landing/close-section";
 import { FaqSection } from "@/components/landing/faq-section";
 import { FinalCta } from "@/components/landing/final-cta";
-import { GoogleReviewsBadge } from "@/components/landing/google-reviews-badge";
 import { GuaranteeSection } from "@/components/landing/guarantee-section";
-import {
-  Hero,
-  HeroReviewVideo,
-  TrustStrip,
-} from "@/components/landing/hero";
+import { Hero, HeroReviewVideo, TrustStrip } from "@/components/landing/hero";
 import { HowItWorks } from "@/components/landing/how-it-works";
 import { InterviewVideoSection } from "@/components/landing/interview-video-section";
 import { LandingPageTheme } from "@/components/landing/landing-page-theme";
@@ -60,7 +55,6 @@ export function LandingPageView({ page, gallery }: LandingPageViewProps) {
             className="max-md:-order-1"
           />
           <TrustStrip page={page} />
-          <GoogleReviewsBadge page={page} />
           <ReviewsBlock page={page} />
           <ProblemSection page={page} />
           <div className="max-md:-order-1">
@@ -75,7 +69,7 @@ export function LandingPageView({ page, gallery }: LandingPageViewProps) {
             onSelectCategory={setGalleryCategory}
           />
           <FaqSection page={page} />
-          <div className="md:hidden">
+          <div className="landing-dark-surface pt-6 md:hidden">
             <HeroReviewVideo />
           </div>
           <InterviewVideoSection page={page} />

@@ -2,9 +2,12 @@
 
 import { ChevronsLeftRightIcon } from "lucide-react";
 import Image from "next/image";
-import { useRef, useState, type KeyboardEvent, type PointerEvent } from "react";
+import { type KeyboardEvent, type PointerEvent, useRef, useState } from "react";
 
-const SLIDER_IMAGE_SIZES = "(min-width: 1024px) 33vw, (min-width: 768px) 50vw, 100vw";
+import { cn } from "@/lib/utils";
+
+const SLIDER_IMAGE_SIZES =
+  "(min-width: 1024px) 33vw, (min-width: 768px) 50vw, 100vw";
 
 type BeforeAfterSliderProps = {
   readonly beforeUrl: string | null;
@@ -12,6 +15,7 @@ type BeforeAfterSliderProps = {
   readonly beforeAlt: string;
   readonly afterAlt: string;
   readonly onOpenLightbox: () => void;
+  readonly className?: string;
 };
 
 export function BeforeAfterSlider({
@@ -20,6 +24,7 @@ export function BeforeAfterSlider({
   beforeAlt,
   afterAlt,
   onOpenLightbox,
+  className,
 }: BeforeAfterSliderProps) {
   const [position, setPosition] = useState(50);
   const [showHint, setShowHint] = useState(true);
@@ -93,7 +98,10 @@ export function BeforeAfterSlider({
   return (
     <div
       ref={frameRef}
-      className="relative aspect-6/5 overflow-hidden rounded-2xl bg-muted shadow-md"
+      className={cn(
+        "relative aspect-6/5 overflow-hidden rounded-3xl bg-muted shadow-elevated ring-1 ring-black/5",
+        className,
+      )}
     >
       {afterUrl ? (
         <Image
@@ -129,33 +137,37 @@ export function BeforeAfterSlider({
         )}
       </div>
 
-      <span className="pointer-events-none absolute bottom-3 left-3 rounded-md bg-black/60 px-2.5 py-1 text-sm font-medium text-white">
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-x-0 bottom-0 h-24 bg-linear-to-t from-black/45 to-transparent"
+      />
+      <span className="pointer-events-none absolute bottom-3.5 left-3.5 rounded-full bg-black/55 px-3 py-1 text-[0.6875rem] font-semibold tracking-[0.12em] text-white uppercase ring-1 ring-white/15 backdrop-blur-md">
         Before
       </span>
       <span
-        className="pointer-events-none absolute bottom-3 right-3 rounded-md px-2.5 py-1 text-sm font-medium text-white"
+        className="pointer-events-none absolute right-3.5 bottom-3.5 rounded-full px-3 py-1 text-[0.6875rem] font-semibold tracking-[0.12em] text-white uppercase ring-1 ring-white/20 backdrop-blur-md"
         style={{
           backgroundColor:
-            "color-mix(in srgb, var(--landing-accent) 90%, black)",
+            "color-mix(in srgb, var(--landing-accent) 85%, black)",
         }}
       >
         After
       </span>
 
       <div
-        className="pointer-events-none absolute inset-y-0 z-10 w-0.5 -translate-x-1/2 bg-white shadow-sm"
+        className="pointer-events-none absolute inset-y-0 z-10 w-[3px] -translate-x-1/2 bg-white shadow-[0_0_12px_rgb(0_0_0/0.35)]"
         style={{ left: `${position}%` }}
       />
 
       {showHint ? (
-        <span className="pointer-events-none absolute top-3 left-1/2 z-30 -translate-x-1/2 rounded-full bg-black/70 px-3 py-1 text-xs font-medium text-white shadow-sm">
+        <span className="pointer-events-none absolute top-3.5 left-1/2 z-30 -translate-x-1/2 rounded-full bg-black/60 px-3 py-1 text-xs font-medium text-white ring-1 ring-white/15 backdrop-blur-md">
           Drag to compare
         </span>
       ) : null}
 
       <button
         type="button"
-        className="absolute top-1/2 z-20 flex size-11 -translate-x-1/2 -translate-y-1/2 touch-none items-center justify-center rounded-full border-2 border-white bg-white text-foreground shadow-md"
+        className="absolute top-1/2 z-20 flex size-12 -translate-x-1/2 -translate-y-1/2 touch-none items-center justify-center rounded-full bg-white text-foreground shadow-float ring-4 ring-white/35 transition-transform active:scale-95"
         style={{ left: `${position}%` }}
         aria-label="Compare before and after"
         role="slider"
