@@ -1,5 +1,6 @@
 import { PhoneIcon } from "lucide-react";
 import Image from "next/image";
+import { GoogleRatingSummary } from "@/components/landing/google-reviews-badge";
 import { LeadForm } from "@/components/landing/lead-form";
 import { LeadFormHeading } from "@/components/landing/lead-form-heading";
 import { Badge } from "@/components/ui/badge";
@@ -19,6 +20,11 @@ type HeroProps = {
 
 const HERO_MEDIA_CLASS =
   "object-contain object-[10%_50%] scale-[1.45] origin-[22%_80%]";
+
+const HERO_MOBILE_OVERLAY_STYLE = {
+  background:
+    "linear-gradient(to bottom, color-mix(in srgb, var(--landing-hero-from) 92%, transparent) 0%, color-mix(in srgb, var(--landing-hero-from) 72%, transparent) 45%, color-mix(in srgb, var(--landing-hero-to) 55%, transparent) 100%)",
+} as const;
 
 const HERO_OVERLAY_STYLE = {
   background:
@@ -47,11 +53,11 @@ function HeroBackgroundMedia({
             alt=""
             fill
             unoptimized
-            className={HERO_MEDIA_CLASS}
+            className="object-cover object-center"
             priority
             sizes="100vw"
           />
-          <div className="absolute inset-0" style={HERO_OVERLAY_STYLE} />
+          <div className="absolute inset-0" style={HERO_MOBILE_OVERLAY_STYLE} />
         </div>
       ) : null}
       {desktopMediaUrl ? (
@@ -116,7 +122,12 @@ export function Hero({ page }: HeroProps) {
             <h1 className="font-heading text-4xl font-bold leading-tight tracking-tight md:text-6xl">
               {hero.headline}
             </h1>
-            <p className="pt-6 text-lg text-white md:pt-10 md:text-2xl">
+            <GoogleRatingSummary
+              page={page}
+              className="md:hidden"
+              countClassName="text-white"
+            />
+            <p className="text-lg text-white md:pt-10 md:text-2xl">
               {hero.subheadline}
             </p>
             <LinkButton
@@ -135,14 +146,14 @@ export function Hero({ page }: HeroProps) {
           </div>
         </div>
       </section>
-      <div className="relative z-20 mx-auto max-w-7xl">
+      <div className="relative z-20 mx-auto hidden max-w-7xl md:block">
         <HeroReviewVideo />
       </div>
     </div>
   );
 }
 
-function HeroReviewVideo() {
+export function HeroReviewVideo() {
   return (
     <div className="mx-auto w-full max-w-3xl px-4 py-6 min-[2237px]:absolute min-[2237px]:top-10 min-[2237px]:-left-140 min-[2237px]:mx-0 min-[2237px]:max-w-none min-[2237px]:w-[48rem] min-[2237px]:-translate-y-1/2 min-[2237px]:px-0 min-[2237px]:py-0">
       <div className="overflow-hidden rounded-2xl border-2 border-white bg-black/70 shadow-xl">

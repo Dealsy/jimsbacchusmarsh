@@ -12,10 +12,15 @@ import { FaqSection } from "@/components/landing/faq-section";
 import { FinalCta } from "@/components/landing/final-cta";
 import { GoogleReviewsBadge } from "@/components/landing/google-reviews-badge";
 import { GuaranteeSection } from "@/components/landing/guarantee-section";
-import { Hero, TrustStrip } from "@/components/landing/hero";
+import {
+  Hero,
+  HeroReviewVideo,
+  TrustStrip,
+} from "@/components/landing/hero";
 import { HowItWorks } from "@/components/landing/how-it-works";
 import { InterviewVideoSection } from "@/components/landing/interview-video-section";
 import { LandingPageTheme } from "@/components/landing/landing-page-theme";
+import { MobileResultPeek } from "@/components/landing/mobile-result-peek";
 import { OfferStackSection } from "@/components/landing/offer-stack-section";
 import { ProblemSection } from "@/components/landing/problem-section";
 import { ReviewsBlock } from "@/components/landing/reviews-wedge-block";
@@ -45,13 +50,22 @@ export function LandingPageView({ page, gallery }: LandingPageViewProps) {
       <MetaPixel pixelId={metaPixelId} />
       <GoogleAds adsId={googleAdsId} />
       <LandingPageTheme theme={page.theme}>
-        <main className="pb-28 md:pb-14">
-          <Hero page={page} />
+        <main className="flex flex-col pb-28 md:block md:pb-14">
+          <div className="max-md:-order-1">
+            <Hero page={page} />
+          </div>
+          <MobileResultPeek
+            page={page}
+            items={gallery}
+            className="max-md:-order-1"
+          />
           <TrustStrip page={page} />
           <GoogleReviewsBadge page={page} />
           <ReviewsBlock page={page} />
           <ProblemSection page={page} />
-          <SocialVideosSection page={page} />
+          <div className="max-md:-order-1">
+            <SocialVideosSection page={page} />
+          </div>
           <WedgeSection page={page} />
           <HowItWorks page={page} />
           <BeforeAfterGallery
@@ -61,6 +75,9 @@ export function LandingPageView({ page, gallery }: LandingPageViewProps) {
             onSelectCategory={setGalleryCategory}
           />
           <FaqSection page={page} />
+          <div className="md:hidden">
+            <HeroReviewVideo />
+          </div>
           <InterviewVideoSection page={page} />
           <OfferStackSection page={page} />
           <ServicesGrid page={page} />

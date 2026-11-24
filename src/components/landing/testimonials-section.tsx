@@ -26,7 +26,7 @@ export function TestimonialsSection({ page }: TestimonialsSectionProps) {
       id="reviews"
       className={cn(
         landingSectionSurfaceClass("band"),
-        "scroll-mt-4 pt-24 pb-16 md:pt-32 md:pb-20 min-[2237px]:pt-72!",
+        "scroll-mt-4 pt-16 pb-16 md:pt-32 md:pb-20 min-[2237px]:pt-72!",
       )}
     >
       <div className="mx-auto max-w-[100rem] space-y-10 px-4">
@@ -55,7 +55,7 @@ export function TestimonialsSection({ page }: TestimonialsSectionProps) {
           </CarouselContent>
         </ReviewsCarousel>
         <div
-          className="h-24 md:h-32 min-[2000px]:h-56 min-[2237px]:h-72"
+          className="hidden md:block md:h-32 min-[2000px]:h-56 min-[2237px]:h-72"
           aria-hidden
         />
       </div>

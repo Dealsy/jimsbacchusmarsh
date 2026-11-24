@@ -280,7 +280,7 @@ export function LeadForm({
             className="gap-3 border-0 p-0"
           >
             <FieldLegend className="mb-0 px-0">Affected surface</FieldLegend>
-            <div className="grid gap-3 sm:grid-cols-2">
+            <div className="grid grid-cols-2 gap-2 sm:gap-3">
               {page.surfaceOptions.map((surface) => {
                 const surfaceId = `${idPrefix}-surface-${surface.replace(/\s+/g, "-").toLowerCase()}`;
                 return (

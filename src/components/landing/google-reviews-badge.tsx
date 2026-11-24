@@ -5,6 +5,7 @@ import {
   googleStarFill,
 } from "@/lib/google-rating";
 import type { PublishedLandingPage } from "@/lib/types/landing-page";
+import { cn } from "@/lib/utils";
 
 type GoogleReviewsBadgeProps = {
   readonly page: PublishedLandingPage;
@@ -38,9 +39,17 @@ function GoogleRatingStars({ rating }: { readonly rating: number | undefined }) 
   );
 }
 
-export function GoogleReviewsBadge({ page }: GoogleReviewsBadgeProps) {
-  const url = page.googleReviewUrl?.trim();
-  if (!url) {
+type GoogleRatingSummaryProps = GoogleReviewsBadgeProps & {
+  readonly className?: string;
+  readonly countClassName?: string;
+};
+
+export function GoogleRatingSummary({
+  page,
+  className,
+  countClassName,
+}: GoogleRatingSummaryProps) {
+  if (!page.googleReviewUrl?.trim()) {
     return null;
   }
 
@@ -50,23 +59,34 @@ export function GoogleReviewsBadge({ page }: GoogleReviewsBadgeProps) {
   const hasCount = typeof count === "number" && Number.isFinite(count);
 
   return (
+    <div className={cn("flex flex-wrap items-center gap-2 text-sm", className)}>
+      <GoogleRatingStars rating={hasRating ? rating : undefined} />
+      {hasRating ? (
+        <span className="font-semibold tabular-nums">{rating.toFixed(1)}</span>
+      ) : null}
+      <span className={cn("font-medium text-primary", countClassName)}>
+        {hasCount
+          ? `${formatReviewCount(count)} Google reviews`
+          : "Google reviews"}
+      </span>
+    </div>
+  );
+}
+
+export function GoogleReviewsBadge({ page }: GoogleReviewsBadgeProps) {
+  if (!page.googleReviewUrl?.trim()) {
+    return null;
+  }
+
+  return (
     <section
       data-landing-section="google-reviews"
-      className="border-b bg-background py-3"
+      className="hidden border-b bg-background py-3 md:block"
     >
-      <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-center gap-2 px-4 text-sm text-foreground">
-        <GoogleRatingStars rating={hasRating ? rating : undefined} />
-        {hasRating ? (
-          <span className="font-semibold tabular-nums">
-            {rating.toFixed(1)}
-          </span>
-        ) : null}
-        <span className="font-medium text-primary">
-          {hasCount
-            ? `${formatReviewCount(count)} Google reviews`
-            : "Google reviews"}
-        </span>
-      </div>
+      <GoogleRatingSummary
+        page={page}
+        className="mx-auto max-w-6xl justify-center px-4 text-foreground"
+      />
     </section>
   );
 }
