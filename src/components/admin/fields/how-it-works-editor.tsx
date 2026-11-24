@@ -84,7 +84,7 @@ export function HowItWorksEditor({ values, onChange }: HowItWorksEditorProps) {
   return (
     <ListSection
       title="How it works"
-      description="Step-by-step process shown on the page. Drag to reorder."
+      description="Step-by-step process shown on the page. Drag to reorder. Remove, add, and reorder update the live page immediately."
       addLabel="Add step"
       onAdd={openAdd}
       isEmpty={values.length === 0}

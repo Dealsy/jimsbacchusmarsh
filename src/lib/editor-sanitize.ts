@@ -39,7 +39,7 @@ export function persistServiceSlug(
 export function sanitizeServices(
   values: readonly ServiceItem[],
 ): ServiceItem[] {
-  return values
+  const cleaned = values
     .map((item) => {
       const title = item.title.trim();
       const whatsIncluded = trimStringList(item.whatsIncluded ?? []);
@@ -55,6 +55,40 @@ export function sanitizeServices(
       };
     })
     .filter((item) => item.title || item.description);
+
+  return assignUniqueServiceSlugs(cleaned);
+}
+
+function assignUniqueServiceSlugs(
+  items: readonly ServiceItem[],
+): ServiceItem[] {
+  const titleSlugs = new Set(
+    items.map((item) => persistServiceSlug(item.title, undefined)),
+  );
+  const used = new Set<string>();
+
+  return items.map((item) => {
+    const titleSlug = persistServiceSlug(item.title, undefined) || "service";
+    const stored = item.slug?.trim()
+      ? persistServiceSlug(item.title, item.slug)
+      : titleSlug;
+    const slugIsAnotherServicesTitle =
+      stored !== titleSlug && titleSlugs.has(stored);
+    let slug = slugIsAnotherServicesTitle ? titleSlug : stored || titleSlug;
+
+    if (used.has(slug)) {
+      let suffix = 2;
+      let candidate = `${titleSlug}-${suffix}`;
+      while (used.has(candidate)) {
+        suffix += 1;
+        candidate = `${titleSlug}-${suffix}`;
+      }
+      slug = candidate;
+    }
+
+    used.add(slug);
+    return { ...item, slug };
+  });
 }
 
 export function sanitizeHowItWorks(

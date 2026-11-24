@@ -81,6 +81,8 @@ export type UpdateEditorField = <K extends keyof EditorState>(
   value: EditorState[K],
 ) => void;
 
+export type PersistEditorFields = (patch: Partial<EditorState>) => void;
+
 export type LoadedPage = NonNullable<
   FunctionReturnType<typeof api.landingPages.getBySlug>
 >;

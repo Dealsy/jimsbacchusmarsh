@@ -8,6 +8,7 @@ import { ImageUpload } from "@/components/admin/image-upload";
 import type {
   EditorState,
   LoadedPage,
+  PersistEditorFields,
   UpdateEditorField,
 } from "@/components/admin/page-editor-types";
 import { SectionCard, TabIntro } from "@/components/admin/section-card";
@@ -27,6 +28,7 @@ type ContentTabProps = {
   readonly page: LoadedPage;
   readonly state: EditorState;
   readonly updateField: UpdateEditorField;
+  readonly persistFields: PersistEditorFields;
   readonly onUploadingChange: (uploading: boolean) => void;
 };
 
@@ -34,6 +36,7 @@ export function ContentTab({
   page,
   state,
   updateField,
+  persistFields,
   onUploadingChange,
 }: ContentTabProps) {
   return (
@@ -120,6 +123,9 @@ export function ContentTab({
             description="Drawbacks of the alternative approach."
             values={state.pressurePoints}
             onChange={(values) => updateField("pressurePoints", values)}
+            onCommit={(values) =>
+              persistFields({ pressurePoints: [...values] })
+            }
             placeholder="Add a point…"
             addLabel="Add"
           />
@@ -129,6 +135,9 @@ export function ContentTab({
             description="Benefits of your approach."
             values={state.softwashPoints}
             onChange={(values) => updateField("softwashPoints", values)}
+            onCommit={(values) =>
+              persistFields({ softwashPoints: [...values] })
+            }
             placeholder="Add a point…"
             addLabel="Add"
           />
@@ -164,7 +173,7 @@ export function ContentTab({
           </SectionCard>
           <ServicesEditor
             values={state.services}
-            onChange={(values) => updateField("services", values)}
+            onChange={(values) => persistFields({ services: values })}
           />
           <SectionCard title="How it works headings">
             <FieldGroup>
@@ -196,7 +205,7 @@ export function ContentTab({
           </SectionCard>
           <HowItWorksEditor
             values={state.howItWorks}
-            onChange={(values) => updateField("howItWorks", values)}
+            onChange={(values) => persistFields({ howItWorks: values })}
           />
           <SectionCard
             title="About us"
@@ -273,7 +282,9 @@ export function ContentTab({
                   variant="ghost"
                   size="sm"
                   className="self-start"
-                  onClick={() => updateField("aboutPhotoStorageId", undefined)}
+                  onClick={() =>
+                    persistFields({ aboutPhotoStorageId: undefined })
+                  }
                 >
                   Remove team photo
                 </Button>
@@ -343,7 +354,7 @@ export function ContentTab({
           <OfferValueItemsEditor
             values={state.offer.valueItems}
             onChange={(valueItems) =>
-              updateField("offer", { ...state.offer, valueItems })
+              persistFields({ offer: { ...state.offer, valueItems } })
             }
           />
 
@@ -353,6 +364,11 @@ export function ContentTab({
             values={state.offer.bonuses}
             onChange={(bonuses) =>
               updateField("offer", { ...state.offer, bonuses })
+            }
+            onCommit={(bonuses) =>
+              persistFields({
+                offer: { ...state.offer, bonuses: [...bonuses] },
+              })
             }
             placeholder="e.g. Priority booking this week"
             addLabel="Add bonus"
@@ -490,7 +506,7 @@ export function ContentTab({
           </SectionCard>
           <FaqEditor
             values={state.faq}
-            onChange={(values) => updateField("faq", values)}
+            onChange={(values) => persistFields({ faq: values })}
           />
         </TabsContent>
 
@@ -520,7 +536,7 @@ export function ContentTab({
                   size="sm"
                   className="self-start"
                   onClick={() =>
-                    updateField("equipmentPhotoStorageId", undefined)
+                    persistFields({ equipmentPhotoStorageId: undefined })
                   }
                 >
                   Remove equipment photo
@@ -573,7 +589,7 @@ export function ContentTab({
           </SectionCard>
           <TestimonialsEditor
             values={state.testimonials}
-            onChange={(values) => updateField("testimonials", values)}
+            onChange={(values) => persistFields({ testimonials: values })}
           />
         </TabsContent>
       </Tabs>

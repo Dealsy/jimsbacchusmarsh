@@ -106,7 +106,7 @@ export function ServicesEditor({ values, onChange }: ServicesEditorProps) {
   return (
     <ListSection
       title="Services"
-      description="What you offer — shown as cards on the landing page, each with its own detail page. Drag to reorder."
+      description="What you offer — shown as cards on the landing page, each with its own detail page. Drag to reorder. Remove, add, and reorder update the live page immediately."
       addLabel="Add service"
       onAdd={openAdd}
       isEmpty={values.length === 0}

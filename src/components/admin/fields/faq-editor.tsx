@@ -74,7 +74,7 @@ export function FaqEditor({ values, onChange }: FaqEditorProps) {
   return (
     <ListSection
       title="FAQ"
-      description="Questions customers ask — shown as an accordion on the page. Drag to reorder."
+      description="Questions customers ask — shown as an accordion on the page. Drag to reorder. Remove, add, and reorder update the live page immediately."
       addLabel="Add FAQ"
       onAdd={openAdd}
       isEmpty={values.length === 0}

@@ -78,7 +78,7 @@ export function TestimonialsEditor({
   return (
     <ListSection
       title="Testimonials"
-      description="Customer quotes shown on the page. Drag to reorder."
+      description="Customer quotes shown on the page. Drag to reorder. Remove, add, and reorder update the live page immediately."
       addLabel="Add testimonial"
       onAdd={openAdd}
       isEmpty={values.length === 0}

@@ -76,7 +76,7 @@ export function OfferValueItemsEditor({
   return (
     <ListSection
       title="What's included"
-      description="Itemize what they get in the assessment — optional dollar value for stacking (e.g. $150)."
+      description="Itemize what they get in the assessment — optional dollar value for stacking (e.g. $150). Remove, add, and reorder update the live page immediately."
       addLabel="Add item"
       onAdd={openAdd}
       isEmpty={values.length === 0}

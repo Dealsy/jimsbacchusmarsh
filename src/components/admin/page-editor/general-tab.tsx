@@ -3,6 +3,7 @@ import { DEFAULT_REASON_QUESTION } from "convex/lib/reasonQuestionDefaults";
 import { StringListEditor } from "@/components/admin/fields/string-list-editor";
 import type {
   EditorState,
+  PersistEditorFields,
   UpdateEditorField,
 } from "@/components/admin/page-editor-types";
 import { SectionCard, TabIntro } from "@/components/admin/section-card";
@@ -12,9 +13,14 @@ import { Input } from "@/components/ui/input";
 type GeneralTabProps = {
   readonly state: EditorState;
   readonly updateField: UpdateEditorField;
+  readonly persistFields: PersistEditorFields;
 };
 
-export function GeneralTab({ state, updateField }: GeneralTabProps) {
+export function GeneralTab({
+  state,
+  updateField,
+  persistFields,
+}: GeneralTabProps) {
   return (
     <div className="space-y-6 pt-6">
       <TabIntro
@@ -80,6 +86,7 @@ export function GeneralTab({ state, updateField }: GeneralTabProps) {
         description="Suburbs or regions you service."
         values={state.serviceAreas}
         onChange={(values) => updateField("serviceAreas", values)}
+        onCommit={(values) => persistFields({ serviceAreas: [...values] })}
         placeholder="e.g. Bacchus Marsh"
         addLabel="Add area"
       />
@@ -89,6 +96,7 @@ export function GeneralTab({ state, updateField }: GeneralTabProps) {
         description="Choices on the quote form — roof, driveway, etc."
         values={state.surfaceOptions}
         onChange={(values) => updateField("surfaceOptions", values)}
+        onCommit={(values) => persistFields({ surfaceOptions: [...values] })}
         placeholder="e.g. Roof"
         addLabel="Add option"
       />
@@ -114,6 +122,7 @@ export function GeneralTab({ state, updateField }: GeneralTabProps) {
         description="Single-choice answers for why they're getting the job done."
         values={state.reasonOptions}
         onChange={(values) => updateField("reasonOptions", values)}
+        onCommit={(values) => persistFields({ reasonOptions: [...values] })}
         placeholder="e.g. The place just looks tired"
         addLabel="Add option"
       />

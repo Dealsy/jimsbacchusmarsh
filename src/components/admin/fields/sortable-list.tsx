@@ -93,6 +93,7 @@ export function SortableItem({
   const isDragging = draggingIndex === index;
 
   return (
+    // biome-ignore lint/a11y/noStaticElementInteractions: drag-and-drop row
     <div
       ref={itemRef}
       data-sortable-item
@@ -105,10 +106,12 @@ export function SortableItem({
       onDrop={(event) => {
         event.preventDefault();
         setIsOver(false);
-        const fromIndex = Number(
-          event.dataTransfer.getData(SORTABLE_INDEX_MIME),
-        );
-        if (!Number.isNaN(fromIndex)) {
+        const rawIndex = event.dataTransfer.getData(SORTABLE_INDEX_MIME);
+        if (!rawIndex) {
+          return;
+        }
+        const fromIndex = Number(rawIndex);
+        if (Number.isInteger(fromIndex)) {
           onReorder(fromIndex, index);
         }
       }}

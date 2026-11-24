@@ -5,6 +5,7 @@ import type { MutationCtx } from "./_generated/server";
 import { mutation, query } from "./_generated/server";
 import { describeAdminAuthFailure, requireAdmin } from "./lib/adminAuth";
 import { createPageFromTemplate } from "./lib/createPageFromTemplate";
+import { definedFields } from "./lib/definedFields";
 import {
   createPressureWashingSeed,
   PRESSURE_WASHING_SLUG,
@@ -213,7 +214,7 @@ export const update = mutation({
     }
 
     await ctx.db.patch(page._id, {
-      ...args.updates,
+      ...definedFields(args.updates),
       updatedAt: Date.now(),
     });
 

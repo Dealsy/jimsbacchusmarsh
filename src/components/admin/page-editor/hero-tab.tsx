@@ -5,6 +5,7 @@ import { ImageUpload } from "@/components/admin/image-upload";
 import type {
   EditorState,
   LoadedPage,
+  PersistEditorFields,
   UpdateEditorField,
 } from "@/components/admin/page-editor-types";
 import { SectionCard, TabIntro } from "@/components/admin/section-card";
@@ -17,12 +18,14 @@ type HeroTabProps = {
   readonly page: LoadedPage;
   readonly state: EditorState;
   readonly updateField: UpdateEditorField;
+  readonly persistFields: PersistEditorFields;
   readonly onUploadingChange: (uploading: boolean) => void;
 };
 
 export function HeroTab({
   page,
   state,
+  persistFields,
   updateField,
   onUploadingChange,
 }: HeroTabProps) {
@@ -76,6 +79,9 @@ export function HeroTab({
         description="5–6 scannable hooks that mix pain, curiosity, and secrets — shown below the sub-headline."
         values={state.heroIntrigueBullets}
         onChange={(values) => updateField("heroIntrigueBullets", values)}
+        onCommit={(values) =>
+          persistFields({ heroIntrigueBullets: [...values] })
+        }
         placeholder="e.g. Why pressure washing brings mould back…"
         addLabel="Add bullet"
       />
@@ -85,6 +91,7 @@ export function HeroTab({
         description="Short proof points under the headline — e.g. Fully insured."
         values={state.trustStrip}
         onChange={(values) => updateField("trustStrip", values)}
+        onCommit={(values) => persistFields({ trustStrip: [...values] })}
         placeholder="e.g. Fully insured"
         addLabel="Add badge"
       />

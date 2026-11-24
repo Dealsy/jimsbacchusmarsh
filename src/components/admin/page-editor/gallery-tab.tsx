@@ -5,6 +5,7 @@ import { StringListEditor } from "@/components/admin/fields/string-list-editor";
 import { ImageUpload } from "@/components/admin/image-upload";
 import type {
   EditorState,
+  PersistEditorFields,
   UpdateEditorField,
 } from "@/components/admin/page-editor-types";
 import { SectionCard, TabIntro } from "@/components/admin/section-card";
@@ -40,7 +41,7 @@ type GalleryTabProps = {
     itemId: Id<"landingPageGallery">,
     category: string,
   ) => void;
-  readonly onCommitSocialVideos: (values: readonly string[]) => void;
+  readonly persistFields: PersistEditorFields;
 };
 
 export function GalleryTab({
@@ -61,7 +62,7 @@ export function GalleryTab({
   onAddGalleryItem,
   onRemoveGalleryItem,
   onUpdateGalleryCategory,
-  onCommitSocialVideos,
+  persistFields,
 }: GalleryTabProps) {
   const hiddenVideoUrls = state.socialVideoUrls.filter(
     (url) => url.trim().length > 0 && parseSocialVideoUrl(url) === null,
@@ -231,7 +232,9 @@ export function GalleryTab({
               )
             }
             onCommit={(values) =>
-              onCommitSocialVideos(values.map(normalizeSocialVideoInput))
+              persistFields({
+                socialVideoUrls: values.map(normalizeSocialVideoInput),
+              })
             }
             normalize={normalizeSocialVideoInput}
             placeholder="Paste a link or Instagram embed code"
@@ -256,6 +259,7 @@ export function GalleryTab({
           <InterviewVideoField
             value={state.interviewVideoUrl}
             onChange={(value) => updateField("interviewVideoUrl", value)}
+            onRemove={() => persistFields({ interviewVideoUrl: "" })}
           />
         </TabsContent>
       </Tabs>
@@ -266,9 +270,11 @@ export function GalleryTab({
 function InterviewVideoField({
   value,
   onChange,
+  onRemove,
 }: {
   readonly value: string;
   readonly onChange: (value: string) => void;
+  readonly onRemove: () => void;
 }) {
   const trimmed = value.trim();
   const parsed = trimmed ? parseSocialVideoUrl(trimmed) : null;
@@ -280,12 +286,7 @@ function InterviewVideoField({
       description="Shown large under Common questions. Every page starts with the Jim's franchise interview. Remove it to hide the video on this page."
       action={
         trimmed ? (
-          <Button
-            type="button"
-            variant="outline"
-            size="sm"
-            onClick={() => onChange("")}
-          >
+          <Button type="button" variant="outline" size="sm" onClick={onRemove}>
             Remove
           </Button>
         ) : null

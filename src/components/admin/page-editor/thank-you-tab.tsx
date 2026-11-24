@@ -1,6 +1,7 @@
 import { HowItWorksEditor } from "@/components/admin/fields/how-it-works-editor";
 import type {
   EditorState,
+  PersistEditorFields,
   UpdateEditorField,
 } from "@/components/admin/page-editor-types";
 import { SectionCard, TabIntro } from "@/components/admin/section-card";
@@ -12,9 +13,14 @@ import { Textarea } from "@/components/ui/textarea";
 type ThankYouTabProps = {
   readonly state: EditorState;
   readonly updateField: UpdateEditorField;
+  readonly persistFields: PersistEditorFields;
 };
 
-export function ThankYouTab({ state, updateField }: ThankYouTabProps) {
+export function ThankYouTab({
+  state,
+  updateField,
+  persistFields,
+}: ThankYouTabProps) {
   return (
     <div className="space-y-6 pt-6">
       <TabIntro
@@ -88,9 +94,11 @@ export function ThankYouTab({ state, updateField }: ThankYouTabProps) {
                 id="thank-you-use-how-it-works"
                 checked={state.thankYou.useHowItWorksSteps}
                 onCheckedChange={(checked) =>
-                  updateField("thankYou", {
-                    ...state.thankYou,
-                    useHowItWorksSteps: checked === true,
+                  persistFields({
+                    thankYou: {
+                      ...state.thankYou,
+                      useHowItWorksSteps: checked === true,
+                    },
                   })
                 }
               />
@@ -103,9 +111,11 @@ export function ThankYouTab({ state, updateField }: ThankYouTabProps) {
             <HowItWorksEditor
               values={state.thankYou.nextSteps}
               onChange={(values) =>
-                updateField("thankYou", {
-                  ...state.thankYou,
-                  nextSteps: values,
+                persistFields({
+                  thankYou: {
+                    ...state.thankYou,
+                    nextSteps: values,
+                  },
                 })
               }
             />

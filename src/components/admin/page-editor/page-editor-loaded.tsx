@@ -19,30 +19,17 @@ import { ThemeTab } from "@/components/admin/page-editor/theme-tab";
 import type {
   EditorState,
   LoadedPage,
+  PersistEditorFields,
   UpdateEditorField,
 } from "@/components/admin/page-editor-types";
 import { capturePostHogEvent } from "@/components/analytics/posthog";
 import { LinkButton } from "@/components/ui/link-button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
-  sanitizeAbout,
-  sanitizeClose,
-  sanitizeFaq,
-  sanitizeGuarantee,
-  sanitizeHowItWorks,
-  sanitizeOffer,
-  sanitizeServices,
-  sanitizeTestimonials,
-  sanitizeThankYou,
-  sanitizeTheme,
-  sanitizeUrgency,
-} from "@/lib/editor-sanitize";
-import {
-  optionalTrim,
-  parseGoogleRating,
-  parseGoogleReviewCount,
-  trimStringList,
-} from "@/lib/editor-string";
+  buildPageUpdates,
+  pageUpdatesForPatch,
+  saveFailureMessage,
+} from "@/lib/editor-page-updates";
 
 type PageEditorLoadedProps = {
   readonly slug: string;
@@ -67,6 +54,9 @@ export function PageEditorLoaded({
 
   const [state, setState] = useState<EditorState>(initialState);
   const [message, setMessage] = useState<string | null>(null);
+  const [messageTone, setMessageTone] = useState<"neutral" | "error">(
+    "neutral",
+  );
   const [saving, setSaving] = useState(false);
   const [activeUploads, setActiveUploads] = useState(0);
   const [newBeforeId, setNewBeforeId] = useState<Id<"_storage"> | undefined>();
@@ -76,7 +66,8 @@ export function PageEditorLoaded({
   const [createdGalleryCategories, setCreatedGalleryCategories] = useState<
     string[]
   >([]);
-  const socialVideoSave = useRef(Promise.resolve());
+  const stateRef = useRef(initialState);
+  const saveQueue = useRef<Promise<void>>(Promise.resolve());
 
   function handleUploadingChange(uploading: boolean): void {
     setActiveUploads((count) => {
@@ -94,140 +85,79 @@ export function PageEditorLoaded({
     createdGalleryCategories,
   );
 
-  const updateField: UpdateEditorField = (key, value) => {
-    setState((current) => ({ ...current, [key]: value }));
-  };
-
-  function handleCommitSocialVideos(values: readonly string[]): void {
-    const socialVideos = trimStringList(values);
-    setState((current) => ({ ...current, socialVideoUrls: socialVideos }));
-    socialVideoSave.current = socialVideoSave.current
-      .catch(() => undefined)
-      .then(async () => {
-        try {
-          const result = await updatePage({
-            slug,
-            updates: { socialVideos },
-          });
-          setMessage(
-            result.success
-              ? "Live page updated."
-              : (result.error ?? "Could not update the live page."),
-          );
-        } catch {
-          setMessage("Could not update the live page.");
-        }
-      });
+  function applyPatch(patch: Partial<EditorState>): EditorState {
+    const next = { ...stateRef.current, ...patch };
+    stateRef.current = next;
+    setState(next);
+    return next;
   }
 
+  function showStatus(text: string, tone: "neutral" | "error"): void {
+    setMessage(text);
+    setMessageTone(tone);
+  }
+
+  function enqueueSave(run: () => Promise<void>): Promise<void> {
+    const next = saveQueue.current.then(run, run);
+    saveQueue.current = next.then(
+      () => undefined,
+      () => undefined,
+    );
+    return next;
+  }
+
+  const updateField: UpdateEditorField = (key, value) => {
+    applyPatch({ [key]: value } as Partial<EditorState>);
+  };
+
+  const persistFields: PersistEditorFields = (patch) => {
+    const drafted = { ...stateRef.current, ...patch };
+    const updates = pageUpdatesForPatch(patch, drafted);
+    const next = updates.services
+      ? { ...drafted, services: updates.services }
+      : drafted;
+    stateRef.current = next;
+    setState(next);
+    if (Object.keys(updates).length === 0) {
+      return;
+    }
+
+    void enqueueSave(async () => {
+      try {
+        const result = await updatePage({ slug, updates });
+        showStatus(
+          result.success
+            ? "Live page updated."
+            : (result.error ?? "Could not update the live page."),
+          result.success ? "neutral" : "error",
+        );
+      } catch (error) {
+        showStatus(saveFailureMessage(error), "error");
+      }
+    });
+  };
+
   async function handleSave(): Promise<void> {
-    const currentState = state;
     setSaving(true);
     setMessage(null);
+    setMessageTone("neutral");
 
     try {
-      const result = await updatePage({
-        slug,
-        updates: {
-          name: currentState.name.trim(),
-          seoTitle: currentState.seoTitle.trim(),
-          seoDescription: currentState.seoDescription.trim(),
-          businessName: currentState.businessName.trim(),
-          phone: currentState.phone.trim(),
-          serviceAreas: trimStringList(currentState.serviceAreas),
-          offerText: sanitizeOffer(currentState.offer).headline,
-          ctaLabel: currentState.ctaLabel.trim(),
-          hero: {
-            headline: currentState.heroHeadline.trim(),
-            subheadline: currentState.heroSubheadline.trim(),
-            trustStrip: trimStringList(currentState.trustStrip),
-            imageStorageId: currentState.heroImageStorageId,
-            logoStorageId: currentState.heroLogoStorageId,
-            videoStorageId: currentState.heroVideoStorageId,
-            backgroundKind: currentState.heroBackgroundKind,
-            audienceCallout:
-              currentState.heroAudienceCallout.trim() || undefined,
-            intrigueBullets: trimStringList(currentState.heroIntrigueBullets),
-          },
-          problem: { body: currentState.problemBody.trim() },
-          wedge: {
-            headline: optionalTrim(currentState.wedgeHeadline),
-            description: optionalTrim(currentState.wedgeDescription),
-            negativeTitle: optionalTrim(currentState.wedgeNegativeTitle),
-            positiveTitle: optionalTrim(currentState.wedgePositiveTitle),
-            pressureWashPoints: trimStringList(currentState.pressurePoints),
-            softwashPoints: trimStringList(currentState.softwashPoints),
-          },
-          offer: sanitizeOffer(currentState.offer),
-          guarantee: sanitizeGuarantee(currentState.guarantee),
-          urgency: sanitizeUrgency(currentState.urgency),
-          close: sanitizeClose(currentState.close),
-          thankYou: (() => {
-            const sanitized = sanitizeThankYou(currentState.thankYou);
-            return {
-              headline: sanitized.headline,
-              body: sanitized.body,
-              phonePrompt: sanitized.phonePrompt,
-              nextStepsTitle: sanitized.nextStepsTitle,
-              useHowItWorksSteps: sanitized.useHowItWorksSteps,
-              nextSteps: sanitized.useHowItWorksSteps
-                ? undefined
-                : sanitized.nextSteps,
-            };
-          })(),
-          services: sanitizeServices(currentState.services),
-          howItWorks: sanitizeHowItWorks(currentState.howItWorks),
-          faq: sanitizeFaq(currentState.faq),
-          testimonials: sanitizeTestimonials(currentState.testimonials),
-          metaPixelId: currentState.metaPixelId.trim() || undefined,
-          googleAdsId: currentState.googleAdsId.trim() || undefined,
-          googleConversionLabel:
-            currentState.googleConversionLabel.trim() || undefined,
-          googleReviewUrl: currentState.googleReviewUrl.trim() || undefined,
-          googleRating: parseGoogleRating(currentState.googleRating),
-          googleReviewCount: parseGoogleReviewCount(
-            currentState.googleReviewCount,
-          ),
-          leadServiceType: currentState.leadServiceType.trim(),
-          surfaceOptions: trimStringList(currentState.surfaceOptions),
-          reasonQuestion: currentState.reasonQuestion.trim() || undefined,
-          reasonOptions: trimStringList(currentState.reasonOptions),
-          servicesSectionTitle: optionalTrim(currentState.servicesSectionTitle),
-          servicesSectionDescription: optionalTrim(
-            currentState.servicesSectionDescription,
-          ),
-          gallerySectionTitle: optionalTrim(currentState.gallerySectionTitle),
-          gallerySectionDescription: optionalTrim(
-            currentState.gallerySectionDescription,
-          ),
-          socialVideos: trimStringList(currentState.socialVideoUrls),
-          interviewVideoUrl: currentState.interviewVideoUrl.trim(),
-          howItWorksSectionTitle: optionalTrim(
-            currentState.howItWorksSectionTitle,
-          ),
-          howItWorksSectionDescription: optionalTrim(
-            currentState.howItWorksSectionDescription,
-          ),
-          faqSectionTitle: optionalTrim(currentState.faqSectionTitle),
-          equipmentPhotoStorageId: currentState.equipmentPhotoStorageId ?? null,
-          about: sanitizeAbout({
-            headline: currentState.aboutHeadline,
-            body: currentState.aboutBody,
-            photoStorageId: currentState.aboutPhotoStorageId,
-            founderName: currentState.aboutFounderName,
-            yearsLocal: currentState.aboutYearsLocal,
-            jobsCompleted: currentState.aboutJobsCompleted,
-          }),
-          theme: sanitizeTheme(currentState.theme),
-        },
+      await enqueueSave(async () => {
+        const result = await updatePage({
+          slug,
+          updates: buildPageUpdates(stateRef.current),
+        });
+        showStatus(
+          result.success ? "Saved." : (result.error ?? "Save failed."),
+          result.success ? "neutral" : "error",
+        );
+        if (result.success) {
+          capturePostHogEvent("landing_page_saved", { page_slug: slug });
+        }
       });
-
-      setMessage(result.success ? "Saved." : (result.error ?? "Save failed."));
-      if (result.success) {
-        capturePostHogEvent("landing_page_saved", { page_slug: slug });
-      }
-    } catch {
-      setMessage("Save failed.");
+    } catch (error) {
+      showStatus(saveFailureMessage(error), "error");
     } finally {
       setSaving(false);
     }
@@ -238,7 +168,10 @@ export function PageEditorLoaded({
     if (result.success) {
       capturePostHogEvent("landing_page_published", { page_slug: slug });
     }
-    setMessage(result.success ? "Published." : (result.error ?? "Failed."));
+    showStatus(
+      result.success ? "Published." : (result.error ?? "Failed."),
+      result.success ? "neutral" : "error",
+    );
   }
 
   async function handleUnpublish(): Promise<void> {
@@ -246,12 +179,15 @@ export function PageEditorLoaded({
     if (result.success) {
       capturePostHogEvent("landing_page_unpublished", { page_slug: slug });
     }
-    setMessage(result.success ? "Unpublished." : (result.error ?? "Failed."));
+    showStatus(
+      result.success ? "Unpublished." : (result.error ?? "Failed."),
+      result.success ? "neutral" : "error",
+    );
   }
 
   async function handleAddGalleryItem(): Promise<void> {
     if (!newBeforeId || !newAfterId) {
-      setMessage("Upload both before and after images.");
+      showStatus("Upload both before and after images.", "error");
       return;
     }
 
@@ -272,7 +208,7 @@ export function PageEditorLoaded({
     setNewAfterId(undefined);
     setNewGalleryLabel("");
     setNewGalleryCategory("");
-    setMessage("Gallery item added.");
+    showStatus("Gallery item added.", "neutral");
   }
 
   async function handleRemoveGalleryItem(
@@ -314,6 +250,7 @@ export function PageEditorLoaded({
         saving={saving}
         uploading={activeUploads > 0}
         message={message}
+        messageTone={messageTone}
         onSave={handleSave}
         onPublish={handlePublish}
         onUnpublish={handleUnpublish}
@@ -333,7 +270,11 @@ export function PageEditorLoaded({
         </TabsList>
 
         <TabsContent value="general">
-          <GeneralTab state={state} updateField={updateField} />
+          <GeneralTab
+            state={state}
+            updateField={updateField}
+            persistFields={persistFields}
+          />
         </TabsContent>
 
         <TabsContent value="seo">
@@ -345,6 +286,7 @@ export function PageEditorLoaded({
             page={page}
             state={state}
             updateField={updateField}
+            persistFields={persistFields}
             onUploadingChange={handleUploadingChange}
           />
         </TabsContent>
@@ -354,12 +296,17 @@ export function PageEditorLoaded({
             page={page}
             state={state}
             updateField={updateField}
+            persistFields={persistFields}
             onUploadingChange={handleUploadingChange}
           />
         </TabsContent>
 
         <TabsContent value="thank-you">
-          <ThankYouTab state={state} updateField={updateField} />
+          <ThankYouTab
+            state={state}
+            updateField={updateField}
+            persistFields={persistFields}
+          />
         </TabsContent>
 
         <TabsContent value="theme">
@@ -391,7 +338,7 @@ export function PageEditorLoaded({
             onUpdateGalleryCategory={(itemId, category) => {
               void handleUpdateGalleryCategory(itemId, category);
             }}
-            onCommitSocialVideos={handleCommitSocialVideos}
+            persistFields={persistFields}
           />
         </TabsContent>
 

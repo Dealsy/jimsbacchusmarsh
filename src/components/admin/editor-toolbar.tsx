@@ -5,6 +5,7 @@ import { ExternalLinkIcon, SaveIcon } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { LinkButton } from "@/components/ui/link-button";
+import { cn } from "@/lib/utils";
 
 type EditorToolbarProps = {
   readonly pageName: string;
@@ -13,6 +14,7 @@ type EditorToolbarProps = {
   readonly saving: boolean;
   readonly uploading?: boolean;
   readonly message: string | null;
+  readonly messageTone?: "neutral" | "error";
   readonly onSave: () => void;
   readonly onPublish: () => void;
   readonly onUnpublish: () => void;
@@ -25,6 +27,7 @@ export function EditorToolbar({
   saving,
   uploading = false,
   message,
+  messageTone = "neutral",
   onSave,
   onPublish,
   onUnpublish,
@@ -46,7 +49,14 @@ export function EditorToolbar({
 
         <div className="flex flex-wrap items-center gap-2">
           {message ? (
-            <span className="hidden text-sm text-muted-foreground sm:inline">
+            <span
+              className={cn(
+                "hidden text-sm sm:inline",
+                messageTone === "error"
+                  ? "text-destructive"
+                  : "text-muted-foreground",
+              )}
+            >
               {message}
             </span>
           ) : null}
@@ -60,7 +70,7 @@ export function EditorToolbar({
             Live page
           </LinkButton>
           <span className="hidden text-xs text-muted-foreground lg:inline">
-            Live page updates automatically when saved — keep the tab open
+            Removals update the live page immediately
           </span>
           <LinkButton
             href={`/admin/${slug}/preview`}
@@ -101,7 +111,14 @@ export function EditorToolbar({
         </div>
       </div>
       {message ? (
-        <p className="mx-auto mt-2 max-w-6xl text-sm text-muted-foreground sm:hidden">
+        <p
+          className={cn(
+            "mx-auto mt-2 max-w-6xl text-sm sm:hidden",
+            messageTone === "error"
+              ? "text-destructive"
+              : "text-muted-foreground",
+          )}
+        >
           {message}
         </p>
       ) : null}
