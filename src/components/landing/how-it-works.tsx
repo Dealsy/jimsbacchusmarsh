@@ -1,6 +1,9 @@
+import { LandingSection } from "@/components/landing/shell/landing-section";
+import { Reveal } from "@/components/landing/shell/reveal";
+import { SectionHeading } from "@/components/landing/shell/section-heading";
 import { resolveHowItWorksSection } from "@/lib/landing-page-content";
-import { landingSectionSurfaceClass } from "@/lib/landing-section-surface";
 import type { PublishedLandingPage } from "@/lib/types/landing-page";
+import { cn } from "@/lib/utils";
 
 type HowItWorksProps = {
   readonly page: PublishedLandingPage;
@@ -11,36 +14,55 @@ export function HowItWorks({ page }: HowItWorksProps) {
   const sorted = [...page.howItWorks].sort((a, b) => a.step - b.step);
 
   return (
-    <section className={`${landingSectionSurfaceClass("band")} py-16 md:py-20`}>
-      <div className="mx-auto max-w-6xl space-y-10 px-4">
-        <div className="mx-auto max-w-2xl space-y-4 text-center">
-          <h2 className="font-heading text-3xl font-bold tracking-tight md:text-4xl">
-            {section.title}
-          </h2>
-          <p className="text-muted-foreground">{section.description}</p>
-        </div>
-        <ol className="relative grid gap-8 md:grid-cols-3">
-          {sorted.length > 1 ? (
-            <div
-              aria-hidden
-              className="pointer-events-none absolute top-6 right-[16.666%] left-[16.666%] hidden h-0.5 bg-primary/25 md:block"
-            />
-          ) : null}
-          {sorted.map((step) => (
-            <li key={step.step} className="relative space-y-4 text-center">
-              <div className="relative z-10 mx-auto flex size-12 items-center justify-center rounded-full bg-primary text-lg font-bold text-primary-foreground">
+    <LandingSection tone="dark" containerClassName="space-y-12 md:space-y-16">
+      <Reveal>
+        <SectionHeading
+          eyebrow="The process"
+          title={section.title}
+          description={section.description}
+        />
+      </Reveal>
+      <ol className="relative grid gap-0 md:grid-cols-3 md:gap-6">
+        {sorted.map((step, index) => (
+          <li key={step.step} className="relative">
+            <Reveal
+              delay={index * 120}
+              className={cn(
+                "relative grid h-full grid-cols-[3rem_1fr] gap-x-5 md:block md:rounded-3xl md:bg-white/[0.04] md:p-8 md:ring-1 md:ring-white/10 md:backdrop-blur-sm",
+                index < sorted.length - 1 && "pb-10",
+              )}
+            >
+              {index < sorted.length - 1 ? (
+                <span
+                  aria-hidden
+                  className="absolute top-12 bottom-0 left-6 w-px bg-linear-to-b from-white/30 to-white/5 md:hidden"
+                />
+              ) : null}
+              <span className="relative z-10 flex size-12 items-center justify-center rounded-full bg-white/10 font-heading text-lg font-bold ring-1 ring-white/20 backdrop-blur-md md:hidden">
                 {step.step}
+              </span>
+              <span
+                aria-hidden
+                className="mb-6 hidden font-heading text-7xl leading-none font-bold text-transparent md:block"
+                style={{
+                  WebkitTextStroke:
+                    "1.5px color-mix(in srgb, var(--landing-primary) 55%, white)",
+                }}
+              >
+                {String(step.step).padStart(2, "0")}
+              </span>
+              <div className="space-y-2 pt-2 md:pt-0">
+                <h3 className="font-heading text-xl font-semibold md:text-2xl">
+                  {step.title}
+                </h3>
+                <p className="text-[0.9375rem] leading-relaxed text-muted-foreground">
+                  {step.description}
+                </p>
               </div>
-              <h3 className="font-heading text-xl font-semibold">
-                {step.title}
-              </h3>
-              <p className="text-sm leading-relaxed text-muted-foreground">
-                {step.description}
-              </p>
-            </li>
-          ))}
-        </ol>
-      </div>
-    </section>
+            </Reveal>
+          </li>
+        ))}
+      </ol>
+    </LandingSection>
   );
 }

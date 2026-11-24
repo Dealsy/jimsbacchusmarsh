@@ -1,6 +1,6 @@
 "use client";
 
-import { BadgeCheckIcon, StarIcon } from "lucide-react";
+import { BadgeCheckIcon, QuoteIcon, StarIcon } from "lucide-react";
 import { startTransition, useState, ViewTransition } from "react";
 
 import { Button } from "@/components/ui/button";
@@ -75,8 +75,12 @@ export function ReviewCard({ quote, author, location }: ReviewCardProps) {
 
   return (
     <ViewTransition default="none" update="review-expand">
-      <Card className="h-full rounded-2xl border-border/80 bg-background py-4 shadow-md">
-        <CardContent className="flex h-full flex-col gap-3 px-4">
+      <Card className="relative h-full rounded-3xl bg-background py-5 shadow-elevated ring-border/70 transition-transform duration-300 md:hover:-translate-y-1">
+        <QuoteIcon
+          aria-hidden
+          className="pointer-events-none absolute right-4 bottom-3 size-14 fill-primary/10 text-transparent"
+        />
+        <CardContent className="relative flex h-full flex-col gap-3 px-5">
           <header className="flex items-start justify-between gap-2">
             <div className="flex min-w-0 items-center gap-2.5">
               <span
@@ -105,8 +109,8 @@ export function ReviewCard({ quote, author, location }: ReviewCardProps) {
           <div className="flex min-h-0 flex-1 flex-col">
             <div
               className={cn(
-                "overflow-hidden text-sm leading-5 text-foreground",
-                canToggle && "min-h-20",
+                "overflow-hidden text-[0.9375rem] leading-6 text-foreground",
+                canToggle && "min-h-24",
                 !expanded && canToggle && "line-clamp-4",
               )}
             >

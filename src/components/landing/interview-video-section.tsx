@@ -1,5 +1,6 @@
+import { LandingSection } from "@/components/landing/shell/landing-section";
+import { Reveal } from "@/components/landing/shell/reveal";
 import { resolveInterviewVideo } from "@/lib/interview-video";
-import { landingSectionSurfaceClass } from "@/lib/landing-section-surface";
 import type { PublishedLandingPage } from "@/lib/types/landing-page";
 
 type InterviewVideoSectionProps = {
@@ -13,11 +14,15 @@ export function InterviewVideoSection({ page }: InterviewVideoSectionProps) {
   }
 
   return (
-    <section
-      className={`${landingSectionSurfaceClass("plain")} py-16 md:py-20`}
-    >
-      <div className="mx-auto max-w-7xl px-4">
-        <div className="overflow-hidden rounded-2xl border bg-background shadow-sm">
+    <LandingSection tone="dark" width="wide" className="max-md:pt-6">
+      <Reveal>
+        <div
+          className="overflow-hidden rounded-3xl bg-black ring-1 ring-white/15"
+          style={{
+            boxShadow:
+              "0 40px 120px -30px color-mix(in srgb, var(--landing-primary) 55%, transparent), 0 24px 48px -16px rgb(0 0 0 / 0.5)",
+          }}
+        >
           <div className="relative aspect-video w-full">
             <iframe
               src={video.embedUrl}
@@ -30,7 +35,7 @@ export function InterviewVideoSection({ page }: InterviewVideoSectionProps) {
             />
           </div>
         </div>
-      </div>
-    </section>
+      </Reveal>
+    </LandingSection>
   );
 }
